@@ -46,7 +46,8 @@ The `GeneticAlgorithm` class takes the following inputs:
 - `crossover_method` (optional): The method used for crossover. Available options are "Between", "Midpoint", and "Either Or". Default is "Between".
     - *Between*: In this method, the child's genes are chosen to be a random value between the corresponding genes of the two parents. 
     - *Midpoint*: In this method, the child's genes are chosen to be the average of the corresponding genes of the two parents. 
-    - *Either Or*: In this method, the child's genes are chosen to be either the corresponding gene of the first parent or the second parent. 
+    - *Either Or*: In this method, the child's genes are chosen to be either the corresponding gene of the first parent or the second parent.
+    - *None*: No crossover is used, new individuals are created by mutating the previous generation.
 - `number_of_parameters` (optional): The number of parameters. Default is the length of `param_ranges`.
 
 - `mutation_mode` (optional): The mode used for mutation. Available options are "additive", "multiplicative", and "random". Default is "additive" for all parameters.

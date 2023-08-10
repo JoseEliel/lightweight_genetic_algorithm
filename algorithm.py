@@ -54,7 +54,8 @@ class GeneticAlgorithm:
         crossover_methods = {
             "between": CrossoverBetween(),
             "midpoint": CrossoverMidpoint(),
-            "either or": CrossoverEitherOr()
+            "either or": CrossoverEitherOr(), 
+            "none": "none"
         }
         if crossover_method.lower() not in crossover_methods:
             warnings.warn(f"Invalid crossover method '{crossover_method}'. Defaulting to 'Between'. Available options are: {', '.join(crossover_methods.keys())}. Defaulting to 'Between'!")
@@ -132,15 +133,18 @@ class GeneticAlgorithm:
         for generation in range(n_generations):
             # Apply crossover and mutation to create new population
             new_population = []
-            for _ in range(population_size):
-                # Select two parents randomly
-                num_individuals = population.shape[0]
-                random_indices = np.random.choice(num_individuals, 2, replace=False)
-                parent1 = population[random_indices[0], :]
-                parent2 = population[random_indices[1], :]
-                parents = np.array([parent1, parent2])
-                # Create child by crossover
-                child = self.crossover_method.crossover(parents[0], parents[1])
+            for i in range(population_size):
+                if self.crossover_method == "none":
+                    # If no crossover, take the individual directly from the current population
+                    child = population[i]
+                else:
+                    # Select two parents randomly
+                    random_indices = np.random.choice(population_size, 2, replace=False)
+                    parent1 = population[random_indices[0], :]
+                    parent2 = population[random_indices[1], :]
+                    # Create child by crossover
+                    child = self.crossover_method.crossover(parent1, parent2)
+
                 # Apply mutation
                 child = self.mutation(child)
                 new_population.append(child)
@@ -154,6 +158,6 @@ class GeneticAlgorithm:
             if generation in print_generations or generation == 0:
                 average_fitness = np.mean([self.survival(individual) for individual in population])
                 print(f"Generation {generation}, Average Fitness: {average_fitness}")
-             
+                print(f"Size of current population: {len(population)}, Combined population before selection: {len(combined_population)}")
 
         return population
