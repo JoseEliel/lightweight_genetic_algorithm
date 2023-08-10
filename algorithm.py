@@ -5,6 +5,39 @@ import matplotlib.pyplot as plt
 import warnings
 
 class GeneticAlgorithm:
+    """
+    A class used to represent a Genetic Algorithm
+
+    Attributes
+    ----------
+    survival_function : function
+        A function that calculates the survival score of an individual
+    param_ranges : list
+        A list of tuples representing the range of each parameter
+    crossover_method : str
+        The method used for crossover (default is "Between")
+    number_of_parameters : int
+        The number of parameters (default is the length of param_ranges)
+    mutation_mode : list
+        The mode used for mutation (default is "additive" for all parameters)
+    mutation_rate : float
+        The rate of mutation (default is 1.0/number_of_parameters)
+    diversity : Diversity
+        An instance of the Diversity class used to calculate diversity scores
+
+    Methods
+    -------
+    create_initial_population(n)
+        Creates an initial population of n individuals
+    survival(point)
+        Calculates the survival score of an individual
+    select_survivors(population, surviving_population_size)
+        Selects the best individuals from a population
+    mutation(point)
+        Mutates an individual
+    run(n_generations, population_size)
+        Runs the genetic algorithm for a specified number of generations
+    """
     def __init__(self, survival_function, param_ranges, crossover_method="Between", number_of_parameters=None, mutation_mode=None, mutation_rate=None, distance=None):
         self.survival_function = survival_function
         self.param_ranges = param_ranges
@@ -40,13 +73,11 @@ class GeneticAlgorithm:
         return self.survival_function(point)
 
     def select_survivors(self, population, surviving_population_size):
-        # Initialize a 2D array to store the index and survival score of each individual
-        SurvSort = np.zeros((len(population), 2))
+        # Compute the survival scores for all individuals at once
+        survival_scores = np.apply_along_axis(self.survival, 1, population)
 
-        # Compute the survival score for each individual
-        for i in range(len(population)):
-            SurvSort[i][0] = i  # Store the index
-            SurvSort[i][1] = self.survival(population[i])  # Compute and store the survival score
+        # Create a 2D array to store the index and survival score of each individual
+        SurvSort = np.column_stack((np.arange(len(population)), survival_scores))
 
         # Initialize a 2D array to store the selected survivors
         survivors = np.zeros((surviving_population_size, len(population[0])))
@@ -62,8 +93,7 @@ class GeneticAlgorithm:
             # Update the survival scores of the remaining individuals
             for j in range(i + 1, len(population)):
                 # Compute the diversity score between the selected individual and the j-th individual
-                diversity_score = self.diversity.compute_diversity(population[int(SurvSort[j, 0])], survivors[i],surviving_population_size)
-                #diversity_score = 0
+                diversity_score = self.diversity.compute_diversity(population[int(SurvSort[j, 0])], survivors[i], surviving_population_size)
                 # Add the diversity score to the survival score of the j-th individual
                 SurvSort[j, 1] += diversity_score
 
@@ -92,7 +122,6 @@ class GeneticAlgorithm:
                         point[i] += np.random.uniform(low=self.param_ranges[i][0], high=self.param_ranges[i][1])
         return point
     
-
     def run(self, n_generations, population_size):
         # Create initial population
         population = self.create_initial_population(population_size)
@@ -122,11 +151,6 @@ class GeneticAlgorithm:
 
             # Select the best individuals to form the next generation
             population = self.select_survivors(combined_population, population_size)
-
-            # Compute and print averages at specified generations
-            #if generation in print_generations:
-            #    averages = self.compute_averages(population)
-            #    print(f"Generation {generation}: chi^2  = {averages[0]}, sigma_chi^2 = {averages[1]}, diversity measure = {averages[2]}")
 
             if generation in print_generations or generation == 0:
                 average_fitness = np.mean([self.survival(individual) for individual in population])

@@ -1,6 +1,21 @@
 import numpy as np
 
 class Diversity:
+    """
+    A class to calculate the diversity score between two individuals.
+
+    ...
+
+    Attributes
+    ----------
+    number_of_parameters : int
+        The number of parameters for each individual.
+
+    Methods
+    -------
+    compute_diversity(point, survivor, population_size):
+        Calculates the diversity score between an individual and a survivor.
+    """
     def __init__(self, number_of_parameters):
         self.number_of_parameters = number_of_parameters
 

@@ -1,66 +1,66 @@
-# Lightweight Genetic Algorithm
+# README.md
 
-This package provides an intuitive, flexible, and efficient implementation of a genetic algorithm in Python. It is designed to be easy to use while still providing a high degree of flexibility for a wide range of optimization problems.
+## Lightweight Genetic Algorithm
 
-## Features
+This package provides an intuitive, flexible, and efficient implementation of a genetic algorithm in Python. It is designed to be easy to use while still providing a high degree of flexibility for a wide range of optimization problems. The package is developed by Eliel Camargo-Molina and Jonas Wessén.
 
-- Supports multiple crossover methods: "Between", "Midpoint", and "Either Or".
-- Allows for additive mutation.
-- Includes a diversity mechanism to maintain a diverse population.
-- The survival function can be customized to suit your specific optimization problem.
+The genetic algorithm implemented in this package includes features such as multiple crossover methods, mutation modes, and a unique diversity calculation that makes it effective even for small populations and few generations.
 
-## Installation
+### Installation
 
-You can install the package via pip:
+You can install the package using pip:
 
 ```bash
-pip install lightweight_genetic_algorithm
+pip install lightweight-genetic-algorithm
 ```
 
-## Usage
+### Usage
 
-Here is a basic example of how to use the package:
+The main class in the package is `GeneticAlgorithm`. Here is an example of how to use it:
 
 ```python
-from simple_genetic_algorithm import GeneticAlgorithm
+from lightweight_genetic_algorithm import GeneticAlgorithm
 
 # Define your survival function
 def survival_function(individual):
-    # This is just an example. Replace with your actual survival function.
     return sum(individual)
 
-# Define the ranges for your parameters
+# Define the range of your parameters
 param_ranges = [(0, 1), (0, 1), (0, 1)]
 
-# Create the genetic algorithm
+# Create a GeneticAlgorithm instance
 ga = GeneticAlgorithm(survival_function, param_ranges)
 
 # Run the genetic algorithm
 population = ga.run(n_generations=100, population_size=50)
-
-# The final population is returned. You can extract the best individual, etc.
 ```
 
-### Creating the GeneticAlgorithm class
+### Inputs
 
-The `GeneticAlgorithm` class is the main class of the package. It is initialized with the following parameters:
+The `GeneticAlgorithm` class takes the following inputs:
 
-- `survival_function`: A function that takes an individual (a list of parameter values) and returns a fitness score. The higher the score, the better the individual. This is a required parameter.
-- `param_ranges`: A list of tuples, where each tuple represents the lower and upper bounds for a parameter. This is a required parameter.
-- `crossover_method` (optional): A string that specifies the crossover method to use. Can be "Between", "Midpoint", or "Either Or". Default is "Between".
-- `number_of_parameters` (optional): The number of parameters in an individual. If not provided, it is inferred from the length of `param_ranges`.
-- `additive_mutation` (optional): A list of booleans that specify whether additive mutation should be applied to each parameter. If not provided, no additive mutation is applied.
-- `mutation_rate` (optional): The probability of mutation for each parameter. If not provided, it is set to 1 divided by the number of parameters.
+- `survival_function`: A function that calculates the survival score of an individual. This function should take a list of parameters as input and return a single number.
 
-### Running the Genetic Algorithm
+- `param_ranges`: A list of tuples representing the range of each parameter. Each tuple should contain two numbers, with the first number being the lower bound and the second number being the upper bound.
 
-The genetic algorithm is run using the `run` method of the `GeneticAlgorithm` class. It takes the following parameters:
+- `crossover_method` (optional): The method used for crossover. Available options are "Between", "Midpoint", and "Either Or". Default is "Between".
+    - *Between*: In this method, the child's genes are chosen to be a random value between the corresponding genes of the two parents. 
+    - *Midpoint*: In this method, the child's genes are chosen to be the average of the corresponding genes of the two parents. 
+    - *Either Or*: In this method, the child's genes are chosen to be either the corresponding gene of the first parent or the second parent. 
+- `number_of_parameters` (optional): The number of parameters. Default is the length of `param_ranges`.
 
-- `n_generations`: The number of generations to run the algorithm for. This is a required parameter.
-- `population_size`: The size of the population in each generation. This is a required parameter.
+- `mutation_mode` (optional): The mode used for mutation. Available options are "additive", "multiplicative", and "random". Default is "additive" for all parameters.
+  * *Additive*: In this mode, a random value within the range of the parameter is added to the gene. 
+  * *Multiplicative*: In this mode, the gene is multiplied by a random value between -2 and 2. 
+  * *Random*: In this mode, the algorithm randomly chooses between additive and multiplicative mutation for each gene.
 
-The `run` method returns the final population after running the algorithm for the specified number of generations.
 
-## License
+- `mutation_rate` (optional): The rate of mutation. Default is 1.0/number_of_parameters.
 
-This project is licensed under the MIT License.
+### Features
+
+- **Multiple Crossover Methods**: The package provides three different crossover methods: "Between", "Midpoint", and "Either Or". This allows you to choose the method that best suits your problem.
+
+- **Multiple Mutation Modes**: The package provides three different mutation modes: "additive", "multiplicative", and "random". This allows you to choose the mode that best suits your problem.
+
+- **Diversity Calculation**: The package includes a unique diversity calculation that makes the algorithm effective even for small populations and few generations. This calculation is based on the Euclidean distance between individuals and is designed to promote diversity in the population.
