@@ -1,7 +1,6 @@
 import numpy as np
 from .diversity import Diversity
 from .crossover import CrossoverBetween, CrossoverMidpoint, CrossoverEitherOr
-import matplotlib.pyplot as plt
 import warnings
 
 class GeneticAlgorithm:

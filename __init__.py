@@ -1,5 +1,5 @@
 """
-The simple_genetic_algorithm package
+The lightweight_genetic_algorithm package
 An intuitive, flexible and efficient implementation of a genetic algorithm in Python
 """
 
@@ -7,3 +7,5 @@ An intuitive, flexible and efficient implementation of a genetic algorithm in Py
 __version__ = "0.1"
 
 from .algorithm import GeneticAlgorithm
+from .crossover import CrossoverBetween, CrossoverMidpoint, CrossoverEitherOr
+from .diversity import Diversity
