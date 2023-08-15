@@ -19,21 +19,44 @@ pip install lightweight-genetic-algorithm
 The main class in the package is `GeneticAlgorithm`. Here is an example of how to use it:
 
 ```python
-from lightweight_genetic_algorithm import GeneticAlgorithm
+# Define the center and radius of a circle
+center = np.array([0.0, 0.0])
+radius = 5.0
 
 # Define your survival function
-def survival_function(individual):
-    return sum(individual)
+def survival_function(point):
+    distance = np.linalg.norm(point - center)
+    fitness = abs(distance - radius)**2
+    return fitness
 
 # Define the range of your parameters
-param_ranges = [(0, 1), (0, 1), (0, 1)]
+param_ranges = [(-10, 10), (-10, 10)]
 
 # Create a GeneticAlgorithm instance
-ga = GeneticAlgorithm(survival_function, param_ranges)
+ga = GeneticAlgorithm(survival_function, 
+                      param_ranges, 
+                      crossover_method="Between",
+                      number_of_parameters=2, 
+                      mutation_mode=["Additive", "Multiplicative"], 
+                      mutation_rate=0.1)
 
 # Run the genetic algorithm
-population = ga.run(n_generations=100, population_size=50)
+population = ga.run(n_generations=100, population_size=100)
+
+# Plot the final population
+plt.figure(figsize=(6, 6))
+plt.scatter(population[:, 0], population[:, 1], color='blue')
+circle1 = plt.Circle(center1, radius1, fill=False, color='red')
+plt.gca().add_artist(circle1)
+plt.gca().set_aspect('equal', adjustable='box')
+plt.show()
 ```
+
+**Initial population vs 50th generation**
+
+![Image showing the resulting populations](https://imgur.com/vn2uRJw)
+
+In this example, we use the genetic algorithm to approximate a circular shape based on a defined radial fitness function. The parameters for the `GeneticAlgorithm` class can be adjusted to fit the needs of your specific problem.
 
 ### Inputs
 
