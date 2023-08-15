@@ -58,7 +58,8 @@ The `GeneticAlgorithm` class takes the following inputs:
 
 - `mutation_rate` (optional): The rate of mutation. Default is 1.0/number_of_parameters.
 
-- `measure` (optional): A function used to measure the distance between two points in the parameter space. Default is Euclidean distance.
+- `measure` (optional): A function used to measure the distance between two points in the parameter space. Default is Euclidean distance. If no measure is given the default is Euclidean measure.
+To use the measure used in arXiv:XXX.XXX, the user can pass the string "paper".
 
 ### Features
 
