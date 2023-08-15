@@ -54,7 +54,7 @@ plt.show()
 
 **Initial population vs 50th generation**
 
-![Image showing the resulting populations](https://imgur.com/vn2uRJw)
+![Image showing the resulting populations](https://i.imgur.com/vn2uRJw.png)
 
 In this example, we use the genetic algorithm to approximate a circular shape based on a defined radial fitness function. The parameters for the `GeneticAlgorithm` class can be adjusted to fit the needs of your specific problem.
 
