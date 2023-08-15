@@ -23,6 +23,8 @@ class GeneticAlgorithm:
         The rate of mutation (default is 1.0/number_of_parameters)
     diversity : Diversity
         An instance of the Diversity class used to calculate diversity scores
+    measure : function
+        A function used to measure the distance between two points in the parameter space (default is Euclidean distance)
 
     Methods
     -------
@@ -31,25 +33,23 @@ class GeneticAlgorithm:
     survival(point)
         Calculates the survival score of an individual
     select_survivors(population, surviving_population_size)
-        Selects the best individuals from a population
+        Selects the best individuals from a population based on their survival scores and diversity scores
     mutation(point)
-        Mutates an individual
+        Mutates an individual based on the specified mutation mode and rate
     run(n_generations, population_size)
-        Runs the genetic algorithm for a specified number of generations
+        Runs the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals
     """
-    def __init__(self, survival_function, param_ranges, crossover_method="Between", number_of_parameters=None, mutation_mode=None, mutation_rate=None, distance=None):
+    def __init__(self, survival_function, param_ranges, crossover_method="Between", number_of_parameters=None, mutation_mode=None, mutation_rate=None, measure=None):
         self.survival_function = survival_function
         self.param_ranges = param_ranges
         self.number_of_parameters = number_of_parameters if number_of_parameters else len(param_ranges)
-        self.mutation_mode = mutation_mode if mutation_mode else ["additive"]*self.number_of_parameters
+        self.mutation_mode = [mode.lower() for mode in mutation_mode] if mutation_mode else ["additive"]*self.number_of_parameters
                 # check if mutation methods are valid
         for mode in self.mutation_mode:
             if mode not in {'additive', 'multiplicative', 'random'}:
                 warnings.warn(f"Invalid mutation mode '{mode}'. Available options are: 'additive', 'multiplicative', 'random'. Defaulting to 'additive'!")
 
         self.mutation_rate = mutation_rate if mutation_rate else 1.0/self.number_of_parameters
-        self.diversity = Diversity(self.number_of_parameters)
-
         # Map string to corresponding crossover method
         crossover_methods = {
             "between": CrossoverBetween(),
@@ -60,6 +60,12 @@ class GeneticAlgorithm:
         if crossover_method.lower() not in crossover_methods:
             warnings.warn(f"Invalid crossover method '{crossover_method}'. Defaulting to 'Between'. Available options are: {', '.join(crossover_methods.keys())}. Defaulting to 'Between'!")
         self.crossover_method = crossover_methods.get(crossover_method.lower(), CrossoverBetween())
+        
+        # Set the measure function
+        if not measure:
+            print("No measure given, defaulting to Euclidean measure for parameter points.")
+        self.measure = measure if measure else None
+        self.diversity = Diversity(self.measure)
 
     def create_initial_population(self, n):
         population = []
@@ -74,6 +80,7 @@ class GeneticAlgorithm:
 
     def select_survivors(self, population, surviving_population_size):
         # Compute the survival scores for all individuals at once
+
         survival_scores = np.apply_along_axis(self.survival, 1, population)
 
         # Create a 2D array to store the index and survival score of each individual
@@ -81,6 +88,9 @@ class GeneticAlgorithm:
 
         # Initialize a 2D array to store the selected survivors
         survivors = np.zeros((surviving_population_size, len(population[0])))
+
+        # Set populaton size for diversity calculation
+        self.diversity.set_population_size(surviving_population_size)
 
         # Select the k survivors
         for i in range(surviving_population_size):
@@ -93,7 +103,7 @@ class GeneticAlgorithm:
             # Update the survival scores of the remaining individuals
             for j in range(i + 1, len(population)):
                 # Compute the diversity score between the selected individual and the j-th individual
-                diversity_score = self.diversity.compute_diversity(population[int(SurvSort[j, 0])], survivors[i], surviving_population_size)
+                diversity_score = self.diversity.compute_diversity(population[int(SurvSort[j, 0])], survivors[i])
                 # Add the diversity score to the survival score of the j-th individual
                 SurvSort[j, 1] += diversity_score
 

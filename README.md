@@ -43,11 +43,12 @@ The `GeneticAlgorithm` class takes the following inputs:
 
 - `param_ranges`: A list of tuples representing the range of each parameter. Each tuple should contain two numbers, with the first number being the lower bound and the second number being the upper bound.
 
-- `crossover_method` (optional): The method used for crossover. Available options are "Between", "Midpoint", and "Either Or". Default is "Between".
+- `crossover_method` (optional): The method used for crossover. Available options are "Between", "Midpoint", "Either Or", and "None". Default is "Between".
     - *Between*: In this method, the child's genes are chosen to be a random value between the corresponding genes of the two parents. 
     - *Midpoint*: In this method, the child's genes are chosen to be the average of the corresponding genes of the two parents. 
     - *Either Or*: In this method, the child's genes are chosen to be either the corresponding gene of the first parent or the second parent.
     - *None*: No crossover is used, new individuals are created by mutating the previous generation.
+
 - `number_of_parameters` (optional): The number of parameters. Default is the length of `param_ranges`.
 
 - `mutation_mode` (optional): The mode used for mutation. Available options are "additive", "multiplicative", and "random". Default is "additive" for all parameters.
@@ -55,13 +56,16 @@ The `GeneticAlgorithm` class takes the following inputs:
   * *Multiplicative*: In this mode, the gene is multiplied by a random value between -2 and 2. 
   * *Random*: In this mode, the algorithm randomly chooses between additive and multiplicative mutation for each gene.
 
-
 - `mutation_rate` (optional): The rate of mutation. Default is 1.0/number_of_parameters.
+
+- `measure` (optional): A function used to measure the distance between two points in the parameter space. Default is Euclidean distance.
 
 ### Features
 
-- **Multiple Crossover Methods**: The package provides three different crossover methods: "Between", "Midpoint", and "Either Or". This allows you to choose the method that best suits your problem.
+- **Multiple Crossover Methods**: The package provides four different crossover methods: "Between", "Midpoint", "Either Or", and "None". This allows you to choose the method that best suits your problem.
 
 - **Multiple Mutation Modes**: The package provides three different mutation modes: "additive", "multiplicative", and "random". This allows you to choose the mode that best suits your problem.
 
 - **Diversity Calculation**: The package includes a unique diversity calculation that makes the algorithm effective even for small populations and few generations. This calculation is based on the Euclidean distance between individuals and is designed to promote diversity in the population.
+
+- **Customizable Measure Function**: You can provide your own function to measure the distance between two points in the parameter space. This allows you to customize the diversity calculation to better suit your problem.

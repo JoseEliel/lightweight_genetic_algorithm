@@ -8,21 +8,28 @@ class Diversity:
 
     Attributes
     ----------
-    number_of_parameters : int
-        The number of parameters for each individual.
+    B0 : float
+        The diversity constant.
+    measure : function
+        The function to measure the distance between two points. Default is Euclidean distance.
 
     Methods
     -------
-    compute_diversity(point, survivor, population_size):
-        Calculates the diversity score between an individual and a survivor.
+    set_population_size(population_size):
+        Sets the population size and calculates the diversity constant B0.
+    compute_diversity(point, survivor):
+        Calculates the diversity score between an individual and a survivor using the measure function and the diversity constant B0.
     """
-    def __init__(self, number_of_parameters):
-        self.number_of_parameters = number_of_parameters
 
-    def compute_diversity(self, point, survivor, population_size):
-        r = sum((point[i] - survivor[i]) ** 2 for i in range(self.number_of_parameters))
-        B0=1/population_size
-        r0=0.5
-        diversity_result = B0 * np.exp(-r/r0)
+    def __init__(self, measure):
+        self.B0 = None
+        self.measure = measure if measure else lambda point_a, point_b: np.linalg.norm(point_a - point_b)
 
+    def set_population_size(self, population_size):
+        self.B0 = 1 / population_size
+
+    def compute_diversity(self, point, survivor):
+        r = self.measure(point,survivor)
+        r0 = 0.5
+        diversity_result = self.B0 * np.exp(-r / r0)
         return diversity_result
