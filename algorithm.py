@@ -24,7 +24,9 @@ class GeneticAlgorithm:
     diversity : Diversity
         An instance of the Diversity class used to calculate diversity scores
     measure : function
-        A function used to measure the distance between two points in the parameter space (default is Euclidean distance)
+        A function used to measure the distance between two points in the parameter space (default is Euclidean distance).
+        If "paper" is given, then the measure from arXiv:XXX.XXX is used.
+
 
     Methods
     -------
@@ -168,6 +170,5 @@ class GeneticAlgorithm:
             if generation in print_generations or generation == 0:
                 average_fitness = np.mean([self.survival(individual) for individual in population])
                 print(f"Generation {generation}, Average Fitness: {average_fitness}")
-                print(f"Size of current population: {len(population)}, Combined population before selection: {len(combined_population)}")
-
+            
         return population
