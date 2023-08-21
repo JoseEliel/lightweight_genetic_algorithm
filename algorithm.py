@@ -4,6 +4,7 @@ from .crossover import CrossoverBetween, CrossoverMidpoint, CrossoverEitherOr
 from .mutation import Mutation
 from .population import Individual, NumericGene, CategoricalGene
 import warnings
+import heapq
 
 class GeneticAlgorithm:
     """
@@ -121,68 +122,72 @@ class GeneticAlgorithm:
 
         return survival
 
-    def select_survivors(self, population, surviving_population_size):
-            # Compute the survival scores for all individuals
-            survival_scores = [self.survival(individual) for individual in population]
-            # Arrange individuals and their scores into pairs
-            scored_population = list(zip(population, survival_scores))
-            # List to keep selected survivors
-            survivors = []
-            for i in range(surviving_population_size):
-                # Sort individuals by their survival scores
-                scored_population.sort(key=lambda p: p[1], reverse=False)
-                # Pick the best survivor and remove it from scored_population
-                best_survivor = scored_population.pop(0)
-                survivors.append(best_survivor[0])
-                # Update the scores of the remaining individuals
-                for j in range(len(scored_population)):
-                    j_individual = scored_population[j][0]
-                    i_survivor = best_survivor[0]
-                    # Compute the diversity score between the selected survivor and the j-th individual
-                    diversity_score = self.diversity.compute_diversity(j_individual, i_survivor)
-                    # Add the diversity score to the survival score of the j-th individual
-                    scored_population[j] = (scored_population[j][0], scored_population[j][1] + diversity_score)
-            return survivors
+
+    def select_survivors(self, population, survival_scores, surviving_population_size):
+        # Arrange individuals, their scores and original survival scores into tuples and convert the list into a heap
+        scored_population = list(zip(survival_scores, survival_scores, population))
+        heapq.heapify(scored_population)
+        # List to keep selected survivors and their original survival scores
+        survivors = []
+        survivor_scores = []
+        for _ in range(surviving_population_size):
+            # Get the best survivor and its original survival score and remove it from scored_population
+            _, original_score, best_survivor = heapq.heappop(scored_population)
+            survivors.append(best_survivor)
+            survivor_scores.append(original_score)
+            # Update the scores of the remaining individuals using list comprehension
+            scored_population = [(score + self.diversity.compute_diversity(individual, best_survivor), original_score, individual) 
+                                for score, original_score, individual in scored_population]
+            # Re-heapify the scored_population list
+            heapq.heapify(scored_population)
+        return survivors, survivor_scores
     
     def run(self, n_generations, population_size):
-        # Set population size for diversity calculation
-        self.diversity.set_population_size(population_size)
-        # Create initial population
-        population = self.create_initial_population(population_size)
-        if population is None:
-            raise ValueError("Failed to create initial population.")
+            # Set population size for diversity calculation
+            self.diversity.set_population_size(population_size)
+            # Create initial population
+            population = self.create_initial_population(population_size)
+            if population is None:
+                raise ValueError("Failed to create initial population.")
 
-        # Determine the generations at which to print the averages
-        print_generations = np.linspace(0, n_generations, 6, dtype=int)[1:]
+            # Determine the generations at which to print the averages
+            print_generations = np.linspace(0, n_generations, 6, dtype=int)[1:]
 
-        # Run the genetic algorithm for the specified number of generations
-        for generation in range(n_generations):
-            # Apply crossover and mutation to create new population
-            new_population = []
-            for i in range(population_size):
-                if self.crossover_method == "none":
-                    # If no crossover, take the individual directly from the current population
-                    child = population[i]
-                else:
-                    # Select two parents randomly
-                    random_indices = np.random.choice(population_size, 2, replace=False)
-                    parent1 = population[random_indices[0]]
-                    parent2 = population[random_indices[1]]
-                    # Create child by crossover
-                    child = self.crossover_method.crossover(parent1, parent2)
+            # Calculate and store the survival scores of the initial population
+            survival_scores = [self.survival(individual) for individual in population]
 
-                # Apply mutation
-                child = self.mutation.mutate(child)
-                new_population.append(child)
+            # Run the genetic algorithm for the specified number of generations
+            for generation in range(n_generations):
+                # Apply crossover and mutation to create new population
+                new_population = []
+                for i in range(population_size):
+                    if self.crossover_method == "none":
+                        # If no crossover, take the individual directly from the current population
+                        child = population[i]
+                    else:
+                        # Select two parents randomly
+                        random_indices = np.random.choice(population_size, 2, replace=False)
+                        parent1 = population[random_indices[0]]
+                        parent2 = population[random_indices[1]]
+                        # Create child by crossover
+                        child = self.crossover_method.crossover(parent1, parent2)
 
-            # Combine old and new populations
-            combined_population = np.concatenate((population, new_population))
+                    # Apply mutation
+                    child = self.mutation.mutate(child)
+                    new_population.append(child)
 
-            # Select the best individuals to form the next generation
-            population = self.select_survivors(combined_population, population_size)
+                # Calculate the survival scores of the new population
+                new_survival_scores = [self.survival(individual) for individual in new_population]
 
-            if generation in print_generations or generation == 0:
-                average_fitness = np.mean([self.survival(individual) for individual in population])
-                print(f"Generation {generation}, Average Fitness: {average_fitness}")
-            
-        return [individual.get_gene_values() for individual in population]
+                # Combine old and new populations
+                combined_population = population + new_population
+                combined_survival_scores = survival_scores + new_survival_scores
+
+                # Select the best individuals to form the next generation
+                population, survival_scores = self.select_survivors(combined_population, combined_survival_scores, population_size)
+
+                if generation in print_generations or generation == 0:
+                    average_fitness = np.mean(survival_scores)
+                    print(f"Generation {generation}, Average Fitness: {average_fitness}")
+                
+            return [individual.get_gene_values() for individual in population]
