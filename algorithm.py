@@ -133,7 +133,7 @@ class GeneticAlgorithm:
 
         for _ in range(surviving_population_size):
             # Sort the scored population
-            scored_population.sort()
+            scored_population.sort(key=lambda x: x[0])
             
             # Get the best survivor and its original survival score and remove it from scored_population
             _, original_score, best_survivor = scored_population.pop(0)
