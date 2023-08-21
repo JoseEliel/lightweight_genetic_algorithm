@@ -14,20 +14,20 @@ class GeneticAlgorithm:
     survival_function : function
         A function that calculates the survival score of an individual
     param_ranges : list
-        A list of tuples representing the range of each parameter
+        A list of tuples representing the range of each parameter; if parameters are categorical, it's a simple 1D list of categories
     crossover_method : str
         The method used for crossover (default is "Either Or")
     number_of_parameters : int
-        The number of parameters (default is the length of param_ranges)
+        The number of parameters (default is the length of param_ranges). This must be explicitly provided if parameters are categorical.
     mutation_mode : list
-        The mode used for mutation (default is "additive" for all parameters)
+        The mode used for mutation (default is "additive" for numeric parameters and "categorical" for categorical parameters)
     mutation_rate : float
         The rate of mutation (default is 1.0/number_of_parameters)
     diversity : Diversity
         An instance of the Diversity class used to calculate diversity scores
     measure : function
         A function used to measure the distance between two points in the parameter space (default is Euclidean distance).
-        If "paper" is given, then the measure from arXiv:XXX.XXX is used.
+        If "paper" is given, then the measure from arXiv:XXX.XXX is used. This is ignored for categorical parameters.
 
 
     Methods
@@ -44,22 +44,30 @@ class GeneticAlgorithm:
         Runs the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals
     """
     def __init__(self, survival_function, param_ranges, number_of_parameters=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None):
-        self.survival_function = survival_function
+        # User-defined function to calculate survival score of each individual
+        self.survival_function = survival_function 
+
+        # Parameter ranges of genes
         self.param_ranges = param_ranges
 
+        # Function to check if parameters are a 1D list. If true, the parameters are treated as categories
         def is_one_dimensional(lst):
             return not any(isinstance(i, tuple) for i in lst)
         
+        # Store results of parameter check
         self.is_discrete = is_one_dimensional(param_ranges)
 
+        # If parameters are categories, we print out the corresponding notice
         if self.is_discrete:
             print("Detected categorical genes.")
 
+        # Raise error if number of parameters is not provided for categorical parameters
         if self.is_discrete and number_of_parameters is None:
-            raise ValueError("Your param_ranges is a list of values, which assumes categorical genes but you have not given the number of genes in each individual with number of parameters.")
-
+            raise ValueError("Your param_ranges is a list of values, which assumes categorical genes but you have not given the number of genes in each individual with the number of parameters.")
+  
+        # For categorical parameters, we use their provided count. For numerical parameters, we infer the count from the parameter ranges
         self.number_of_parameters = number_of_parameters if number_of_parameters else len(param_ranges)
-
+  
         # Set default mutation mode based on gene type
         default_mutation_mode = ["additive"]*self.number_of_parameters if not self.is_discrete else ["categorical"]*self.number_of_parameters
         self.mutation_mode = [mode.lower() for mode in mutation_mode] if mutation_mode else default_mutation_mode
