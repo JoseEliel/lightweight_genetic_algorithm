@@ -62,7 +62,7 @@ class Individual:
     """
     def __init__(self, genes):
         self.genes = genes
-        self.genes_values = [gene.value for gene in genes]   # Add this line
+        self.genes_values = np.array([gene.value for gene in genes])  # Add this line
 
     def get_genes(self):
         return self.genes

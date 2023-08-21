@@ -61,8 +61,8 @@ class Diversity:
     # Use the measure method set in the constructor and the B0 constant
     def compute_diversity(self, individual, survivor):
         # Extract gene values from individuals
-        point = np.array(individual.get_gene_values())
-        survivor_point = np.array(survivor.get_gene_values())
+        point = individual.get_gene_values()
+        survivor_point = survivor.get_gene_values()
 
         # Check if genes are categorical or numeric
         if individual.get_genes()[0].__class__.__name__ == 'CategoricalGene':
