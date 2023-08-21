@@ -4,7 +4,7 @@ from .crossover import CrossoverBetween, CrossoverMidpoint, CrossoverEitherOr
 from .mutation import Mutation
 from .population import Individual, NumericGene, CategoricalGene
 import warnings
-import heapq
+
 
 class GeneticAlgorithm:
     """
@@ -124,22 +124,26 @@ class GeneticAlgorithm:
 
 
     def select_survivors(self, population, survival_scores, surviving_population_size):
-        # Arrange individuals, their scores and original survival scores into tuples and convert the list into a heap
+        # Arrange individuals, their scores and original survival scores into tuples
         scored_population = list(zip(survival_scores, survival_scores, population))
-        heapq.heapify(scored_population)
+        
         # List to keep selected survivors and their original survival scores
         survivors = []
         survivor_scores = []
+
         for _ in range(surviving_population_size):
+            # Sort the scored population
+            scored_population.sort()
+            
             # Get the best survivor and its original survival score and remove it from scored_population
-            _, original_score, best_survivor = heapq.heappop(scored_population)
+            _, original_score, best_survivor = scored_population.pop(0)
             survivors.append(best_survivor)
             survivor_scores.append(original_score)
+            
             # Update the scores of the remaining individuals using list comprehension
             scored_population = [(score + self.diversity.compute_diversity(individual, best_survivor), original_score, individual) 
                                 for score, original_score, individual in scored_population]
-            # Re-heapify the scored_population list
-            heapq.heapify(scored_population)
+
         return survivors, survivor_scores
     
     def run(self, n_generations, population_size):
