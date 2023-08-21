@@ -1,6 +1,8 @@
 import numpy as np
 from .diversity import Diversity
 from .crossover import CrossoverBetween, CrossoverMidpoint, CrossoverEitherOr
+from .mutation import Mutation
+from .population import Individual, NumericGene, CategoricalGene
 import warnings
 
 class GeneticAlgorithm:
@@ -14,7 +16,7 @@ class GeneticAlgorithm:
     param_ranges : list
         A list of tuples representing the range of each parameter
     crossover_method : str
-        The method used for crossover (default is "Between")
+        The method used for crossover (default is "Either Or")
     number_of_parameters : int
         The number of parameters (default is the length of param_ranges)
     mutation_mode : list
@@ -41,17 +43,34 @@ class GeneticAlgorithm:
     run(n_generations, population_size)
         Runs the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals
     """
-    def __init__(self, survival_function, param_ranges, crossover_method="Between", number_of_parameters=None, mutation_mode=None, mutation_rate=None, measure=None):
+    def __init__(self, survival_function, param_ranges, number_of_parameters=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None):
         self.survival_function = survival_function
         self.param_ranges = param_ranges
+
+        def is_one_dimensional(lst):
+            return not any(isinstance(i, tuple) for i in lst)
+        
+        self.is_discrete = is_one_dimensional(param_ranges)
+
+        if self.is_discrete:
+            print("Detected categorical genes.")
+
+        if self.is_discrete and number_of_parameters is None:
+            raise ValueError("Your param_ranges is a list of values, which assumes categorical genes but you have not given the number of genes in each individual with number of parameters.")
+
         self.number_of_parameters = number_of_parameters if number_of_parameters else len(param_ranges)
-        self.mutation_mode = [mode.lower() for mode in mutation_mode] if mutation_mode else ["additive"]*self.number_of_parameters
-                # check if mutation methods are valid
+
+        # Set default mutation mode based on gene type
+        default_mutation_mode = ["additive"]*self.number_of_parameters if not self.is_discrete else ["categorical"]*self.number_of_parameters
+        self.mutation_mode = [mode.lower() for mode in mutation_mode] if mutation_mode else default_mutation_mode
+
+        # Check if mutation methods are valid
         for mode in self.mutation_mode:
-            if mode not in {'additive', 'multiplicative', 'random'}:
-                warnings.warn(f"Invalid mutation mode '{mode}'. Available options are: 'additive', 'multiplicative', 'random'. Defaulting to 'additive'!")
+            if mode not in {'additive', 'multiplicative', 'random', 'categorical'}:
+                warnings.warn(f"Invalid mutation mode '{mode}'. Available options are: 'additive', 'multiplicative', 'random', 'categorical'. Defaulting to 'additive'!")
 
         self.mutation_rate = mutation_rate if mutation_rate else 1.0/self.number_of_parameters
+
         # Map string to corresponding crossover method
         crossover_methods = {
             "between": CrossoverBetween(),
@@ -60,83 +79,70 @@ class GeneticAlgorithm:
             "none": "none"
         }
         if crossover_method.lower() not in crossover_methods:
-            warnings.warn(f"Invalid crossover method '{crossover_method}'. Defaulting to 'Between'. Available options are: {', '.join(crossover_methods.keys())}. Defaulting to 'Between'!")
+            warnings.warn(f"Invalid crossover method '{crossover_method}'. Available options are: {', '.join(crossover_methods.keys())}. Defaulting to 'Between'!")
         self.crossover_method = crossover_methods.get(crossover_method.lower(), CrossoverBetween())
         
         # Set the measure function
-        if not measure:
-            print("No measure given, defaulting to Euclidean measure for parameter points.")
+        if not measure and not self.is_discrete:
+            print("No measure given, defaulting to Euclidean measure.")
         self.measure = measure if measure else None
         self.diversity = Diversity(self.measure)
 
+        self.mutation = Mutation(self.mutation_mode, self.mutation_rate, self.param_ranges)
+    
     def create_initial_population(self, n):
         population = []
         for _ in range(n):
-            individual = [np.random.uniform(low=low, high=high) for low, high in self.param_ranges]
+            if self.is_discrete:
+                # Expecting a 1D list for discrete parameters
+                individual_genes = [CategoricalGene(self.param_ranges) for _ in range(self.number_of_parameters)]
+            else:
+                # Expecting a 2D list for continuous parameters. Each item (which is a tuple) defines the (low, high) range for a gene.
+                individual_genes = [NumericGene(low, high) for low, high in self.param_ranges]
+            
+            individual = Individual(individual_genes)
             population.append(individual)
-        return np.array(population)
+        return population
 
-    def survival(self, point):
+    def survival(self, individual):
         # Use the user-defined survival function
-        return self.survival_function(point)
+        try:
+            survival = self.survival_function(individual.get_gene_values())
+        except:
+            raise ValueError("Error in survival function evaluation. Your survival function does not seem to be compatible with your individuals.")
+
+        return survival
 
     def select_survivors(self, population, surviving_population_size):
-        # Compute the survival scores for all individuals at once
-
-        survival_scores = np.apply_along_axis(self.survival, 1, population)
-
-        # Create a 2D array to store the index and survival score of each individual
-        SurvSort = np.column_stack((np.arange(len(population)), survival_scores))
-
-        # Initialize a 2D array to store the selected survivors
-        survivors = np.zeros((surviving_population_size, len(population[0])))
-
-        # Set populaton size for diversity calculation
-        self.diversity.set_population_size(surviving_population_size)
-
-        # Select the k survivors
-        for i in range(surviving_population_size):
-            # Sort SurvSort in ascending order based on the survival scores
-            SurvSort = SurvSort[np.argsort(SurvSort[:, 1])]
-
-            # Select the individual with the highest survival score that has not been selected yet
-            survivors[i] = population[int(SurvSort[i, 0])]
-
-            # Update the survival scores of the remaining individuals
-            for j in range(i + 1, len(population)):
-                # Compute the diversity score between the selected individual and the j-th individual
-                diversity_score = self.diversity.compute_diversity(population[int(SurvSort[j, 0])], survivors[i])
-                # Add the diversity score to the survival score of the j-th individual
-                SurvSort[j, 1] += diversity_score
-
-        # Return the selected survivors
-        return survivors
-
-    def mutation(self, point):
-        # Loop over parameters. A mutation occurs by adding or multiplying a random value, depending on the specified mode. 
-        for i in range(self.number_of_parameters):
-            # Check if a mutation should occur based on the specified mutation rate. 
-            if np.random.rand() < self.mutation_rate:
-                # If the mutation mode is additive, add a random number within the range of parameter i.
-                if self.mutation_mode[i] == "additive":
-                    point[i] += np.random.uniform(low=self.param_ranges[i][0], high=self.param_ranges[i][1])
-                # If the mutation mode is multiplicative, multiply by a random number within a certain range.
-                elif self.mutation_mode[i] == "multiplicative":
-                    point[i] *= np.random.uniform(low=-2, high=2)
-                # If the mutation mode is random, randomly choose to add or multiply a random number 
-                elif self.mutation_mode[i] == "random":
-                    # Randomly choose between additive and multiplicative mutation.
-                    if np.random.rand() < 0.5:
-                        # (50% chance) Mutate through multiplication (multiplicative mutation)
-                        point[i] *= np.random.uniform(low=-2, high=2)
-                    else:
-                        # (50% chance) Mutate through addition (additive mutation)
-                        point[i] += np.random.uniform(low=self.param_ranges[i][0], high=self.param_ranges[i][1])
-        return point
+            # Compute the survival scores for all individuals
+            survival_scores = [self.survival(individual) for individual in population]
+            # Arrange individuals and their scores into pairs
+            scored_population = list(zip(population, survival_scores))
+            # List to keep selected survivors
+            survivors = []
+            for i in range(surviving_population_size):
+                # Sort individuals by their survival scores
+                scored_population.sort(key=lambda p: p[1], reverse=False)
+                # Pick the best survivor and remove it from scored_population
+                best_survivor = scored_population.pop(0)
+                survivors.append(best_survivor[0])
+                # Update the scores of the remaining individuals
+                for j in range(len(scored_population)):
+                    j_individual = scored_population[j][0]
+                    i_survivor = best_survivor[0]
+                    # Compute the diversity score between the selected survivor and the j-th individual
+                    diversity_score = self.diversity.compute_diversity(j_individual, i_survivor)
+                    # Add the diversity score to the survival score of the j-th individual
+                    scored_population[j] = (scored_population[j][0], scored_population[j][1] + diversity_score)
+            return survivors
     
     def run(self, n_generations, population_size):
+        # Set population size for diversity calculation
+        self.diversity.set_population_size(population_size)
         # Create initial population
         population = self.create_initial_population(population_size)
+        if population is None:
+            raise ValueError("Failed to create initial population.")
 
         # Determine the generations at which to print the averages
         print_generations = np.linspace(0, n_generations, 6, dtype=int)[1:]
@@ -152,13 +158,13 @@ class GeneticAlgorithm:
                 else:
                     # Select two parents randomly
                     random_indices = np.random.choice(population_size, 2, replace=False)
-                    parent1 = population[random_indices[0], :]
-                    parent2 = population[random_indices[1], :]
+                    parent1 = population[random_indices[0]]
+                    parent2 = population[random_indices[1]]
                     # Create child by crossover
                     child = self.crossover_method.crossover(parent1, parent2)
 
                 # Apply mutation
-                child = self.mutation(child)
+                child = self.mutation.mutate(child)
                 new_population.append(child)
 
             # Combine old and new populations
@@ -171,4 +177,4 @@ class GeneticAlgorithm:
                 average_fitness = np.mean([self.survival(individual) for individual in population])
                 print(f"Generation {generation}, Average Fitness: {average_fitness}")
             
-        return population
+        return [individual.get_gene_values() for individual in population]

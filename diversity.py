@@ -59,8 +59,19 @@ class Diversity:
 
     # Compute diversity between an individual and a survivor
     # Use the measure method set in the constructor and the B0 constant
-    def compute_diversity(self, point, survivor):
-        r = self.measure(point, survivor)
+    def compute_diversity(self, individual, survivor):
+        # Extract gene values from individuals
+        point = np.array(individual.get_gene_values())
+        survivor_point = np.array(survivor.get_gene_values())
+
+        # Check if genes are categorical or numeric
+        if individual.get_genes()[0].__class__.__name__ == 'CategoricalGene':
+            # Use Hamming distance for categorical genes
+            r = np.sum(point != survivor_point) / len(point)
+        else:
+            # Use the measure method set in the constructor for numeric genes
+            r = self.measure(point, survivor_point)
+
         r0 = 0.5
         diversity_result = self.B0 * np.exp(-r / r0)
         return diversity_result
