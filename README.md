@@ -41,7 +41,7 @@ ga = GeneticAlgorithm(survival_function,
                       mutation_rate=0.1)
 
 # Run the genetic algorithm
-population = ga.run(n_generations=75, population_size=100)
+population = ga.run(n_generations=20, population_size=100)
 
 # Plot the final population
 plt.figure(figsize=(6, 6))
