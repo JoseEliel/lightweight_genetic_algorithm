@@ -52,7 +52,7 @@ plt.gca().set_aspect('equal', adjustable='box')
 plt.show()
 ```
 
-**Initial population vs 75th generation**
+**Initial population vs 20th generation**
 
 ![Image showing the resulting populations](example.png)
 
