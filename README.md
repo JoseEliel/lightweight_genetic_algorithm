@@ -24,16 +24,17 @@ center = np.array([0.0, 0.0])
 radius = 5.0
 
 # Define your survival function
-def survival_function(point):
+def fitness_function(point):
     distance = np.linalg.norm(point - center)
-    fitness = abs(distance - radius)**2
+    # It has a minus because the algorithm maximizes fitness.
+    fitness = -abs(distance - radius)**2
     return fitness
 
 # Define the range of your parameters
 param_ranges = [(-10, 10), (-10, 10)]
 
 # Create a GeneticAlgorithm instance
-ga = GeneticAlgorithm(survival_function, 
+ga = GeneticAlgorithm(fitness_function, 
                       param_ranges, 
                       crossover_method="Between",
                       number_of_parameters=2, 
