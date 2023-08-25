@@ -12,8 +12,8 @@ class GeneticAlgorithm:
 
     Attributes
     ----------
-    survival_function : function
-        A function that calculates the survival score of an individual
+    fitness_function : function
+        A function that calculates the fitness score of an individual
     param_ranges : list
         A list of tuples representing the range of each parameter; if parameters are categorical, it's a simple 1D list of categories
     crossover_method : str
@@ -35,18 +35,16 @@ class GeneticAlgorithm:
     -------
     create_initial_population(n)
         Creates an initial population of n individuals
-    survival(point)
-        Calculates the survival score of an individual
     select_survivors(population, surviving_population_size)
-        Selects the best individuals from a population based on their survival scores and diversity scores
+        Selects the best individuals from a population based on their fitness and diversity scores
     mutation(point)
         Mutates an individual based on the specified mutation mode and rate
     run(n_generations, population_size)
         Runs the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals
     """
-    def __init__(self, survival_function, param_ranges, number_of_parameters=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None):
-        # User-defined function to calculate survival score of each individual
-        self.survival_function = survival_function 
+    def __init__(self, fitness_function, param_ranges, number_of_parameters=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None):
+        # User-defined function to calculate fitness score of each individual
+        self.fitness_function = fitness_function 
 
         # Parameter ranges of genes
         self.param_ranges = param_ranges
@@ -99,6 +97,7 @@ class GeneticAlgorithm:
 
         self.mutation = Mutation(self.mutation_mode, self.mutation_rate, self.param_ranges)
     
+
     def create_initial_population(self, n):
         population = []
         for _ in range(n):
@@ -108,44 +107,58 @@ class GeneticAlgorithm:
             else:
                 # Expecting a 2D list for continuous parameters. Each item (which is a tuple) defines the (low, high) range for a gene.
                 individual_genes = [NumericGene(low, high) for low, high in self.param_ranges]
-            
-            individual = Individual(individual_genes)
+
+            # Create individual, which calculates its fitness        
+            individual = Individual(individual_genes, self.fitness_function)
             population.append(individual)
         return population
 
-    def survival(self, individual):
-        # Use the user-defined survival function
-        try:
-            survival = self.survival_function(individual.get_gene_values())
-        except:
-            raise ValueError("Error in survival function evaluation. Your survival function does not seem to be compatible with your individuals.")
+    # def select_survivors(self, population, surviving_population_size):
+    #     # List to keep selected survivors
+    #     survivors = []
 
-        return survival
+    #     for i in range(surviving_population_size):
+    #         # Sort the population based purely on fitness for the first individual, then use fitness - diversity_score
+    #         if i == 0:
+    #             for individual in population:
+    #                 individual.set_diversity_score(individual.fitness)
 
-
-    def select_survivors(self, population, survival_scores, surviving_population_size):
-        # Arrange individuals, their scores and original survival scores into tuples
-        scored_population = list(zip(survival_scores, survival_scores, population))
+    #         population.sort(key=lambda individual: individual.diversity_score, reverse=True)
+            
+    #         # Get the best survivor and remove it from population
+    #         best_survivor = population.pop(0)
+    #         survivors.append(best_survivor)
         
-        # List to keep selected survivors and their original survival scores
+    #         # Update the diversity score of remaining individuals, don't alter the fitness
+    #         for individual in population:
+    #             diversity_punishment = self.diversity.compute_diversity(individual, best_survivor)
+    #             individual.set_diversity_score(individual.diversity_score - diversity_punishment)
+
+    #     return survivors
+
+    def select_survivors(self, population, surviving_population_size):
+        # List to keep selected survivors
         survivors = []
-        survivor_scores = []
 
-        for _ in range(surviving_population_size):
-            # Sort the scored population
-            scored_population.sort(key=lambda x: x[0])
+        for i in range(surviving_population_size):
+            # Sort the population based purely on fitness for the first individual, then use fitness - diversity_score
+            if i == 0:
+                for individual in population:
+                    individual.diversity_score = individual.fitness
+
+            population = sorted(population, key=lambda individual: individual.diversity_score, reverse=True)
             
-            # Get the best survivor and its original survival score and remove it from scored_population
-            _, original_score, best_survivor = scored_population.pop(0)
+            # Get the best survivor and remove it from population
+            best_survivor = population.pop(0)
             survivors.append(best_survivor)
-            survivor_scores.append(original_score)
-            
-            # Update the scores of the remaining individuals using list comprehension
-            scored_population = [(score + self.diversity.compute_diversity(individual, best_survivor), original_score, individual) 
-                                for score, original_score, individual in scored_population]
+        
+            # Update the diversity score of remaining individuals, don't alter the fitness
+            for individual in population:
+                diversity_punishment = self.diversity.compute_diversity(individual, best_survivor)
+                individual.diversity_score -= diversity_punishment
 
-        return survivors, survivor_scores
-    
+        return survivors
+
     def run(self, n_generations, population_size):
             # Set population size for diversity calculation
             self.diversity.set_population_size(population_size)
@@ -156,9 +169,6 @@ class GeneticAlgorithm:
 
             # Determine the generations at which to print the averages
             print_generations = np.linspace(0, n_generations, 6, dtype=int)[1:]
-
-            # Calculate and store the survival scores of the initial population
-            survival_scores = [self.survival(individual) for individual in population]
 
             # Run the genetic algorithm for the specified number of generations
             for generation in range(n_generations):
@@ -180,18 +190,14 @@ class GeneticAlgorithm:
                     child = self.mutation.mutate(child)
                     new_population.append(child)
 
-                # Calculate the survival scores of the new population
-                new_survival_scores = [self.survival(individual) for individual in new_population]
-
                 # Combine old and new populations
                 combined_population = population + new_population
-                combined_survival_scores = survival_scores + new_survival_scores
 
                 # Select the best individuals to form the next generation
-                population, survival_scores = self.select_survivors(combined_population, combined_survival_scores, population_size)
+                population = self.select_survivors(combined_population, population_size)
 
                 if generation in print_generations or generation == 0:
-                    average_fitness = np.mean(survival_scores)
+                    average_fitness = np.mean([individual.fitness for individual in population])
                     print(f"Generation {generation}, Average Fitness: {average_fitness}")
                 
             return [individual.get_gene_values() for individual in population]

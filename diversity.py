@@ -67,11 +67,11 @@ class Diversity:
         # Check if genes are categorical or numeric
         if individual.get_genes()[0].__class__.__name__ == 'CategoricalGene':
             # Use Hamming distance for categorical genes
-            r = np.sum(point != survivor_point) / len(point)
+            distance_sq = np.sum(point != survivor_point) / len(point)
         else:
             # Use the measure method set in the constructor for numeric genes
-            r = self.measure(point, survivor_point)
+            distance_sq = self.measure(point, survivor_point)
 
         r0 = 0.5
-        diversity_result = self.B0 * np.exp(-r / r0)
+        diversity_result = self.B0 * np.exp(-distance_sq / r0)
         return diversity_result

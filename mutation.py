@@ -32,7 +32,7 @@ class Mutation:
                 mutated_genes.append(mutated_gene)
             else:
                 mutated_genes.append(gene)
-        mutated_individual = Individual(mutated_genes)
+        mutated_individual = Individual(mutated_genes,individual.get_fitness_function())
         return mutated_individual
     
     def additive(self, gene, param_range):
