@@ -14,16 +14,16 @@ class GeneticAlgorithm:
     ----------
     fitness_function : function
         A function that calculates the fitness score of an individual
-    param_ranges : list
+    gene_ranges : list
         A list of tuples representing the range of each parameter; if parameters are categorical, it's a simple 1D list of categories
     crossover_method : str
         The method used for crossover (default is "Either Or")
-    number_of_parameters : int
-        The number of parameters (default is the length of param_ranges). This must be explicitly provided if parameters are categorical.
+    number_of_genes : int
+        The number of parameters (default is the length of gene_ranges). This must be explicitly provided if parameters are categorical.
     mutation_mode : list
         The mode used for mutation (default is "additive" for numeric parameters and "categorical" for categorical parameters)
     mutation_rate : float
-        The rate of mutation (default is 1.0/number_of_parameters)
+        The rate of mutation (default is 1.0/number_of_genes)
     diversity : Diversity
         An instance of the Diversity class used to calculate diversity scores
     measure : function
@@ -42,33 +42,33 @@ class GeneticAlgorithm:
     run(n_generations, population_size)
         Runs the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals
     """
-    def __init__(self, fitness_function, param_ranges, number_of_parameters=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None):
+    def __init__(self, fitness_function, gene_ranges, number_of_genes=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None):
         # User-defined function to calculate fitness score of each individual
         self.fitness_function = fitness_function 
 
         # Parameter ranges of genes
-        self.param_ranges = param_ranges
+        self.gene_ranges = gene_ranges
 
         # Function to check if parameters are a 1D list. If true, the parameters are treated as categories
         def is_one_dimensional(lst):
             return not any(isinstance(i, tuple) for i in lst)
         
         # Store results of parameter check
-        self.is_discrete = is_one_dimensional(param_ranges)
+        self.is_discrete = is_one_dimensional(gene_ranges)
 
         # If parameters are categories, we print out the corresponding notice
         if self.is_discrete:
             print("Detected categorical genes.")
 
         # Raise error if number of parameters is not provided for categorical parameters
-        if self.is_discrete and number_of_parameters is None:
-            raise ValueError("Your param_ranges is a list of values, which assumes categorical genes but you have not given the number of genes in each individual with the number of parameters.")
+        if self.is_discrete and number_of_genes is None:
+            raise ValueError("Your gene_ranges is a list of values, which assumes categorical genes but you have not given the number of genes in each individual with the number of parameters.")
   
         # For categorical parameters, we use their provided count. For numerical parameters, we infer the count from the parameter ranges
-        self.number_of_parameters = number_of_parameters if number_of_parameters else len(param_ranges)
+        self.number_of_genes = number_of_genes if number_of_genes else len(gene_ranges)
   
         # Set default mutation mode based on gene type
-        default_mutation_mode = ["additive"]*self.number_of_parameters if not self.is_discrete else ["categorical"]*self.number_of_parameters
+        default_mutation_mode = ["additive"]*self.number_of_genes if not self.is_discrete else ["categorical"]*self.number_of_genes
         self.mutation_mode = [mode.lower() for mode in mutation_mode] if mutation_mode else default_mutation_mode
 
         # Check if mutation methods are valid
@@ -76,7 +76,7 @@ class GeneticAlgorithm:
             if mode not in {'additive', 'multiplicative', 'random', 'categorical'}:
                 warnings.warn(f"Invalid mutation mode '{mode}'. Available options are: 'additive', 'multiplicative', 'random', 'categorical'. Defaulting to 'additive'!")
 
-        self.mutation_rate = mutation_rate if mutation_rate else 1.0/self.number_of_parameters
+        self.mutation_rate = mutation_rate if mutation_rate else 1.0/self.number_of_genes
 
         # Map string to corresponding crossover method
         crossover_methods = {
@@ -95,7 +95,7 @@ class GeneticAlgorithm:
         self.measure = measure if measure else None
         self.diversity = Diversity(self.measure)
 
-        self.mutation = Mutation(self.mutation_mode, self.mutation_rate, self.param_ranges)
+        self.mutation = Mutation(self.mutation_mode, self.mutation_rate, self.gene_ranges)
     
 
     def create_initial_population(self, n):
@@ -103,10 +103,10 @@ class GeneticAlgorithm:
         for _ in range(n):
             if self.is_discrete:
                 # Expecting a 1D list for discrete parameters
-                individual_genes = [CategoricalGene(self.param_ranges) for _ in range(self.number_of_parameters)]
+                individual_genes = [CategoricalGene(self.gene_ranges) for _ in range(self.number_of_genes)]
             else:
                 # Expecting a 2D list for continuous parameters. Each item (which is a tuple) defines the (low, high) range for a gene.
-                individual_genes = [NumericGene(low, high) for low, high in self.param_ranges]
+                individual_genes = [NumericGene(low, high) for low, high in self.gene_ranges]
 
             # Create individual, which calculates its fitness        
             individual = Individual(individual_genes, self.fitness_function)
