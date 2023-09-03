@@ -157,6 +157,9 @@ class GeneticAlgorithm:
                 diversity_punishment = self.diversity.compute_diversity(individual, best_survivor)
                 individual.diversity_score -= diversity_punishment
 
+        for s in survivors:
+            s.set_diversity_score(0)
+
         return survivors
 
     def run(self, n_generations, population_size):
