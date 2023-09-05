@@ -60,13 +60,14 @@ class Individual:
     """
     An individual is defined by its genes.
     """
-    def __init__(self, genes, fitness_function):
+    def __init__(self, genes, fitness_function, fitness_function_args):
         self.genes = genes
         self.genes_values = np.array([gene.value for gene in genes])  # Add this line
         self.diversity_score = 0
         self.fitness_function = fitness_function
+        self.fitness_function_args = fitness_function_args
         try:
-            self.fitness = fitness_function(self.genes_values)
+            self.fitness = fitness_function(self.genes_values,*self.fitness_function_args)
         except:
             raise ValueError("Error in fitness function evaluation. Your fitness function does not seem to be compatible with your individuals.")
 

@@ -14,6 +14,8 @@ class GeneticAlgorithm:
     ----------
     fitness_function : function
         A function that calculates the fitness score of an individual
+    fitness_function_args: tuple
+        Wildcard arguments to pass to the fitness_function
     gene_ranges : list
         A list of tuples representing the range of each parameter; if parameters are categorical, it's a simple 1D list of categories
     crossover_method : str
@@ -42,9 +44,10 @@ class GeneticAlgorithm:
     run(n_generations, population_size)
         Runs the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals
     """
-    def __init__(self, fitness_function, gene_ranges, number_of_genes=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None):
+    def __init__(self, fitness_function, gene_ranges, fitness_function_args=(), number_of_genes=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None):
         # User-defined function to calculate fitness score of each individual
         self.fitness_function = fitness_function 
+        self.fitness_function_args = fitness_function_args
 
         # Parameter ranges of genes
         self.gene_ranges = gene_ranges
@@ -109,7 +112,7 @@ class GeneticAlgorithm:
                 individual_genes = [NumericGene(low, high) for low, high in self.gene_ranges]
 
             # Create individual, which calculates its fitness        
-            individual = Individual(individual_genes, self.fitness_function)
+            individual = Individual(individual_genes, self.fitness_function, self.fitness_function_args)
             population.append(individual)
         return population
 
@@ -157,9 +160,6 @@ class GeneticAlgorithm:
                 diversity_punishment = self.diversity.compute_diversity(individual, best_survivor)
                 individual.diversity_score -= diversity_punishment
 
-        for s in survivors:
-            s.set_diversity_score(0)
-
         return survivors
 
     def run(self, n_generations, population_size):
@@ -201,6 +201,7 @@ class GeneticAlgorithm:
 
                 if generation in print_generations or generation == 0:
                     average_fitness = np.mean([individual.fitness for individual in population])
-                    print(f"Generation {generation}, Average Fitness: {average_fitness}")
+                    best_fitness = np.max( [individual.fitness for individual in population] )
+                    print(f"Generation {generation}, Average Fitness: {average_fitness}, Best fitness: {best_fitness}")
                 
             return [individual.get_gene_values() for individual in population]

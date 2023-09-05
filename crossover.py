@@ -33,7 +33,7 @@ class CrossoverBetween(Crossover):
             high = max(g1.value, g2.value)
             value = np.random.uniform(low=low, high=high)
             child_genes.append(NumericGene(low, high, value))
-        return Individual(child_genes, parent1.get_fitness_function())
+        return Individual(child_genes, parent1.get_fitness_function(), parent1.fitness_function_args)
 
 class CrossoverMidpoint(Crossover):
     """
@@ -49,7 +49,7 @@ class CrossoverMidpoint(Crossover):
             high = max(g1.high, g2.high)
             value = (g1.value + g2.value) / 2
             child_genes.append(NumericGene(low, high, value))
-        return Individual(child_genes, parent1.get_fitness_function())
+        return Individual(child_genes, parent1.get_fitness_function(), parent1.fitness_function_args)
 
 class CrossoverEitherOr(Crossover):
     """
@@ -62,4 +62,4 @@ class CrossoverEitherOr(Crossover):
             if "either or" not in g1.crossover_methods:
                 raise ValueError(f"The crossover method 'either or' is not compatible with the gene type.")
             child_genes.append(g1 if np.random.rand() < 0.5 else g2)
-        return Individual(child_genes, parent1.get_fitness_function())
+        return Individual(child_genes, parent1.get_fitness_function(), parent1.fitness_function_args)
