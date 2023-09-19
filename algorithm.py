@@ -31,7 +31,8 @@ class GeneticAlgorithm:
         A function used to measure the distance between two points in the parameter space (default is Euclidean distance).
         If "paper" is given, then the measure from arXiv:XXX.XXX is used. This is ignored for categorical parameters.
     use_multiprocessing : bool
-        Whether to use multiprocessing to speed up the algorithm (default is False)
+        Whether to use multiprocessing for fitness evaluations (default is False). 
+        This speeds up the algorithm for computationally expensive fitness functions.
     ncpus : int
         The number of processes to use for multiprocessing (default is the number of CPUs on the system minus 1)
 
@@ -44,7 +45,7 @@ class GeneticAlgorithm:
         Selects the best individuals from a population based on their fitness and diversity scores
     mutation(point)
         Mutates an individual based on the specified mutation mode and rate
-    run(n_generations, population_size)
+    run(n_generations, population_size, initial_population, fitness_threshold)
         Runs the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals
     """
     def __init__(self, fitness_function, gene_ranges, fitness_function_args=(), number_of_genes=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None, use_multiprocessing=False, ncpus=None):
@@ -179,13 +180,26 @@ class GeneticAlgorithm:
 
         return survivors
 
-    def run(self, n_generations, population_size):
+    def run(self, n_generations, population_size=None, initial_population=None, fitness_threshold=None):
+            '''
+            Run the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals.
+            The initial population can be specified as a list of individuals, or the population size can be specified to create a random initial population. If both are specified, the initial population is used.
+            A fitness threshold can be specified to stop the algorithm early if the fitness exceeds the threshold.
+            '''
+
+            if population_size is None and initial_population is None:
+                raise ValueError("Either population_size or initial_population must be specified.")
+
+            if initial_population is not None:
+                # Use input initial_population as initial population
+                raise ValueError("Using input initial_population is not yet implemented!")
+            else:        
+                # Create initial population
+                population = self.create_initial_population(population_size)
+                if population is None:
+                    raise ValueError("Failed to create initial population.")
             # Set population size for diversity calculation
-            self.diversity.set_population_size(population_size)
-            # Create initial population
-            population = self.create_initial_population(population_size)
-            if population is None:
-                raise ValueError("Failed to create initial population.")
+            self.diversity.set_population_size( len(population) )
 
             # Determine the generations at which to print the averages
             print_generations = np.linspace(0, n_generations, 6, dtype=int)[1:]
@@ -228,4 +242,9 @@ class GeneticAlgorithm:
                     best_fitness = np.max( [individual.fitness for individual in population] )
                     print(f"Generation {generation}, Average Fitness: {average_fitness}, Best fitness: {best_fitness}")
                 
+                # Check if fitness threshold is reached
+                if fitness_threshold and best_fitness >= fitness_threshold:
+                    print(f"Fitness threshold reached at generation {generation}!")
+                    break
+             
             return [individual.get_gene_values() for individual in population]
