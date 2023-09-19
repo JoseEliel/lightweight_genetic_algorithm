@@ -23,9 +23,8 @@ class NumericGene(Gene):
     mutation_methods = ["additive", "multiplicative", "random"]
     crossover_methods = ["between", "midpoint", "either or"]
 
-    def __init__(self, low, high, value=None):
-        self.low = low
-        self.high = high
+    def __init__(self, gene_range, value=None):
+        self.low, self.high = gene_range
         self.value = value if value is not None else self.random_initialization()
 
     def random_initialization(self):

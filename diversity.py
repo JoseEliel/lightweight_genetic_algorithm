@@ -44,7 +44,8 @@ class Diversity:
     # Static method for calculating Euclidean distance
     @staticmethod
     def measure_euclidean(point_a, point_b):
-        return sum((x - y) ** 2 for x, y in zip(point_a, point_b))
+        return np.sum((point_a - point_b)**2)
+        #return sum((x - y) ** 2 for x, y in zip(point_a, point_b))
 
     # Static method for calculating 'paper' measure
     @staticmethod

@@ -6,32 +6,45 @@ class Mutation:
     """
     A class used to represent a Mutation
     """
-    def __init__(self, mutation_modes, mutation_rate, param_ranges):
+    def __init__(self, mutation_modes, mutation_probability, param_ranges):
         self.mutation_modes = mutation_modes
-        self.mutation_rate = mutation_rate if mutation_rate else 1.0/len(param_ranges)
+        self.mutation_probability = mutation_probability if mutation_probability else 1.0/len(param_ranges)
         self.param_ranges = param_ranges
         self.is_categorical = len(param_ranges) != len(mutation_modes)
 
-    def mutate(self, individual):
-        if not isinstance(individual, Individual):
-            raise TypeError("The mutate method expects an instance of Individual.")
+    def mutate_genes(self, genes, force_mutate=False):
+        '''
+        Mutate a list of genes. Give a list of Gene objects as input, return a list of Gene objects.
+        '''
+        # Choose which genes to mutate
+        genes_to_mutate = [ True if np.random.rand() < self.mutation_probability else False for i in range(len(genes))]
         
-        mutated_genes = []
-        for i, gene in enumerate(individual.get_genes()):
+        # If no gene was chosen to mutate, force the mutation of one gene (unless force_mutate is False)
+        if np.sum(genes_to_mutate) == 0 and not force_mutate:
+            genes_to_mutate[np.random.randint(len(genes))] = True
+
+        for i, gene in enumerate(genes):
             # Check if a mutation should occur based on the specified mutation rate.
-            if np.random.rand() < self.mutation_rate:
+            if genes_to_mutate[i]:
                 # Check if the mutation mode is compatible with the gene
                 if self.mutation_modes[i] not in gene.mutation_methods:
                     raise ValueError(f"The mutation mode '{self.mutation_modes[i]}' is not compatible with the gene type.")
-                # Call the mutation method
+                # Call the mutation method and update the gene
                 if self.is_categorical:
-                    mutated_gene = getattr(self, self.mutation_modes[i])(gene, None)
+                    gene = getattr(self, self.mutation_modes[i])(gene, None)
                 else:
-                    mutated_gene = getattr(self, self.mutation_modes[i])(gene, self.param_ranges[i])
+                    gene = getattr(self, self.mutation_modes[i])(gene, self.param_ranges[i])
+        
+        return genes
 
-                mutated_genes.append(mutated_gene)
-            else:
-                mutated_genes.append(gene)
+    def mutate_individual(self, individual, force_mutate=False):
+        '''
+        Mutate an individual by mutating its genes. Give an Individual as input, return a mutated Individual.
+        '''
+        if not isinstance(individual, Individual):
+            raise TypeError("The mutate method expects an instance of Individual.")
+        
+        mutated_genes = self.mutate_genes(individual.get_genes(), force_mutate)
         mutated_individual = Individual(mutated_genes,individual.get_fitness_function(),individual.fitness_function_args)
         return mutated_individual
     

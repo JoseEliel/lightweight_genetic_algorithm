@@ -5,7 +5,6 @@ from .mutation import Mutation
 from .population import Individual, NumericGene, CategoricalGene
 import warnings
 
-
 class GeneticAlgorithm:
     """
     A class used to represent a Genetic Algorithm
@@ -31,6 +30,10 @@ class GeneticAlgorithm:
     measure : function
         A function used to measure the distance between two points in the parameter space (default is Euclidean distance).
         If "paper" is given, then the measure from arXiv:XXX.XXX is used. This is ignored for categorical parameters.
+    use_multiprocessing : bool
+        Whether to use multiprocessing to speed up the algorithm (default is False)
+    ncpus : int
+        The number of processes to use for multiprocessing (default is the number of CPUs on the system minus 1)
 
 
     Methods
@@ -44,7 +47,7 @@ class GeneticAlgorithm:
     run(n_generations, population_size)
         Runs the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals
     """
-    def __init__(self, fitness_function, gene_ranges, fitness_function_args=(), number_of_genes=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None):
+    def __init__(self, fitness_function, gene_ranges, fitness_function_args=(), number_of_genes=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None, use_multiprocessing=False, ncpus=None):
         # User-defined function to calculate fitness score of each individual
         self.fitness_function = fitness_function 
         self.fitness_function_args = fitness_function_args
@@ -99,22 +102,36 @@ class GeneticAlgorithm:
         self.diversity = Diversity(self.measure)
 
         self.mutation = Mutation(self.mutation_mode, self.mutation_rate, self.gene_ranges)
-    
+
+        # Setup multiprocessing if specified
+        self.use_multiprocessing = use_multiprocessing
+        if self.use_multiprocessing or ncpus:
+            import multiprocessing as mp
+            self.mp = mp
+            self.ncpus = ncpus if ncpus else self.mp.cpu_count()-1
+
+    def evaluate_fitness(self,genes):
+        return self.fitness_function(genes,*self.fitness_function_args)
 
     def create_initial_population(self, n):
-        population = []
-        for _ in range(n):
-            if self.is_discrete:
-                # Expecting a 1D list for discrete parameters
-                individual_genes = [CategoricalGene(self.gene_ranges) for _ in range(self.number_of_genes)]
-            else:
-                # Expecting a 2D list for continuous parameters. Each item (which is a tuple) defines the (low, high) range for a gene.
-                individual_genes = [NumericGene(low, high) for low, high in self.gene_ranges]
+        # Create genes of the population
+        if self.is_discrete:
+            # Expecting a 1D list for discrete parameters
+            genes = [ [CategoricalGene(self.gene_ranges) for _ in range(self.number_of_genes)] for _ in range(n) ]
+        else:
+            # Expecting a 2D list for continuous parameters.
+            genes = [ [NumericGene(self.gene_ranges[i])  for i in range(self.number_of_genes)] for _ in range(n) ]
 
-            # Create individual, which calculates its fitness        
-            individual = Individual(individual_genes, self.fitness_function, self.fitness_function_args)
-            population.append(individual)
+        # Create population using multiprocessing if specified
+        if self.use_multiprocessing:
+            with self.mp.Pool(self.ncpus) as pool:
+                population = pool.starmap(Individual, [(g, self.fitness_function, self.fitness_function_args) for g in genes] )
+            return population
+        
+        # Otherwise, create population sequentially
+        population = [Individual(g, self.fitness_function, self.fitness_function_args) for g in genes]
         return population
+
 
     # def select_survivors(self, population, surviving_population_size):
     #     # List to keep selected survivors
@@ -174,27 +191,34 @@ class GeneticAlgorithm:
             print_generations = np.linspace(0, n_generations, 6, dtype=int)[1:]
 
             # Run the genetic algorithm for the specified number of generations
-            for generation in range(n_generations):
-                # Apply crossover and mutation to create new population
-                new_population = []
-                for i in range(population_size):
-                    if self.crossover_method == "none":
-                        # If no crossover, take the individual directly from the current population
-                        child = population[i]
-                    else:
-                        # Select two parents randomly
-                        random_indices = np.random.choice(population_size, 2, replace=False)
-                        parent1 = population[random_indices[0]]
-                        parent2 = population[random_indices[1]]
-                        # Create child by crossover
-                        child = self.crossover_method.crossover(parent1, parent2)
+            for generation in range(n_generations):                
+                
+                # Create genes of the offspring
+                if self.crossover_method == "none":
+                        # If no crossover, take the individual directly from the current population and apply mutation. 
+                        # Set force_mutate to True to ensure that at least one gene is mutated.
+                        offspring_genes = [self.mutation.mutate_genes(individual.get_genes(),force_mutate=True) for individual in population]
+                else:
+                    # Select two parents randomly
+                    random_indices = np.random.choice(population_size, 2*population_size, replace=True)
+                    parents = np.array(population)[random_indices].reshape(population_size, 2)
+                    
+                    # Create genes of the offspring by crossover
+                    offspring_genes = [self.crossover_method.crossover(parent1.get_genes(), parent2.get_genes()) for parent1, parent2 in parents]
 
                     # Apply mutation
-                    child = self.mutation.mutate(child)
-                    new_population.append(child)
+                    offspring_genes = [self.mutation.mutate_genes(genes) for genes in offspring_genes]
 
-                # Combine old and new populations
-                combined_population = population + new_population
+                # Create offspring Individual objects using multiprocessing if specified
+                if self.use_multiprocessing:
+                    with self.mp.Pool(self.ncpus) as pool:
+                        # Create offspring Individual objects
+                        offspring = pool.starmap(Individual, [(g, self.fitness_function, self.fitness_function_args) for g in offspring_genes] )
+                else:
+                    offspring = [Individual(genes, self.fitness_function, self.fitness_function_args) for genes in offspring_genes]
+
+                # Combine parent and offspring populations (Elitism)
+                combined_population = population + offspring
 
                 # Select the best individuals to form the next generation
                 population = self.select_survivors(combined_population, population_size)
