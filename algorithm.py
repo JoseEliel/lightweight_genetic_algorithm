@@ -158,6 +158,10 @@ class GeneticAlgorithm:
     #     return survivors
 
     def select_survivors(self, population, surviving_population_size):
+        '''
+        Select survivors using the diversity enhancing selection method. 
+        '''
+
         # List to keep selected survivors
         survivors = []
 
@@ -165,17 +169,15 @@ class GeneticAlgorithm:
         diversity_scores = [individual.fitness for individual in population]
 
         for i in range(surviving_population_size):
-
             # Get the best survivor and remove it from population
             best_survivor_idx = np.argmax(diversity_scores)
             survivors.append(population[best_survivor_idx])
             population = np.delete(population, best_survivor_idx)
             diversity_scores = np.delete(diversity_scores, best_survivor_idx)
         
-            # Update the diversity score of remaining individuals, don't alter the fitness
+            # Update the diversity score of remaining individuals
             for i,individual in enumerate(population):
                 diversity_punishment = self.diversity.compute_diversity(individual, survivors[-1])
-                #individual.diversity_score -= diversity_punishment
                 diversity_scores[i] -= diversity_punishment
 
         return survivors
