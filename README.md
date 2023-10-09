@@ -56,7 +56,11 @@ plt.show()
 
 In this example, we're using the genetic algorithm to approximate a circular shape based on a defined radial fitness function. The genes for the `GeneticAlgorithm` class can be adjusted to fit the needs of your specific problem, including both numerical and categorical genes.
 
-Here's another example using categorical genes:
+Here's another example using categorical genes. In this example, we seek to construct an array of Lysine (K) Glutamic Acid (E) representing the amino-acid sequence of a model intrinsically disordered protein. The goal is to find a diverse set of sequences with a net charge near given target value (target_charge) and a sequence charge decoration (SCD) parameter near a given target value (target_SCD). The net charge is calculated as the sum of the charges of the amino acids in the sequence with Lysine (K) having a charge of +1 and Glutamic Acid (E) having a charge of -1. The SCD parameter is calculated as
+$$
+SCD = \frac{1}{N} \sum_{\alpha=1}^{N} \sum_{\beta=1}^{N} \sigma_{\alpha} \sigma_{\beta} \sqrt{ | \alpha - \beta | }
+$$
+
 
 ```python
 from lightweight_genetic_algorithm import GeneticAlgorithm
