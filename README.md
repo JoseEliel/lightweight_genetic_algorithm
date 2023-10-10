@@ -93,10 +93,8 @@ def fitness_function(fasta_sequence, target_SCD):
     f = -(SCD-target_SCD)**2 
     return f
 
-# Define the range of your genes.
-# Because it is a one-dimensional list,
-# categorical genes are automatically recognized
-# gene_ranges is then the list of categories
+# Because it is a one-dimensional list, categorical genes are automatically recognized.  
+# gene_ranges is then the list of categories, which in this example is the list of available amino acids.
 gene_ranges = [ 'E', 'K' ] # Glutamic acid ('E'), Lysine ('K'),
 
 N = 50 # sequence length
