@@ -112,6 +112,7 @@ ga = lga.GeneticAlgorithm(fitness_function, gene_ranges,
  population = ga.run(n_generations=50, population_size=100)
 
 ```
+
 The terminal output is
 ```bash
 Sequence 0: EEKEKKKKEKKKKEEKKKKKKKKKKEEEKEEKKKKEKEEEEEEEEEEEKE SCD: -15.0 Net charge: 2
