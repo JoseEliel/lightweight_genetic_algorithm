@@ -63,33 +63,33 @@ Here's another example using categorical genes. In this example, we seek to cons
 from lightweight_genetic_algorithm import GeneticAlgorithm
 
 # Convert a fasta sequence to a charge sequence
-def fasta_to_charge(fasta):
-    charge = []
-    for aa in fasta:
+def fasta_to_charge(fasta_sequence):
+    charge_sequence = []
+    for aa in fasta_sequence:
         if aa=='K' or aa=='R': # Lysine or Arginine
-            charge.append(1)
+            charge_sequence.append(1)
         elif aa=='E' or aa=='D': # Glutamic acid or Aspartic acid
-            charge.append(-1)
+            charge_sequence.append(-1)
         elif aa=='H': # Histidine
-            charge.append(0.5)
+            charge_sequence.append(0.5)
         else:
-            charge.append(0)
-    return charge
+            charge_sequence.append(0)
+    return charge_sequence
     
 # Calculates the sequence charge decoration (SCD) parameter
-def calculate_SCD(seq):
+def calculate_SCD(charge_sequence):
     SCD = 0
     for a in range(len(seq)-1):
         for b in range(a+1,len(seq)):
-            SCD += seq[a] * seq[b] * np.sqrt(np.abs(a-b))
-    SCD *= 2/len(seq)
+            SCD += charge_sequence[a] * charge_sequence[b] * np.sqrt(np.abs(a-b))
+    SCD *= 2/len(charge_sequence)
     return SCD
 
 # Define fitness function
-def fitness_function(fasta_seq, target_SCD, target_charge=0):
+def fitness_function(fasta_sequence, target_SCD):
     # Convert fasta sequence to charge sequence
-    seq = fasta_to_charge(fasta_seq)
-    SCD = calculate_SCD(seq)
+    charge_sequence = fasta_to_charge(fasta_sequence)
+    SCD = calculate_SCD(charge_sequence)
     f = -(SCD-target_SCD)**2 
     return f
 
@@ -104,14 +104,29 @@ target_SCD = -10
 
 # Create a GeneticAlgorithm instance
 ga = lga.GeneticAlgorithm(fitness_function, gene_ranges, 
-                            number_of_genes=N, 
-                            fitness_function_args=(target_SCD,target_charge,)
+                          number_of_genes = N, 
+                          fitness_function_args = (target_SCD,)
 )
 
 # Run the genetic algorithm
  population = ga.run(n_generations=50, population_size=100)
- 
+
 ```
+The terminal output is
+```bash
+Sequence 0: EEKEKKKKEKKKKEEKKKKKKKKKKEEEKEEKKKKEKEEEEEEEEEEEKE SCD: -15.0 Net charge: 2
+Sequence 1: EEEEEEEEEKEKEKEKEEEEEEEEKKKKEEKKKKEKKKKEKKEKKEKKKE SCD: -15.03 Net charge: -4
+Sequence 2: EKEEKKKKKEKKKKKKKKKKKKKEKEEEKKKKKEEEEEEKEEKEEEEEKE SCD: -15.12 Net charge: 6
+Sequence 3: EKEEEEEEEKKEEEEEKEEEEKKKKKEEKKKKKKEEEKEEKEKKKKKKKK SCD: -14.86 Net charge: 0
+Sequence 4: KKKKKEKEKKEKKKKEKEKKKKKEEEEEEEEKEEKKEKEEEEEKEKEEEE SCD: -14.84 Net charge: -2
+Sequence 5: KKKKKKEKKKKKEEKEKEKKKKKKEEKEEKEEEEKEEEEKEKEKEEEEEK SCD: -14.81 Net charge: 2
+Sequence 6: EKEEEEEEKKEEKEEEEEKEKKEEKKEEEEEKKKKKKKEKEEKKKKKKKK SCD: -15.2 Net charge: 0
+Sequence 7: KKEEKKKEKKKKKKKKKEKKEEEEKEEKEEKEEKEEEEKKEEEEEKEEEE SCD: -15.22 Net charge: -4
+Sequence 8: KEEEEEEEEEEEEEEKKEKKEEEKKKKKEEKEKKKEEKKKEKEKKKEKKK SCD: -15.35 Net charge: -2
+Sequence 9: EKEEEEEEKKKEEEKEKEEKEEEEEKEKEKKEKEKKKKKKKEKKKKKEKK SCD: -14.55 Net charge: 2
+```
+
+
 In this example, we're trying to optimize an array of +1 and -1 so that the absolute value of the total charge is maximized. For categorical genes, the "Either Or" crossover method is used, which is the only method compatible with categorical genes in the current implementation.
 
 ### Inputs
