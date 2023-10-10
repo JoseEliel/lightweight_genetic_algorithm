@@ -98,7 +98,7 @@ def fitness_function(fasta_sequence, target_SCD):
 gene_ranges = [ 'E', 'K' ] # Glutamic acid ('E'), Lysine ('K'),
 
 N = 50 # sequence length
-target_SCD = -10
+target_SCD = -15
 
 # Create a GeneticAlgorithm instance
 ga = lga.GeneticAlgorithm(fitness_function, gene_ranges, 
@@ -107,7 +107,7 @@ ga = lga.GeneticAlgorithm(fitness_function, gene_ranges,
 )
 
 # Run the genetic algorithm
- population = ga.run(n_generations=150, population_size=100)
+ population = ga.run(n_generations=300, population_size=100)
 
 ```
 The genetic algorithm produces a population of sequences with SCD values and net charges as depicted below.
