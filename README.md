@@ -56,7 +56,7 @@ plt.show()
 
 In this example, we're using the genetic algorithm to approximate a circular shape based on a defined radial fitness function. The genes for the `GeneticAlgorithm` class can be adjusted to fit the needs of your specific problem, including both numerical and categorical genes.
 
-Here's another example using categorical genes. In this example, we seek to construct an array of Lysine (K) Glutamic Acid (E) representing the amino-acid sequence of a model intrinsically disordered protein. The goal is to find a diverse set of sequences with a net charge near given target value (target_charge) and a sequence charge decoration (SCD) parameter near a given target value (target_SCD). The net charge is calculated as the sum of the charges of the amino acids in the sequence with Lysine (K) having a charge of +1 and Glutamic Acid (E) having a charge of -1. The SCD parameter is defined in [ref] correlates well with both the radius-of-gyration of isolated chains and with the upper-critical temperature for phase separation in multi-chain systems. 
+Here's another example using categorical genes. In this example, we seek to construct an array of Lysine (K) Glutamic Acid (E) representing the amino-acid sequence of a model intrinsically disordered protein. The goal is to find a diverse set of sequences with a net charge near given target value (target_charge) and a sequence charge decoration (SCD) parameter near a given target value (target_SCD). The net charge is calculated as the sum of the charges of the amino acids in the sequence with Lysine (K) having a charge of +1 and Glutamic Acid (E) having a charge of -1. The SCD parameter is defined in Sawle & Gosh J. Chem. Phys. 143, 085101 (2015) and correlates well with both the radius-of-gyration of isolated chains and with the upper-critical temperature for phase separation in multi-chain systems. 
 
 
 ```python
@@ -131,8 +131,7 @@ Sequence 8: KEEEEEEEEEEEEEEKKEKKEEEKKKKKEEKEKKKEEKKKEKEKKKEKKK SCD: -15.35 Net c
 Sequence 9: EKEEEEEEKKKEEEKEKEEKEEEEEKEKEKKEKEKKKKKKKEKKKKKEKK SCD: -14.55 Net charge: 2
 ```
 
-
-In this example, we're trying to optimize an array of +1 and -1 so that the absolute value of the total charge is maximized. For categorical genes, the "Either Or" crossover method is used, which is the only method compatible with categorical genes in the current implementation.
+The above example also shows the use of the `fitness_function_args` argument, which allows you to pass additional arguments to the fitness function. In this case, we pass the target SCD value to the fitness function.
 
 ### Inputs
 
