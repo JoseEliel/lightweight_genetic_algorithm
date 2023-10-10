@@ -109,11 +109,15 @@ ga = lga.GeneticAlgorithm(fitness_function, gene_ranges,
 )
 
 # Run the genetic algorithm
- population = ga.run(n_generations=50, population_size=100)
+ population = ga.run(n_generations=150, population_size=100)
 
 ```
+The genetic algorithm produces a population of sequences with SCD values and net charges as depicted below.
 
-The terminal output is
+![Image showing the resulting populations](example_readme_categorical.png)
+
+The 10 sequences with SCD values closest to the target value are shown below. The diversity enhancement of the genetic algorithm is evident in the diversity of the sequences.
+
 ```bash
 Sequence 0: EEKEKKKKEKKKKEEKKKKKKKKKKEEEKEEKKKKEKEEEEEEEEEEEKE SCD: -15.0 Net charge: 2
 Sequence 1: EEEEEEEEEKEKEKEKEEEEEEEEKKKKEEKKKKEKKKKEKKEKKEKKKE SCD: -15.03 Net charge: -4
