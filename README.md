@@ -56,35 +56,61 @@ plt.show()
 
 In this example, we're using the genetic algorithm to approximate a circular shape based on a defined radial fitness function. The genes for the `GeneticAlgorithm` class can be adjusted to fit the needs of your specific problem, including both numerical and categorical genes.
 
-Here's another example using categorical genes. In this example, we seek to construct an array of Lysine (K) Glutamic Acid (E) representing the amino-acid sequence of a model intrinsically disordered protein. The goal is to find a diverse set of sequences with a net charge near given target value (target_charge) and a sequence charge decoration (SCD) parameter near a given target value (target_SCD). The net charge is calculated as the sum of the charges of the amino acids in the sequence with Lysine (K) having a charge of +1 and Glutamic Acid (E) having a charge of -1. The SCD parameter is calculated as
-$$
-SCD = \frac{1}{N} \sum_{\alpha=1}^{N} \sum_{\beta=1}^{N} \sigma_{\alpha} \sigma_{\beta} \sqrt{ | \alpha - \beta | }
-$$
+Here's another example using categorical genes. In this example, we seek to construct an array of Lysine (K) Glutamic Acid (E) representing the amino-acid sequence of a model intrinsically disordered protein. The goal is to find a diverse set of sequences with a net charge near given target value (target_charge) and a sequence charge decoration (SCD) parameter near a given target value (target_SCD). The net charge is calculated as the sum of the charges of the amino acids in the sequence with Lysine (K) having a charge of +1 and Glutamic Acid (E) having a charge of -1. The SCD parameter is defined in [ref] correlates well with both the radius-of-gyration of isolated chains and with the upper-critical temperature for phase separation in multi-chain systems. 
 
 
 ```python
 from lightweight_genetic_algorithm import GeneticAlgorithm
 
-# Define your fitness function
-def fitness_function(individual):
-    abs_total_charge = abs(sum(individual))
-    return abs_total_charge
+# Convert a fasta sequence to a charge sequence
+def fasta_to_charge(fasta):
+    charge = []
+    for aa in fasta:
+        if aa=='K' or aa=='R': # Lysine or Arginine
+            charge.append(1)
+        elif aa=='E' or aa=='D': # Glutamic acid or Aspartic acid
+            charge.append(-1)
+        elif aa=='H': # Histidine
+            charge.append(0.5)
+        else:
+            charge.append(0)
+    return charge
+    
+# Calculates the sequence charge decoration (SCD) parameter
+def calculate_SCD(seq):
+    SCD = 0
+    for a in range(len(seq)-1):
+        for b in range(a+1,len(seq)):
+            SCD += seq[a] * seq[b] * np.sqrt(np.abs(a-b))
+    SCD *= 2/len(seq)
+    return SCD
 
-# Define the range of your genes
-# Because it is a one-dimensional list 
+# Define fitness function
+def fitness_function(fasta_seq, target_SCD, target_charge=0):
+    # Convert fasta sequence to charge sequence
+    seq = fasta_to_charge(fasta_seq)
+    SCD = calculate_SCD(seq)
+    f = -(SCD-target_SCD)**2 
+    return f
+
+# Define the range of your genes.
+# Because it is a one-dimensional list,
 # categorical genes are automatically recognized
 # gene_ranges is then the list of categories
-gene_ranges = [1,-1]
+gene_ranges = [ 'E', 'K' ] # Glutamic acid ('E'), Lysine ('K'),
+
+N = 50 # sequence length
+target_SCD = -10
 
 # Create a GeneticAlgorithm instance
-ga = GeneticAlgorithm(fitness_function, 
-                      gene_ranges, 
-                      crossover_method="Either Or",
-                      number_of_genes=50,  
-                      mutation_rate=0.1)
+ga = lga.GeneticAlgorithm(fitness_function, gene_ranges, 
+                            number_of_genes=N, 
+                            fitness_function_args=(target_SCD,target_charge,)
+)
 
 # Run the genetic algorithm
-population = ga.run(n_generations=10, population_size=1000)
+ population = ga.run(n_generations=50, population_size=100)
+ 
 ```
 In this example, we're trying to optimize an array of +1 and -1 so that the absolute value of the total charge is maximized. For categorical genes, the "Either Or" crossover method is used, which is the only method compatible with categorical genes in the current implementation.
 
