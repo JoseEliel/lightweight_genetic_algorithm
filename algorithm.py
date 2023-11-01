@@ -99,6 +99,7 @@ class GeneticAlgorithm:
         self.crossover_method = crossover_methods.get(crossover_method.lower(), CrossoverBetween())
         
         ##### Set-up the diversity enhanced survivor selection ##### <--- Should we define a survivor selection class instead? It would make it more modular and easier to use different selection methods.
+
         # Set the distance measure function
         if not measure:
             if self.is_discrete:
