@@ -18,8 +18,6 @@ pip install lightweight-genetic-algorithm
 
 ### Usage
 
-### Inputs
-
 The primary class in this package is `GeneticAlgorithm`. A `GeneticAlgorithm` instance is created with the following inputs:
 
 - `fitness_function`: A function computing the fitness score of an individual. This function should receive an array of genes as its first input argument and return a single number. Additional arguments can be passed to the fitness function using the `fitness_function_args` argument, described below.
