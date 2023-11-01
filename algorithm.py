@@ -24,12 +24,12 @@ class GeneticAlgorithm:
     mutation_mode : list
         The mode used for mutation (default is "additive" for numeric parameters and "categorical" for categorical parameters)
     mutation_rate : float
-        The rate of mutation (default is 1.0/number_of_genes)
+        The rate of mutation (default is 1.0/number_of_genes). During cross-over, each gene is mutated with probability mutation_rate.
     diversity : Diversity
         An instance of the Diversity class used to calculate diversity scores
     measure : function
         A function used to measure the distance between two points in the parameter space (default is Euclidean distance).
-        If "paper" is given, then the measure from arXiv:XXX.XXX is used. This is ignored for categorical parameters.
+        If "dynamic" is given, then the dynamic measure from arXiv:XXX.XXX is used. This is ignored for categorical parameters.
     use_multiprocessing : bool
         Whether to use multiprocessing for fitness evaluations (default is False). 
         This speeds up the algorithm for computationally expensive fitness functions.
@@ -66,6 +66,8 @@ class GeneticAlgorithm:
         # If parameters are categories, we print out the corresponding notice
         if self.is_discrete:
             print("Detected categorical genes.")
+        else:
+            print("Detected numeric genes.")
 
         # Raise error if number of parameters is not provided for categorical parameters
         if self.is_discrete and number_of_genes is None:
@@ -96,12 +98,24 @@ class GeneticAlgorithm:
             warnings.warn(f"Invalid crossover method '{crossover_method}'. Available options are: {', '.join(crossover_methods.keys())}. Defaulting to 'Between'!")
         self.crossover_method = crossover_methods.get(crossover_method.lower(), CrossoverBetween())
         
-        # Set the measure function
-        if not measure and not self.is_discrete:
-            print("No measure given, defaulting to Euclidean measure.")
-        self.measure = measure if measure else None
+        ##### Set-up the diversity enhanced survivor selection ##### <--- Should we define a survivor selection class instead? It would make it more modular and easier to use different selection methods.
+        # Set the distance measure function
+        if not measure:
+            if self.is_discrete:
+                print("No measure given, defaulting to Hamming measure.")
+                self.measure = lambda x,y: np.sum(x != y) / len(x) 
+            else:
+                print("No measure given, defaulting to Euclidean measure.")
+                self.measure = lambda x,y: np.sum((x - y)**2)        
+        elif measure == "dynamic":
+            print("Using dynamic measure.")
+            if self.is_discrete:
+                raise ValueError("Dynamic measure is not compatible with categorical parameters.")
+            self.measure = lambda x,y: np.sum((x - y)**2 / (np.abs(x) + np.abs(y) + 1e-10)**2)
+        else:
+            self.measure = measure
+        
         self.diversity = Diversity(self.measure)
-
         self.mutation = Mutation(self.mutation_mode, self.mutation_rate, self.gene_ranges)
 
         # Setup multiprocessing if specified
@@ -182,24 +196,17 @@ class GeneticAlgorithm:
 
         return survivors
 
-    def run(self, n_generations, population_size=None, initial_population=None, fitness_threshold=None):
+    def run(self, n_generations, population_size, fitness_threshold=None):
             '''
-            Run the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals.
-            The initial population can be specified as a list of individuals, or the population size can be specified to create a random initial population. If both are specified, the initial population is used.
-            A fitness threshold can be specified to stop the algorithm early if the fitness exceeds the threshold.
+            Run the genetic algorithm for a specified number of generations (n_generations), printing the average and top fitness at specified intervals. The number of individuals in the population is set by population_size.
+            A fitness threshold can be specified to stop the algorithm early if the fitness of the fittest individual exceeds the threshold.
             '''
 
-            if population_size is None and initial_population is None:
-                raise ValueError("Either population_size or initial_population must be specified.")
-
-            if initial_population is not None:
-                # Use input initial_population as initial population
-                raise ValueError("Using input initial_population is not yet implemented!")
-            else:        
-                # Create initial population
-                population = self.create_initial_population(population_size)
-                if population is None:
-                    raise ValueError("Failed to create initial population.")
+            # Create initial population
+            population = self.create_initial_population(population_size)
+            if population is None:
+                raise ValueError("Failed to create initial population.")
+            
             # Set population size for diversity calculation
             self.diversity.set_population_size( len(population) )
 
@@ -242,7 +249,7 @@ class GeneticAlgorithm:
                 if generation in print_generations or generation == 0:
                     average_fitness = np.mean([individual.fitness for individual in population])
                     best_fitness = np.max( [individual.fitness for individual in population] )
-                    print(f"Generation {generation}, Average Fitness: {average_fitness}, Best fitness: {best_fitness}")
+                    print(f"Generation {generation}, Average Fitness: {average_fitness}, Best Fitness: {best_fitness}")
                 
                 # Check if fitness threshold is reached
                 if fitness_threshold and best_fitness >= fitness_threshold:
