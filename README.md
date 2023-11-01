@@ -147,6 +147,7 @@ ga = lga.GeneticAlgorithm(fitness_function, gene_ranges,
 The genetic algorithm produces a population of sequences with SCD values and net charges as depicted below.
 
 ![Image showing the resulting populations](example_readme_categorical.png)
+<img src="example_readme_categorical.png" width="200"/>
 
 We can print the 10 sequences with SCD values closest to the target value using the following code:
 
