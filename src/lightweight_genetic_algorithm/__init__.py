@@ -8,4 +8,5 @@ __version__ = "0.1"
 
 from .algorithm import GeneticAlgorithm
 from .crossover import CrossoverBetween, CrossoverMidpoint, CrossoverEitherOr
-from .diversity import Diversity
+from .selection import SurvivorSelection, DiversityEnhancedSurvivorSelection
+#from .diversity import Diversity

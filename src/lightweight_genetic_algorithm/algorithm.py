@@ -1,5 +1,6 @@
 import numpy as np
-from .diversity import Diversity
+#from .diversity import Diversity
+from .selection import SurvivorSelection, DiversityEnhancedSurvivorSelection
 from .crossover import CrossoverBetween, CrossoverMidpoint, CrossoverEitherOr
 from .mutation import Mutation
 from .population import Individual, NumericGene, CategoricalGene
@@ -25,9 +26,11 @@ class GeneticAlgorithm:
         The mode used for mutation (default is "additive" for numeric parameters and "categorical" for categorical parameters)
     mutation_rate : float
         The rate of mutation (default is 1.0/number_of_genes). During cross-over, each gene is mutated with probability mutation_rate.
-    diversity : Diversity
-        An instance of the Diversity class used to calculate diversity scores
-    measure : function
+    mutation: Mutation
+        An instance of the Mutation class used to mutate the genes
+    survivor_selection : SurvivorSelection
+        An instance of the SurvivorSelection class used to select the survivors from the population
+    measure : function or str
         A function used to measure the distance between two points in the parameter space (default is Euclidean distance).
         If "dynamic" is given, then the dynamic measure from arXiv:XXX.XXX is used. This is ignored for categorical parameters.
     use_multiprocessing : bool
@@ -41,8 +44,8 @@ class GeneticAlgorithm:
     -------
     create_initial_population(n)
         Creates an initial population of n individuals
-    select_survivors(population, surviving_population_size)
-        Selects the best individuals from a population based on their fitness and diversity scores
+    evaluate_fitness(genes)
+        Evaluates the fitness of an individual defined by the given genes
     mutation(point)
         Mutates an individual based on the specified mutation mode and rate
     run(n_generations, population_size, initial_population, fitness_threshold)
@@ -87,6 +90,8 @@ class GeneticAlgorithm:
 
         self.mutation_rate = mutation_rate if mutation_rate else 1.0/self.number_of_genes
 
+        self.mutation = Mutation(self.mutation_mode, self.mutation_rate, self.gene_ranges)
+
         # Map string to corresponding crossover method
         crossover_methods = {
             "between": CrossoverBetween(),
@@ -98,26 +103,25 @@ class GeneticAlgorithm:
             warnings.warn(f"Invalid crossover method '{crossover_method}'. Available options are: {', '.join(crossover_methods.keys())}. Defaulting to 'Between'!")
         self.crossover_method = crossover_methods.get(crossover_method.lower(), CrossoverBetween())
         
-        ##### Set-up the diversity enhanced survivor selection ##### <--- Should we define a survivor selection class instead? It would make it more modular and easier to use different selection methods.
-
-        # Set the distance measure function
+        ##### Set-up the diversity enhanced survivor selection ##### 
+        # (1) Set the distance measure function
         if not measure:
             if self.is_discrete:
                 print("No measure given, defaulting to Hamming measure.")
-                self.measure = lambda x,y: np.sum(x != y) / len(x) 
+                self.measure = 'hamming'
             else:
                 print("No measure given, defaulting to Euclidean measure.")
-                self.measure = lambda x,y: np.sum((x - y)**2)        
+                self.measure = 'euclidean'   
         elif measure == "dynamic":
             print("Using dynamic measure.")
             if self.is_discrete:
                 raise ValueError("Dynamic measure is not compatible with categorical parameters.")
-            self.measure = lambda x,y: np.sum((x - y)**2 / (np.abs(x) + np.abs(y) + 1e-10)**2)
+            self.measure = 'dynamic'
         else:
-            self.measure = measure
-        
-        self.diversity = Diversity(self.measure)
-        self.mutation = Mutation(self.mutation_mode, self.mutation_rate, self.gene_ranges)
+            print(f"Using user-defined input distance measure.")
+            self.measure = measure  
+        # (2) Create SurvivorSelection instance
+        self.survivor_selection = DiversityEnhancedSurvivorSelection(self.measure)
 
         # Setup multiprocessing if specified
         self.use_multiprocessing = use_multiprocessing
@@ -149,54 +153,6 @@ class GeneticAlgorithm:
         return population
 
 
-    # def select_survivors(self, population, surviving_population_size):
-    #     # List to keep selected survivors
-    #     survivors = []
-
-    #     for i in range(surviving_population_size):
-    #         # Sort the population based purely on fitness for the first individual, then use fitness - diversity_score
-    #         if i == 0:
-    #             for individual in population:
-    #                 individual.set_diversity_score(individual.fitness)
-
-    #         population.sort(key=lambda individual: individual.diversity_score, reverse=True)
-            
-    #         # Get the best survivor and remove it from population
-    #         best_survivor = population.pop(0)
-    #         survivors.append(best_survivor)
-        
-    #         # Update the diversity score of remaining individuals, don't alter the fitness
-    #         for individual in population:
-    #             diversity_punishment = self.diversity.compute_diversity(individual, best_survivor)
-    #             individual.set_diversity_score(individual.diversity_score - diversity_punishment)
-
-    #     return survivors
-
-    def select_survivors(self, population, surviving_population_size):
-        '''
-        Select survivors using the diversity enhancing selection method. 
-        '''
-
-        # List to keep selected survivors
-        survivors = []
-
-        population = np.array(population)
-        diversity_scores = [individual.fitness for individual in population]
-
-        for i in range(surviving_population_size):
-            # Get the best survivor and remove it from population
-            best_survivor_idx = np.argmax(diversity_scores)
-            survivors.append(population[best_survivor_idx])
-            population = np.delete(population, best_survivor_idx)
-            diversity_scores = np.delete(diversity_scores, best_survivor_idx)
-        
-            # Update the diversity score of remaining individuals
-            for i,individual in enumerate(population):
-                diversity_punishment = self.diversity.compute_diversity(individual, survivors[-1])
-                diversity_scores[i] -= diversity_punishment
-
-        return survivors
-
     def run(self, n_generations, population_size, fitness_threshold=None):
             '''
             Run the genetic algorithm for a specified number of generations (n_generations), printing the average and top fitness at specified intervals. The number of individuals in the population is set by population_size.
@@ -208,9 +164,6 @@ class GeneticAlgorithm:
             if population is None:
                 raise ValueError("Failed to create initial population.")
             
-            # Set population size for diversity calculation
-            self.diversity.set_population_size( len(population) )
-
             # Determine the generations at which to print the averages
             print_generations = np.linspace(0, n_generations, 6, dtype=int)[1:]
 
@@ -245,7 +198,8 @@ class GeneticAlgorithm:
                 combined_population = population + offspring
 
                 # Select the best individuals to form the next generation
-                population = self.select_survivors(combined_population, population_size)
+                population = self.survivor_selection.select_survivors(combined_population, population_size)
+                #population = self.select_survivors(combined_population, population_size)
 
                 if generation in print_generations or generation == 0:
                     average_fitness = np.mean([individual.fitness for individual in population])
