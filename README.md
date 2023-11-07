@@ -197,7 +197,7 @@ The package provides four different crossover methods:
 
 The package includes a unique selection procedure that promotes diversity among the surviving individuals in each generation (i.e., the individuals that are selected to constitute the next-generation population). This leads to an efficient non-local exploration of the gene space, which is particularly useful for problems with many local optima. The diversity enhancement is achieved by calculating a diversity score for each individual in the population. The selection procedure works as follows:
 
-1. The individual in the population with the highest (most optimal) fitness is selected as a survivor.
+1. The individual in the population with the highest (most optimal) fitness is selected as a survivor and removed from the population.
 
 2. A "diversity punishment" is subtracted from the fitness of each remaining individuals. The diversity punishment is based on similarity with the previously selected survivor, with similar individuals receiving a higher punishment. 
 
@@ -215,7 +215,7 @@ The package also allows you to supply your own function to measure the distance 
 
 - **Diversity Enhancement**: The package contains a unique diversity calculation which makes the algorithm effective even for small populations and a few generations. This calculation is based on the Euclidean distance between individuals, and it is designed to promote diversity within the population. The diversity score is a measure of how different two individuals are from each other, based on their gene values. The class also includes a method to adjust the diversity calculation based on the size of the total population.
 
-- **Support for Numerical and Categorical Genes**: The GeneticAlgorithm class can handle both numeric and categorical genes, which enables users to solve a wider range of optimization problems.
+- **Support for Numerical and Categorical Genes**: The GeneticAlgorithm class can handle both numeric and categorical genes, which enables users to solve a wide range of optimization problems.
 
 - **Customizable Measure Function**: The package allows you to supply your own function to measure the distance between two points in the gene space. This flexibility lets you customize the diversity calculation to better match your problem. Note that this feature does not apply when working with categorical genes.
 
