@@ -14,14 +14,11 @@ In the context of this genetic algorithm, a "gene" can be understood as a parame
 
 - **Multiple Mutation Modes**: The package includes four mutation modes: "additive", "multiplicative", "random", and "categorical". This flexibility allows you to choose the mutation mode that best suits your problem, whether it uses numeric or categorical genes.
 
-- **Diversity Enhancement**: The package contains a unique diversity calculation which makes the algorithm effective even for small populations and a few generations. This calculation is based on the Euclidean distance between individuals, and it is designed to promote diversity within the population. The diversity score is a measure of how different two individuals are from each other, based on their gene values. The class also includes a method to adjust the diversity calculation based on the size of the total population.
+- **Diversity Enhancement**: The package contains a unique survivor selection procedure that promotes both fitness and diversity among the surviving individuals in each generation. This can procedure provides not only the "best solution", but also a diverse set of solutions to the optimization problem. The diversity is quantified using a distance measure that quantifies the dissimilarity between two individuals. The default distance measure is the Euclidean distance for numeric genes and the Hamming distance for categorical genes. The package also allows you to supply your own distance measure to better match your problem. 
 
 - **Support for Numerical and Categorical Genes**: The GeneticAlgorithm class can handle both numeric and categorical genes, which enables users to solve a wide range of optimization problems.
 
-- **Customizable Measure Function**: The package allows you to supply your own function to measure the distance between two points in the gene space. This flexibility lets you customize the diversity calculation to better match your problem. Note that this feature does not apply when working with categorical genes.
-
 - **Multiprocessing**: The package supports multiprocessing for parallelized fitness evaluations. This feature can dramatically speed up the genetic algorithm for problems where the fitness function is computationally expensive. 
-
 
 ### Installation
 
