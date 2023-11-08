@@ -8,6 +8,21 @@ The genetic algorithm implemented in this package includes features such as mult
 
 In the context of this genetic algorithm, a "gene" can be understood as a parameter or variable that we want to optimize. It can be numeric when we explore the parameter space of a model or theory or categorical when we express discrete, non-numeric options, for example, the amino-acid sequence of in a protein.
 
+### Features
+
+- **Multiple Crossover Methods**: The package provides four different crossover methods: "Between", "Midpoint", "Either Or", and "None". For categorical genes, "Either Or" must be used. For numeric genes, you can select the one that best matches your problem.
+
+- **Multiple Mutation Modes**: The package includes four mutation modes: "additive", "multiplicative", "random", and "categorical". This flexibility allows you to choose the mutation mode that best suits your problem, whether it uses numeric or categorical genes.
+
+- **Diversity Enhancement**: The package contains a unique diversity calculation which makes the algorithm effective even for small populations and a few generations. This calculation is based on the Euclidean distance between individuals, and it is designed to promote diversity within the population. The diversity score is a measure of how different two individuals are from each other, based on their gene values. The class also includes a method to adjust the diversity calculation based on the size of the total population.
+
+- **Support for Numerical and Categorical Genes**: The GeneticAlgorithm class can handle both numeric and categorical genes, which enables users to solve a wide range of optimization problems.
+
+- **Customizable Measure Function**: The package allows you to supply your own function to measure the distance between two points in the gene space. This flexibility lets you customize the diversity calculation to better match your problem. Note that this feature does not apply when working with categorical genes.
+
+- **Multiprocessing**: The package supports multiprocessing for parallelized fitness evaluations. This feature can dramatically speed up the genetic algorithm for problems where the fitness function is computationally expensive. 
+
+
 ### Installation
 
 You can install the package using pip:
@@ -206,17 +221,3 @@ The package includes a unique selection procedure that promotes diversity among 
 The diversity punishment is calculated using a "measure" function that defines a distance between two points in the gene space. The default measure function is the Euclidean distance for numeric genes and the Hamming distance for categorical genes. Given the distance between two individuals, the diversity punishment is obtained using an exponential function that leaves the fitness essentially unchanged for individuals further apart than certain distance. 
 
 The package also allows you to supply your own function to measure the distance between two points in the gene space. This allows you to customize the diversity calculation to better match your problem. 
-
-### Features
-
-- **Multiple Crossover Methods**: The package provides four different crossover methods: "Between", "Midpoint", "Either Or", and "None". For categorical genes, "Either Or" must be used. For numeric genes, you can select the one that best matches your problem.
-
-- **Multiple Mutation Modes**: The package includes four mutation modes: "additive", "multiplicative", "random", and "categorical". This flexibility allows you to choose the mutation mode that best suits your problem, whether it uses numeric or categorical genes.
-
-- **Diversity Enhancement**: The package contains a unique diversity calculation which makes the algorithm effective even for small populations and a few generations. This calculation is based on the Euclidean distance between individuals, and it is designed to promote diversity within the population. The diversity score is a measure of how different two individuals are from each other, based on their gene values. The class also includes a method to adjust the diversity calculation based on the size of the total population.
-
-- **Support for Numerical and Categorical Genes**: The GeneticAlgorithm class can handle both numeric and categorical genes, which enables users to solve a wide range of optimization problems.
-
-- **Customizable Measure Function**: The package allows you to supply your own function to measure the distance between two points in the gene space. This flexibility lets you customize the diversity calculation to better match your problem. Note that this feature does not apply when working with categorical genes.
-
-- **Multiprocessing**: The package supports multiprocessing for parallelized fitness evaluations. This feature can dramatically speed up the genetic algorithm for problems where the fitness function is computationally expensive. 
