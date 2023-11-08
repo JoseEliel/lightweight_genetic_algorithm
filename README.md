@@ -6,7 +6,7 @@ This package provides an intuitive, flexible, and efficient implementation of a 
 
 The genetic algorithm implemented in this package includes features such as multiple crossover methods, mutation modes, support for both numerical and categorical genes, and a unique diversity calculation that makes it effective even for small populations and few generations.
 
-In the context of this genetic algorithm, a "gene" can be understood as a parameter or variable that we want to optimize. It can be numeric when we explore the parameter space of a model or theory or categorical when we express discrete, non-numeric options, for example, the amino-acid sequence of in a protein.
+In the context of this genetic algorithm, a "gene" can be understood as a parameter or variable that we want to optimize. It can be numeric when we explore the parameter space of a model or theory or categorical when we express discrete, non-numeric options, for example, the amino-acid sequence of in a protein. An "individual" is a set of genes that defines a point in the gene space. The user defines a "fitness function" that computes the fitness of an individual, which quantifies how good it is. The goal of the genetic algorithm is to find a set of individuals with high fitness, constituting optimal solutions to the optimization problem at hand.
 
 ### Features
 
