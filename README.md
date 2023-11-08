@@ -10,13 +10,13 @@ In the context of this genetic algorithm, a "gene" can be understood as a parame
 
 ### Features
 
+- **Support for Numerical and Categorical Genes**: The GeneticAlgorithm class can handle both numeric and categorical genes, which enables users to solve a wide range of optimization problems.
+
 - **Multiple Crossover Methods**: The package provides four different crossover methods: "Between", "Midpoint", "Either Or", and "None". For categorical genes, "Either Or" must be used. For numeric genes, you can select the one that best matches your problem.
 
 - **Multiple Mutation Modes**: The package includes four mutation modes: "additive", "multiplicative", "random", and "categorical". This flexibility allows you to choose the mutation mode that best suits your problem, whether it uses numeric or categorical genes.
 
 - **Diversity Enhancement**: The package contains a unique survivor selection procedure that promotes both fitness and diversity among the surviving individuals in each generation. This can procedure provides not only the "best solution", but also a diverse set of solutions to the optimization problem. The diversity is quantified using a distance measure that quantifies the dissimilarity between two individuals. The default distance measure is the Euclidean distance for numeric genes and the Hamming distance for categorical genes. The package also allows you to supply your own distance measure to better match your problem. 
-
-- **Support for Numerical and Categorical Genes**: The GeneticAlgorithm class can handle both numeric and categorical genes, which enables users to solve a wide range of optimization problems.
 
 - **Multiprocessing**: The package supports multiprocessing for parallelized fitness evaluations. This feature can dramatically speed up the genetic algorithm for problems where the fitness function is computationally expensive. 
 
@@ -104,7 +104,7 @@ In this example, we're using the genetic algorithm to approximate a circular sha
 
 #### Example 2: Categorical genes
 
-Here's an example showing the intended usage for categorical genes. In this example, we seek to construct an array of Lysine (K) Glutamic acid (E) representing the amino-acid sequence of a model intrinsically disordered protein. The goal is to find a diverse set of sequences with a sequence charge decoration (SCD) parameter near a given target value (target_SCD). The net charge of a sequence is the sum of the charges of the amino acids with Lysine (K) having a charge of +1 and Glutamic Acid (E) having a charge of -1. The SCD parameter is defined in Sawle & Gosh J. Chem. Phys. 143, 085101 (2015), and is a single number that can be calculated given a sequence of charges. The SCD parameter is a measure of the "charge blockiness" (i.e., an alternating sequence 'EKEKEK...EK' gives SCD~0 while a di-block sequence 'EEEE...EEEKKKK...KKK' gives a large, negative SCD) and correlates well with both the radius-of-gyration of isolated chains and with the upper-critical temperature for phase separation in multi-chain systems. 
+Here's an example showing the intended usage for categorical genes. In this example, we seek to construct an array of Lysine (K) Glutamic acid (E) representing the amino-acid sequence of a model intrinsically disordered protein. The goal is to find a diverse set of sequences with a "sequence charge decoration" (SCD) parameter near a given target value (target_SCD). The net charge of a sequence is the sum of the charges of the amino acids with Lysine (K) having a charge of +1 and Glutamic Acid (E) having a charge of -1. The SCD parameter is defined in Sawle & Gosh J. Chem. Phys. 143, 085101 (2015), and is a single number that can be calculated given a sequence of charges. The SCD parameter is a measure of the "charge blockiness" (i.e., an alternating sequence 'EKEKEK...EK' gives SCD~0 while a di-block sequence 'EEEE...EEEKKKK...KKK' gives a large, negative SCD) and correlates well with both the radius-of-gyration of isolated chains and with the upper-critical temperature for phase separation in multi-chain systems. 
 
 ```python
 from lightweight_genetic_algorithm import GeneticAlgorithm
@@ -209,9 +209,9 @@ The package provides four different crossover methods:
 
 The package includes a unique selection procedure that promotes diversity among the surviving individuals in each generation (i.e., the individuals that are selected to constitute the next-generation population). This leads to an efficient non-local exploration of the gene space, which is particularly useful for problems with many local optima. The diversity enhancement is achieved by calculating a diversity score for each individual in the population. The selection procedure works as follows:
 
-1. The individual in the population with the highest (most optimal) fitness is selected as a survivor and removed from the population.
+1. The individual in the population with the highest (most optimal) fitness is selected as a survivor and is removed from the population.
 
-2. A "diversity punishment" is subtracted from the fitness of each remaining individuals. The diversity punishment is based on similarity with the previously selected survivor, with similar individuals receiving a higher punishment. 
+2. A "diversity punishment" is subtracted from the fitness of each individual in the remaining population. The diversity punishment is based on similarity with the previously selected survivor, with similar individuals receiving a higher punishment. 
 
 3. Steps 1 and 2 are iterated until a new population of the desired size has been selected.
 
