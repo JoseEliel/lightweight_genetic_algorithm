@@ -1,5 +1,4 @@
 import numpy as np
-#from .diversity import Diversity
 from .selection import SurvivorSelection, DiversityEnhancedSurvivorSelection
 from .crossover import CrossoverBetween, CrossoverMidpoint, CrossoverEitherOr
 from .mutation import Mutation
@@ -46,8 +45,6 @@ class GeneticAlgorithm:
         Creates an initial population of n individuals
     evaluate_fitness(genes)
         Evaluates the fitness of an individual defined by the given genes
-    mutation(point)
-        Mutates an individual based on the specified mutation mode and rate
     run(n_generations, population_size, initial_population, fitness_threshold)
         Runs the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals
     """
@@ -189,7 +186,6 @@ class GeneticAlgorithm:
                 # Create offspring Individual objects using multiprocessing if specified
                 if self.use_multiprocessing:
                     with self.mp.Pool(self.ncpus) as pool:
-                        # Create offspring Individual objects
                         offspring = pool.starmap(Individual, [(g, self.fitness_function, self.fitness_function_args) for g in offspring_genes] )
                 else:
                     offspring = [Individual(genes, self.fitness_function, self.fitness_function_args) for genes in offspring_genes]
@@ -199,7 +195,6 @@ class GeneticAlgorithm:
 
                 # Select the best individuals to form the next generation
                 population = self.survivor_selection.select_survivors(combined_population, population_size)
-                #population = self.select_survivors(combined_population, population_size)
 
                 if generation in print_generations or generation == 0:
                     average_fitness = np.mean([individual.fitness for individual in population])
