@@ -1,7 +1,6 @@
 import numpy as np
 from .population import Individual
 
-
 class Mutation:
     """
     A class used to represent a Mutation
@@ -20,7 +19,7 @@ class Mutation:
         genes_to_mutate = [ True if np.random.rand() < self.mutation_probability else False for i in range(len(genes))]
         
         # If no gene was chosen to mutate, force the mutation of one gene (unless force_mutate is False)
-        if np.sum(genes_to_mutate) == 0 and not force_mutate:
+        if np.sum(genes_to_mutate) == 0 and force_mutate:
             genes_to_mutate[np.random.randint(len(genes))] = True
 
         for i, gene in enumerate(genes):
