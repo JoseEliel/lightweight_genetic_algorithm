@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import numpy as np
+
 class Gene(ABC):
     """
     The abstract base class for a gene.
@@ -14,7 +15,6 @@ class Gene(ABC):
     @abstractmethod
     def set_value(self):
         pass
-
 
 class NumericGene(Gene):
     """
@@ -57,7 +57,7 @@ class CategoricalGene(Gene):
     
 class Individual:
     """
-    An individual is defined by its genes.
+    An individual is defined by its genes. The fitness is evaluated when the individual is created.
     """
     def __init__(self, genes, fitness_function, fitness_function_args):
         self.genes = genes
@@ -72,11 +72,9 @@ class Individual:
     def get_genes(self):
         return self.genes
     
-    def get_gene_values(self):   # Add this method
+    def get_gene_values(self):
         return self.genes_values
     
     def get_fitness_function(self):
         return self.fitness_function
 
-    def set_fitness(self,value):
-        self.fitness = value

@@ -55,9 +55,9 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
     Attributes
     ----------
     r0 : float
-        The initial diversity threshold.
+        The characteristic distance beyond which there is no diversity punishment.
     B0 : float
-        The initial diversity bonus.
+        Diversity punishment for identical individuals.
     measure : function
         The function used to measure the "distance" or "dissimilarity" between two individuals.
 
