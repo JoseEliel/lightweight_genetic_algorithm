@@ -80,6 +80,8 @@ class GeneticAlgorithm:
         default_mutation_mode = ["additive"]*self.number_of_genes if not self.is_discrete else ["categorical"]*self.number_of_genes
         self.mutation_mode = [mode.lower() for mode in mutation_mode] if mutation_mode else default_mutation_mode
 
+        print("Mutation mode:", self.mutation_mode)
+
         # Check if mutation methods are valid
         for mode in self.mutation_mode:
             if mode not in {'additive', 'multiplicative', 'random', 'categorical'}:
