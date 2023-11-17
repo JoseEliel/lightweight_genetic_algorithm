@@ -48,7 +48,13 @@ class Mutation:
         return mutated_individual
     
     def additive(self, gene, param_range):
-        gene.set_value(gene.value + np.random.uniform(low=param_range[0], high=param_range[1]))
+        # Calcualtes 
+        
+        range_size = abs(param_range[1] - param_range[0])
+        lowest = -range_size/2
+        highest = range_size/2
+
+        gene.set_value(gene.value + np.random.uniform(low=lowest, high=highest))
         return gene
 
     def multiplicative(self, gene, param_range = None):

@@ -70,7 +70,7 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
         Compute diversity punishment for an individual (point) given a survivor.
     """ 
 
-    def __init__(self, measure, r0=.707, B0=1.0):
+    def __init__(self, measure, r0=1, B0=1.0):
         """
         Constructs all the necessary attributes for the diversity enhanced survivor selection method.
 
@@ -111,7 +111,7 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
         return diversity_result
 
     # Select survivors from a population
-    def select_survivors(self, population, surviving_population_size, B0=None):
+    def select_survivors(self, population, surviving_population_size, B0=None, r0=None):
         """
         Selects the survivors from a population. Returns a list of individuals of size surviving_population_size.
 
@@ -137,6 +137,9 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
             self.B0 = 1. / len(population)
         else:
             self.B0 = B0
+
+        if r0 is None:
+            self.r0 = 1
 
         # List to keep selected survivors
         survivors = []

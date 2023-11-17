@@ -80,8 +80,6 @@ class GeneticAlgorithm:
         default_mutation_mode = ["additive"]*self.number_of_genes if not self.is_discrete else ["categorical"]*self.number_of_genes
         self.mutation_mode = [mode.lower() for mode in mutation_mode] if mutation_mode else default_mutation_mode
 
-        print("Mutation mode:", self.mutation_mode)
-
         # Check if mutation methods are valid
         for mode in self.mutation_mode:
             if mode not in {'additive', 'multiplicative', 'random', 'categorical'}:
@@ -124,10 +122,24 @@ class GeneticAlgorithm:
 
         # Setup multiprocessing if specified
         self.use_multiprocessing = use_multiprocessing
-        if self.use_multiprocessing or ncpus:
+        if self.use_multiprocessing:
             import multiprocessing as mp
             self.mp = mp
             self.ncpus = ncpus if ncpus else self.mp.cpu_count()-1
+            # Initialize the multiprocessing Pool
+            self.pool = self.mp.Pool(self.ncpus)
+        else:
+            self.pool = None
+    
+    def start_pool(self):
+        if self.use_multiprocessing and self.pool is None:
+            self.pool = self.mp.Pool(self.ncpus)
+
+    def stop_pool(self):
+        if self.pool is not None:
+            self.pool.close()
+            self.pool.join()
+            self.pool = None
 
     def evaluate_fitness(self,genes):
         return self.fitness_function(genes,*self.fitness_function_args)
@@ -157,7 +169,8 @@ class GeneticAlgorithm:
             Run the genetic algorithm for a specified number of generations (n_generations), printing the average and top fitness at specified intervals. The number of individuals in the population is set by population_size.
             A fitness threshold can be specified to stop the algorithm early if the fitness of the fittest individual exceeds the threshold.
             '''
-
+            # Start multiprocessing pool if specified
+            self.start_pool()
             # Create initial population
             population = self.create_initial_population(population_size)
             if population is None:
@@ -165,7 +178,6 @@ class GeneticAlgorithm:
             
             # Determine the generations at which to print the averages
             print_generations = np.linspace(0, n_generations, 6, dtype=int)[1:]
-
             # Run the genetic algorithm for the specified number of generations
             for generation in range(n_generations):                
                 
@@ -187,8 +199,7 @@ class GeneticAlgorithm:
 
                 # Create offspring Individual objects using multiprocessing if specified
                 if self.use_multiprocessing:
-                    with self.mp.Pool(self.ncpus) as pool:
-                        offspring = pool.starmap(Individual, [(g, self.fitness_function, self.fitness_function_args) for g in offspring_genes] )
+                    offspring = self.pool.starmap(Individual, [(g, self.fitness_function, self.fitness_function_args) for g in offspring_genes] )
                 else:
                     offspring = [Individual(genes, self.fitness_function, self.fitness_function_args) for genes in offspring_genes]
 
@@ -207,5 +218,7 @@ class GeneticAlgorithm:
                 if fitness_threshold and best_fitness >= fitness_threshold:
                     print(f"Fitness threshold reached at generation {generation}!")
                     break
-             
+            # Stop multiprocessing pool if specified    
+            self.stop_pool()
+            
             return [individual.get_gene_values() for individual in population]
