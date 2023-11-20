@@ -37,7 +37,8 @@ class GeneticAlgorithm:
         This speeds up the algorithm for computationally expensive fitness functions.
     ncpus : int
         The number of processes to use for multiprocessing (default is the number of CPUs on the system minus 1)
-
+    verbosity : int
+        The verbosity level for printing out messages (default is 1). 0 = silent, 1 = normal output, 2 = detailed output.
 
     Methods
     -------
@@ -48,7 +49,9 @@ class GeneticAlgorithm:
     run(n_generations, population_size, initial_population, fitness_threshold)
         Runs the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals
     """
-    def __init__(self, fitness_function, gene_ranges, fitness_function_args=(), number_of_genes=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None, use_multiprocessing=False, ncpus=None):
+    def __init__(self, fitness_function, gene_ranges, fitness_function_args=(), number_of_genes=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None, use_multiprocessing=False, ncpus=None, verbosity=1):
+        # Verbosity level for printing out messages
+        self.verbosity = verbosity
         # User-defined function to calculate fitness score of each individual
         self.fitness_function = fitness_function 
         self.fitness_function_args = fitness_function_args
@@ -65,9 +68,9 @@ class GeneticAlgorithm:
 
         # If parameters are categories, we print out the corresponding notice
         if self.is_discrete:
-            print("Detected categorical genes.")
+            self.log("Detected categorical genes.", level = 2)
         else:
-            print("Detected numeric genes.")
+            self.log("Detected numeric genes.", level = 2)
 
         # Raise error if number of parameters is not provided for categorical parameters
         if self.is_discrete and number_of_genes is None:
@@ -79,6 +82,8 @@ class GeneticAlgorithm:
         # Set default mutation mode based on gene type
         default_mutation_mode = ["additive"]*self.number_of_genes if not self.is_discrete else ["categorical"]*self.number_of_genes
         self.mutation_mode = [mode.lower() for mode in mutation_mode] if mutation_mode else default_mutation_mode
+
+        self.log(f"Mutation mode: {', '.join(self.mutation_mode)}", level=2)
 
         # Check if mutation methods are valid
         for mode in self.mutation_mode:
@@ -100,22 +105,24 @@ class GeneticAlgorithm:
             warnings.warn(f"Invalid crossover method '{crossover_method}'. Available options are: {', '.join(crossover_methods.keys())}. Defaulting to 'Between'!")
         self.crossover_method = crossover_methods.get(crossover_method.lower(), CrossoverBetween())
         
+        self.log(f"Crossover method: {crossover_method}", level=2)
+
         ##### Set-up the diversity enhanced survivor selection ##### 
         # (1) Set the distance measure function
         if not measure:
             if self.is_discrete:
-                print("No measure given, defaulting to Hamming measure.")
+                self.log("No measure given, defaulting to Hamming measure.", level=2)
                 self.measure = 'hamming'
             else:
-                print("No measure given, defaulting to Euclidean measure.")
+                self.log("No measure given, defaulting to Euclidean measure.", level=2)
                 self.measure = 'euclidean'   
         elif measure == "dynamic":
-            print("Using dynamic measure.")
+            self.log("Using dynamic measure.", level=2)
             if self.is_discrete:
                 raise ValueError("Dynamic measure is not compatible with categorical parameters.")
             self.measure = 'dynamic'
         else:
-            print(f"Using user-defined input distance measure.")
+            self.log(f"Using user-defined input distance measure.", level = 2)
             self.measure = measure  
         # (2) Create SurvivorSelection instance
         self.survivor_selection = DiversityEnhancedSurvivorSelection(self.measure)
@@ -123,14 +130,22 @@ class GeneticAlgorithm:
         # Setup multiprocessing if specified
         self.use_multiprocessing = use_multiprocessing
         if self.use_multiprocessing:
+            self.log("Using multiprocessing.", level=2)
             import multiprocessing as mp
             self.mp = mp
             self.ncpus = ncpus if ncpus else self.mp.cpu_count()-1
             # Initialize the multiprocessing Pool
             self.pool = self.mp.Pool(self.ncpus)
         else:
+            self.log("Not using multiprocessing.", level=2)
             self.pool = None
+
+        
     
+    def log(self, message, level=1):
+        if self.verbosity >= level:
+            print(message)
+
     def start_pool(self):
         if self.use_multiprocessing and self.pool is None:
             self.pool = self.mp.Pool(self.ncpus)
@@ -145,6 +160,7 @@ class GeneticAlgorithm:
         return self.fitness_function(genes,*self.fitness_function_args)
 
     def create_initial_population(self, n):
+        self.log(f"Creating initial population of size {n}.", level=2)
         # Create genes of the population
         if self.is_discrete:
             # Expecting a 1D list for discrete parameters
@@ -212,11 +228,11 @@ class GeneticAlgorithm:
                 best_fitness = np.max( [individual.fitness for individual in population] )
                 if generation in print_generations or generation == 0:
                     average_fitness = np.mean([individual.fitness for individual in population])
-                    print(f"Generation {generation}, Average Fitness: {average_fitness}, Best Fitness: {best_fitness}")
+                    self.log(f"Generation {generation}, Average Fitness: {average_fitness}, Best Fitness: {best_fitness}", level=1)
                 
                 # Check if fitness threshold is reached
                 if fitness_threshold and best_fitness >= fitness_threshold:
-                    print(f"Fitness threshold reached at generation {generation}!")
+                    self.log(f"Fitness threshold reached at generation {generation}!", level=1)
                     break
             # Stop multiprocessing pool if specified    
             self.stop_pool()
