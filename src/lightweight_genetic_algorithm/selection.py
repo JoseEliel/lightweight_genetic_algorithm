@@ -87,11 +87,13 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
 
         self.r0 = r0
         self.B0 = B0
+        self.categorical = False
 
         # If the measure is a string, then use the corresponding measure function
         if measure == "euclidean":
             self.measure = lambda x,y: np.sum((x - y)**2)   
         elif measure == "hamming":
+            self.categorical = True
             self.measure = lambda x,y: np.sum(x != y) / len(x) 
         elif measure == "dynamic":
             self.measure = lambda x,y: np.sum((x - y)**2 / (np.abs(x) + np.abs(y) + 1e-10)**2)
@@ -131,15 +133,24 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
         list
             A list of individuals of size surviving_population_size.
         """ 
-        
+            
         # Set self.B0 to 1 / population size if not given
         if B0 is None:
-            self.B0 = 1. / len(population)
+            self.B0 = 2. / len(population)
         else:
             self.B0 = B0
 
         if r0 is None:
-            self.r0 = 1
+            if not self.categorical:
+                # Getting parameter ranges from first individual
+                ranges = [gene.get_gene_range() for gene in population[0].get_genes()]
+                # Compute the maximum distance between two individuals
+                max_distance = self.measure(np.array([range[0] for range in ranges]), np.array([range[1] for range in ranges]))
+                population_size = len(population)
+                self.r0 = max_distance / population_size
+
+            else:
+                self.r0 = 1.0
 
         # List to keep selected survivors
         survivors = []

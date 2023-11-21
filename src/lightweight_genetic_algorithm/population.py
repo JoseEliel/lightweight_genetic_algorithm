@@ -27,6 +27,9 @@ class NumericGene(Gene):
         self.low, self.high = gene_range
         self.value = value if value is not None else self.random_initialization()
 
+    def get_gene_range(self):
+        return (self.low, self.high)
+    
     def random_initialization(self):
         return np.random.uniform(low=self.low, high=self.high)
     
