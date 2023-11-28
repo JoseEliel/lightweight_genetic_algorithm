@@ -195,6 +195,7 @@ class GeneticAlgorithm:
             # Determine the generations at which to print the averages
             print_generations = np.linspace(0, n_generations, 6, dtype=int)[1:]
             # Run the genetic algorithm for the specified number of generations
+            historical_population = []
             for generation in range(n_generations):                
                 
                 # Create genes of the offspring
@@ -230,6 +231,9 @@ class GeneticAlgorithm:
                     average_fitness = np.mean([individual.fitness for individual in population])
                     self.log(f"Generation {generation}, Average Fitness: {average_fitness}, Best Fitness: {best_fitness}", level=1)
                 
+                # Store the population at each generation
+                historical_population.append(population)
+
                 # Check if fitness threshold is reached
                 if fitness_threshold and best_fitness >= fitness_threshold:
                     self.log(f"Fitness threshold reached at generation {generation}!", level=1)
@@ -237,4 +241,8 @@ class GeneticAlgorithm:
             # Stop multiprocessing pool if specified    
             self.stop_pool()
             
-            return [individual.get_gene_values() for individual in population]
+            return historical_population
+    
+    def run_light(self, n_generations, population_size, fitness_threshold=None):
+        historical_population = self.run(n_generations, population_size, fitness_threshold)
+        return [[individual.get_gene_values() for individual in population] for population in historical_population]
