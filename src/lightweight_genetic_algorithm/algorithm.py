@@ -139,8 +139,6 @@ class GeneticAlgorithm:
         else:
             self.log("Not using multiprocessing.", level=2)
             self.pool = None
-
-        
     
     def log(self, message, level=1):
         if self.verbosity >= level:
@@ -180,11 +178,12 @@ class GeneticAlgorithm:
         return population
 
 
-    def run(self, n_generations, population_size, fitness_threshold=None):
+    def run(self, n_generations, population_size, fitness_threshold=None, verbosity=1):
             '''
             Run the genetic algorithm for a specified number of generations (n_generations), printing the average and top fitness at specified intervals. The number of individuals in the population is set by population_size.
             A fitness threshold can be specified to stop the algorithm early if the fitness of the fittest individual exceeds the threshold.
             '''
+            self.verbosity = verbosity
             # Start multiprocessing pool if specified
             self.start_pool()
             # Create initial population
@@ -243,6 +242,6 @@ class GeneticAlgorithm:
             
             return historical_population
     
-    def run_light(self, n_generations, population_size, fitness_threshold=None):
-        historical_population = self.run(n_generations, population_size, fitness_threshold)
+    def run_light(self, n_generations, population_size, fitness_threshold=None, verbosity=1):
+        historical_population = self.run(n_generations, population_size, fitness_threshold, verbosity)
         return [[individual.get_gene_values() for individual in population] for population in historical_population]
