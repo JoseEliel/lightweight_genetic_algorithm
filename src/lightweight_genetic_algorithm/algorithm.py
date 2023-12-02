@@ -1,5 +1,5 @@
 import numpy as np
-from .selection import SurvivorSelection, DiversityEnhancedSurvivorSelection
+from .selection import SurvivorSelection, DiversityEnhancedSurvivorSelection, FitnessProportionalSurvivorSelection
 from .crossover import CrossoverBetween, CrossoverMidpoint, CrossoverEitherOr
 from .mutation import Mutation
 from .population import Individual, NumericGene, CategoricalGene
@@ -49,7 +49,7 @@ class GeneticAlgorithm:
     run(n_generations, population_size, initial_population, fitness_threshold)
         Runs the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals
     """
-    def __init__(self, fitness_function, gene_ranges, fitness_function_args=(), number_of_genes=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None, use_multiprocessing=False, ncpus=None, verbosity=1):
+    def __init__(self, fitness_function, gene_ranges, fitness_function_args=(), number_of_genes=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None, use_multiprocessing=False, ncpus=None, verbosity=1, selection_method="Diversity Enhanced"):
         # Verbosity level for printing out messages
         self.verbosity = verbosity
         # User-defined function to calculate fitness score of each individual
@@ -108,24 +108,31 @@ class GeneticAlgorithm:
         self.log(f"Crossover method: {crossover_method}", level=2)
 
         ##### Set-up the diversity enhanced survivor selection ##### 
-        # (1) Set the distance measure function
-        if not measure:
-            if self.is_discrete:
-                self.log("No measure given, defaulting to Hamming measure.", level=2)
-                self.measure = 'hamming'
+        if selection_method.lower() == "diversity enhanced":
+            self.log("Using diversity enhanced selection.", level=2)
+            # (1) Set the distance measure function
+            if not measure:
+                if self.is_discrete:
+                    self.log("No measure given, defaulting to Hamming measure.", level=2)
+                    self.measure = 'hamming'
+                else:
+                    self.log("No measure given, defaulting to Euclidean measure.", level=2)
+                    self.measure = 'euclidean'   
+            elif measure == "dynamic":
+                self.log("Using dynamic measure.", level=2)
+                if self.is_discrete:
+                    raise ValueError("Dynamic measure is not compatible with categorical parameters.")
+                self.measure = 'dynamic'
             else:
-                self.log("No measure given, defaulting to Euclidean measure.", level=2)
-                self.measure = 'euclidean'   
-        elif measure == "dynamic":
-            self.log("Using dynamic measure.", level=2)
-            if self.is_discrete:
-                raise ValueError("Dynamic measure is not compatible with categorical parameters.")
-            self.measure = 'dynamic'
+                self.log(f"Using user-defined input distance measure.", level = 2)
+                self.measure = measure  
+            # (2) Create SurvivorSelection instance
+            self.survivor_selection = DiversityEnhancedSurvivorSelection(self.measure)
+        elif selection_method.lower() == "Fitness Proportionate".lower():
+            self.log("Using fitness proportionate selection.", level=2)
+            self.survivor_selection = FitnessProportionalSurvivorSelection()
         else:
-            self.log(f"Using user-defined input distance measure.", level = 2)
-            self.measure = measure  
-        # (2) Create SurvivorSelection instance
-        self.survivor_selection = DiversityEnhancedSurvivorSelection(self.measure)
+            raise ValueError("Invalid selection method. Available options are: 'Diversity Enhanced', 'Fitness Proportionate'.")
 
         # Setup multiprocessing if specified
         self.use_multiprocessing = use_multiprocessing
@@ -157,8 +164,9 @@ class GeneticAlgorithm:
     def evaluate_fitness(self,genes):
         return self.fitness_function(genes,*self.fitness_function_args)
 
-    def create_initial_population(self, n):
+    def create_initial_population(self, n, init_gene_values=None):
         self.log(f"Creating initial population of size {n}.", level=2)
+
         # Create genes of the population
         if self.is_discrete:
             # Expecting a 1D list for discrete parameters
@@ -166,6 +174,12 @@ class GeneticAlgorithm:
         else:
             # Expecting a 2D list for continuous parameters.
             genes = [ [NumericGene(self.gene_ranges[i])  for i in range(self.number_of_genes)] for _ in range(n) ]
+
+        # If initial gene values are specified, use them to overwrite the initial population genes
+        if init_gene_values:
+            for i in range(n):
+                for j in range(self.number_of_genes):
+                    genes[i][j].set_value(init_gene_values[j])
 
         # Create population using multiprocessing if specified
         if self.use_multiprocessing:
@@ -178,16 +192,17 @@ class GeneticAlgorithm:
         return population
 
 
-    def run(self, n_generations, population_size, fitness_threshold=None, verbosity=1):
+    def run(self, n_generations, population_size, init_genes=None, fitness_threshold=None, verbosity=1):
             '''
             Run the genetic algorithm for a specified number of generations (n_generations), printing the average and top fitness at specified intervals. The number of individuals in the population is set by population_size.
             A fitness threshold can be specified to stop the algorithm early if the fitness of the fittest individual exceeds the threshold.
+            init_gene_values can be specified to start the algorithm at an initial population given by population_size identical individuals with 'init_gene_values' as their genes.
             '''
             self.verbosity = verbosity
             # Start multiprocessing pool if specified
             self.start_pool()
             # Create initial population
-            population = self.create_initial_population(population_size)
+            population = self.create_initial_population(population_size, init_genes)
             if population is None:
                 raise ValueError("Failed to create initial population.")
             
@@ -242,6 +257,6 @@ class GeneticAlgorithm:
             
             return historical_population
     
-    def run_light(self, n_generations, population_size, fitness_threshold=None, verbosity=1):
-        historical_population = self.run(n_generations, population_size, fitness_threshold, verbosity)
+    def run_light(self, n_generations, population_size, init_genes=None, fitness_threshold=None, verbosity=1):
+        historical_population = self.run(n_generations, population_size, init_genes=init_genes, fitness_threshold=fitness_threshold, verbosity=verbosity)
         return [[individual.get_gene_values() for individual in population] for population in historical_population]
