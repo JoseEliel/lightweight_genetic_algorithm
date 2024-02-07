@@ -32,7 +32,10 @@ class Mutation:
                 if self.is_categorical:
                     gene = getattr(self, self.mutation_modes[i])(gene, None)
                 else:
+                    #print("gene ranges from ", self.param_ranges[i])
                     gene = getattr(self, self.mutation_modes[i])(gene, self.param_ranges[i])
+                    #print("to ", self.param_ranges[i])
+
         
         return genes
 
@@ -54,11 +57,13 @@ class Mutation:
         lowest = -range_size/2
         highest = range_size/2
 
-        gene.set_value(gene.value + np.random.uniform(low=lowest, high=highest))
+        # gene.set_value(gene.value + np.random.uniform(low=lowest, high=highest))
+        # same as above but with gaussian
+        gene.set_value(gene.value + np.random.normal(loc=0.0, scale= (highest-lowest)/10, size = None))
         return gene
 
     def multiplicative(self, gene, param_range = None):
-        gene.set_value(gene.value * np.random.uniform(low=-2, high=2))
+        gene.set_value(gene.value * np.random.normal(loc=1, scale=0.5))
         return gene
 
     def random(self, gene, param_range):
