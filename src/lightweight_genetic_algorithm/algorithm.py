@@ -209,7 +209,7 @@ class GeneticAlgorithm:
             # Determine the generations at which to print the averages
             print_generations = np.linspace(0, n_generations, 6, dtype=int)[1:]
             # Run the genetic algorithm for the specified number of generations
-            historical_population = []
+            historical_population = [population]
             for generation in range(n_generations):                
                 
                 # Create genes of the offspring
