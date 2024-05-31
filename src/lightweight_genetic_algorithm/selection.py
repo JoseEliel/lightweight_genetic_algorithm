@@ -88,13 +88,10 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
         self.r0 = r0
         self.D0 = D0
 
-        self.categorical = False
-
         # If the measure is a string, then use the corresponding measure function
         if measure == "euclidean":
             self.measure = lambda x,y: np.sum((x - y)**2)   
         elif measure == "hamming":
-            self.categorical = True
             self.measure = lambda x,y: np.sum(x != y) / len(x) 
         elif measure == "dynamic":
             self.measure = lambda x,y: np.sum((x - y)**2 / (np.abs(x) + np.abs(y) + 1e-10)**2)
