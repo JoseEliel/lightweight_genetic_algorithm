@@ -70,7 +70,7 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
         Compute diversity punishment for an individual (point) given a survivor.
     """ 
 
-    def __init__(self, measure, r0=1., D0=1.):
+    def __init__(self, measure, r0=None, D0=None):
         """
         Constructs all the necessary attributes for the diversity enhanced survivor selection method.
 
@@ -134,28 +134,25 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
         list
             A list of individuals of size surviving_population_size.
         """ 
-            
-        # Set self.D0 to 1 / population size if not given
-        if self.D0 is None:
-            self.D0 = 2. / len(population)
 
-        if self.r0 is None:
-            if not self.categorical:
-                # Getting parameter ranges from first individual
-                ranges = [gene.get_gene_range() for gene in population[0].get_genes()]
-                # Compute the maximum distance between two individuals
-                max_distance = self.measure(np.array([range[0] for range in ranges]), np.array([range[1] for range in ranges]))
-                population_size = len(population)
-                self.r0 = max_distance / population_size
-
-            else:
-                self.r0 = 1.0
+        # Here D0 is set with the standard deviation
+        
+        population_size = len(population)
+        population = np.array(population)
+        diversity_scores = [individual.fitness for individual in population]
+        
+        std_diversity = np.std(diversity_scores)
+        #self.D0 = std_diversity / population_size
+        self.D0 = 1
+        
+        # Getting parameter ranges from first individual
+        ranges = [gene.get_gene_range() for gene in population[0].get_genes()]
+        # Compute the maximum distance between two individuals
+        max_distance = self.measure(np.array([range[0] for range in ranges]), np.array([range[1] for range in ranges]))
+        self.r0 = max_distance / population_size
 
         # List to keep selected survivors
         survivors = []
-
-        population = np.array(population)
-        diversity_scores = [individual.fitness for individual in population]
 
         for i in range(surviving_population_size):
             # Get the best survivor and remove it from population
