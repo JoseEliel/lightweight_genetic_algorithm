@@ -56,7 +56,7 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
     ----------
     r0 : float
         The characteristic distance beyond which there is no diversity punishment.
-    B0 : float
+    D0 : float
         Diversity punishment for identical individuals.
     measure : function
         The function used to measure the "distance" or "dissimilarity" between two individuals.
@@ -70,7 +70,7 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
         Compute diversity punishment for an individual (point) given a survivor.
     """ 
 
-    def __init__(self, measure, r0=None, B0=None):
+    def __init__(self, measure, r0=1., D0=1.):
         """
         Constructs all the necessary attributes for the diversity enhanced survivor selection method.
 
@@ -80,13 +80,14 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
             The function used to measure the "distance" or "dissimilarity" between two individuals.
         r0 : float
             The characteristic distance beyond which there is no diversity punishment.
-        B0 : float
+        D0 : float
             Diversity punishment for identical individuals.
 
         """
 
         self.r0 = r0
-        self.B0 = B0
+        self.D0 = D0
+
         self.categorical = False
 
         # If the measure is a string, then use the corresponding measure function
@@ -109,7 +110,7 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
 
         distance_sq = self.measure(point, survivor_point)
 
-        diversity_result = self.B0 * np.exp(-distance_sq / self.r0)
+        diversity_result = self.D0 * np.exp(-distance_sq / self.r0)
         return diversity_result
 
     # Select survivors from a population
@@ -123,7 +124,7 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
             A list of individuals.
         surviving_population_size : int
             The number of individuals to select from the population.
-        B0 : float (optional)
+        D0 : float (optional)
             Diversity punishment for identical individuals.
         r0 : float (optional)
             The characteristic distance beyond which there is no diversity punishment.
@@ -134,9 +135,9 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
             A list of individuals of size surviving_population_size.
         """ 
             
-        # Set self.B0 to 1 / population size if not given
-        if self.B0 is None:
-            self.B0 = 2. / len(population)
+        # Set self.D0 to 1 / population size if not given
+        if self.D0 is None:
+            self.D0 = 2. / len(population)
 
         if self.r0 is None:
             if not self.categorical:
