@@ -91,6 +91,7 @@ class GeneticAlgorithm:
                 warnings.warn(f"Invalid mutation mode '{mode}'. Available options are: 'additive', 'multiplicative', 'random', 'categorical'. Defaulting to 'additive'!")
 
         self.mutation_rate = mutation_rate if mutation_rate else 1.0/self.number_of_genes
+        self.log(f"Mutation rate: {self.mutation_rate}", level=2)
 
         self.mutation = Mutation(self.mutation_mode, self.mutation_rate, self.gene_ranges)
 
@@ -228,17 +229,31 @@ class GeneticAlgorithm:
                     # Apply mutation
                     offspring_genes = [self.mutation.mutate_genes(genes) for genes in offspring_genes]
 
+                #### For bug testing ####
+                #offspring_alt = [Individual(genes, self.fitness_function, self.fitness_function_args) for genes in offspring_genes]
+
                 # Create offspring Individual objects using multiprocessing if specified
                 if self.use_multiprocessing:
                     offspring = self.pool.starmap(Individual, [(g, self.fitness_function, self.fitness_function_args) for g in offspring_genes] )
                 else:
                     offspring = [Individual(genes, self.fitness_function, self.fitness_function_args) for genes in offspring_genes]
 
+                # all_f     = [individual.fitness for individual in offspring]
+                # all_f_alt = [individual.fitness for individual in offspring_alt]
+                # print("Offspring max f diff:",np.max(all_f) - np.max(all_f_alt))
+
+            
                 # Combine parent and offspring populations (Elitism)
-                combined_population = population + offspring
+                combined_population     = population + offspring 
+                # combined_population_alt = population + offspring_alt
 
                 # Select the best individuals to form the next generation
-                population = self.survivor_selection.select_survivors(combined_population, population_size)
+                population     = self.survivor_selection.select_survivors(combined_population,     population_size)
+                # population_alt = self.survivor_selection.select_survivors(combined_population_alt, population_size)
+
+                # all_f = [individual.fitness for individual in population]
+                # all_f_alt = [individual.fitness for individual in population_alt]
+                # print("Population max f diff:",np.max(all_f) - np.max(all_f_alt))
 
                 best_fitness = np.max( [individual.fitness for individual in population] )
                 if generation in print_generations or generation == 0:

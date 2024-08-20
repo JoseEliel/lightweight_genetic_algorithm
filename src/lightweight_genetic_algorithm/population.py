@@ -6,7 +6,7 @@ class Gene(ABC):
     The abstract base class for a gene.
     Each subclass will define a gene in some genotype space.
     """
-    mutation_methods = []  # Add this line
+    mutation_methods = []
 
     @abstractmethod
     def random_initialization(self):
@@ -63,8 +63,8 @@ class Individual:
     An individual is defined by its genes. The fitness is evaluated when the individual is created.
     """
     def __init__(self, genes, fitness_function, fitness_function_args):
-        self.genes = genes
-        self.genes_values = np.array([gene.value for gene in genes])  # Add this line
+        self.genes = genes.copy()
+        self.genes_values = np.array([gene.value for gene in self.genes])
         self.fitness_function = fitness_function
         self.fitness_function_args = fitness_function_args
         try:
@@ -73,10 +73,10 @@ class Individual:
             raise ValueError("Error in fitness function evaluation. Your fitness function does not seem to be compatible with your individuals.")
 
     def get_genes(self):
-        return self.genes
+        return self.genes.copy()
     
     def get_gene_values(self):
-        return self.genes_values
+        return self.genes_values.copy()
     
     def get_fitness_function(self):
         return self.fitness_function

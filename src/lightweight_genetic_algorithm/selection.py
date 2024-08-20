@@ -121,10 +121,6 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
             A list of individuals.
         surviving_population_size : int
             The number of individuals to select from the population.
-        D0 : float (optional)
-            Diversity punishment for identical individuals.
-        r0 : float (optional)
-            The characteristic distance beyond which there is no diversity punishment.
 
         Returns
         -------
@@ -132,21 +128,10 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
             A list of individuals of size surviving_population_size.
         """ 
 
-        # Here D0 is set with the standard deviation
-        
-        population_size = len(population)
-        population = np.array(population)
         diversity_scores = [individual.fitness for individual in population]
-        
-        std_diversity = np.std(diversity_scores)
-        #self.D0 = std_diversity / population_size
+
         self.D0 = 1
-        
-        # Getting parameter ranges from first individual
-        ranges = [gene.get_gene_range() for gene in population[0].get_genes()]
-        # Compute the maximum distance between two individuals
-        max_distance = self.measure(np.array([range[0] for range in ranges]), np.array([range[1] for range in ranges]))
-        self.r0 = max_distance / population_size
+        self.r0 = 1
 
         # List to keep selected survivors
         survivors = []
@@ -205,7 +190,6 @@ class FitnessProportionalSurvivorSelection(SurvivorSelection):
             A list of individuals of size surviving_population_size.
         """ 
 
-        #population = np.array(population)
         fitness_scores = [individual.fitness for individual in population]
         survivors_idx = np.argsort(fitness_scores)[-surviving_population_size:]
         survivors = [population[i] for i in survivors_idx]

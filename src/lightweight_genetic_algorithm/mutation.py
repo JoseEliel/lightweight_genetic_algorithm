@@ -51,8 +51,6 @@ class Mutation:
         return mutated_individual
     
     def additive(self, gene, param_range):
-        # Calcualtes 
-        
         range_size = abs(param_range[1] - param_range[0])
         lowest = -range_size/2
         highest = range_size/2
