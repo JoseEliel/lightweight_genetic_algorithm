@@ -35,6 +35,9 @@ class NumericGene(Gene):
     
     def set_value(self, value):
         self.value = value
+    
+    def copy(self):
+        return NumericGene((self.low, self.high), self.value)
 
 class CategoricalGene(Gene):
     """
@@ -58,26 +61,35 @@ class CategoricalGene(Gene):
         else:
             self.value = value
     
+    def copy(self):
+        return CategoricalGene(self.categories, self.value)
+    
 class Individual:
     """
-    An individual is defined by its genes. The fitness is evaluated when the individual is created.
+    An individual is defined by its genes. The fitness is calculated by the supplied fitness function upon initialization. However, the fitness calculation can be avoided by supplying the fitness value directly.
     """
-    def __init__(self, genes, fitness_function, fitness_function_args):
-        self.genes = genes.copy()
+    def __init__(self, genes, fitness_function, fitness_function_args, fitness=None):
+        self.genes = np.array( [gene.copy() for gene in genes] )
         self.genes_values = np.array([gene.value for gene in self.genes])
         self.fitness_function = fitness_function
         self.fitness_function_args = fitness_function_args
-        try:
-            self.fitness = fitness_function(self.genes_values,*self.fitness_function_args)
-        except:
-            raise ValueError("Error in fitness function evaluation. Your fitness function does not seem to be compatible with your individuals.")
+        if fitness is None:
+            try:
+                self.fitness = fitness_function(self.genes_values,*self.fitness_function_args)
+            except:
+                raise ValueError("Error in fitness function evaluation. Your fitness function does not seem to be compatible with your individuals.")
+        else:
+            self.fitness = fitness
 
     def get_genes(self):
-        return self.genes.copy()
+        return np.array([gene.copy() for gene in self.genes])
     
     def get_gene_values(self):
         return self.genes_values.copy()
     
     def get_fitness_function(self):
         return self.fitness_function
+    
+    def copy(self):
+        return Individual(self.get_genes(), self.fitness_function, self.fitness_function_args, fitness=self.fitness)
 

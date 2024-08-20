@@ -148,10 +148,12 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
                 diversity_punishment = self.compute_diversity(individual, survivors[-1])
                 diversity_scores[i] -= diversity_punishment
 
+        idx = np.argsort([-individual.fitness for individual in survivors])
+        survivors = [survivors[i] for i in idx]
+
         return survivors
 
 
-# Fitness proportional survivor selection
 class FitnessProportionalSurvivorSelection(SurvivorSelection):
     """
     A class for fitness proportional survivor selection.
@@ -172,7 +174,6 @@ class FitnessProportionalSurvivorSelection(SurvivorSelection):
         Selects the survivors from a population. Returns a list of individuals of size surviving_population_size.
     """ 
 
-    # Select survivors from a population
     def select_survivors(self, population, surviving_population_size):
         """
         Selects the survivors from a population. Returns a list of individuals of size surviving_population_size.

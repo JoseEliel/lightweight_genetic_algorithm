@@ -210,7 +210,8 @@ class GeneticAlgorithm:
             # Determine the generations at which to print the averages
             print_generations = np.linspace(0, n_generations, 6, dtype=int)[1:]
             # Run the genetic algorithm for the specified number of generations
-            historical_population = [population]
+
+            historical_population = [ [ individual.copy() for individual in population ] ]
             for generation in range(n_generations):                
                 
                 # Create genes of the offspring
@@ -229,39 +230,24 @@ class GeneticAlgorithm:
                     # Apply mutation
                     offspring_genes = [self.mutation.mutate_genes(genes) for genes in offspring_genes]
 
-                #### For bug testing ####
-                #offspring_alt = [Individual(genes, self.fitness_function, self.fitness_function_args) for genes in offspring_genes]
-
                 # Create offspring Individual objects using multiprocessing if specified
                 if self.use_multiprocessing:
                     offspring = self.pool.starmap(Individual, [(g, self.fitness_function, self.fitness_function_args) for g in offspring_genes] )
                 else:
                     offspring = [Individual(genes, self.fitness_function, self.fitness_function_args) for genes in offspring_genes]
 
-                # all_f     = [individual.fitness for individual in offspring]
-                # all_f_alt = [individual.fitness for individual in offspring_alt]
-                # print("Offspring max f diff:",np.max(all_f) - np.max(all_f_alt))
-
-            
                 # Combine parent and offspring populations (Elitism)
-                combined_population     = population + offspring 
-                # combined_population_alt = population + offspring_alt
+                combined_population = population + offspring 
 
                 # Select the best individuals to form the next generation
-                population     = self.survivor_selection.select_survivors(combined_population,     population_size)
-                # population_alt = self.survivor_selection.select_survivors(combined_population_alt, population_size)
-
-                # all_f = [individual.fitness for individual in population]
-                # all_f_alt = [individual.fitness for individual in population_alt]
-                # print("Population max f diff:",np.max(all_f) - np.max(all_f_alt))
+                population = self.survivor_selection.select_survivors(combined_population, population_size)
 
                 best_fitness = np.max( [individual.fitness for individual in population] )
                 if generation in print_generations or generation == 0:
                     average_fitness = np.mean([individual.fitness for individual in population])
                     self.log(f"Generation {generation}, Average Fitness: {average_fitness}, Best Fitness: {best_fitness}", level=1)
-                
-                # Store the population at each generation
-                historical_population.append(population)
+
+                historical_population.append( [individual.copy() for individual in population ] )
 
                 # Check if fitness threshold is reached
                 if fitness_threshold and best_fitness >= fitness_threshold:
