@@ -50,8 +50,6 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
     The method selects the survivors from the population based both the fitness
     and the diversity of the individuals.
 
-    ...
-
     Attributes
     ----------
     r0 : float
@@ -161,8 +159,6 @@ class FitnessProportionalSurvivorSelection(SurvivorSelection):
     This class implements the fitness proportional survivor selection method.
     The method selects the survivors from the population based on the fitness
     of the individuals.
-
-    ...
 
     Attributes
     ----------
