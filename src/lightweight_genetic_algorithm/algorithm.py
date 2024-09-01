@@ -18,20 +18,16 @@ class GeneticAlgorithm:
     gene_ranges : list
         A list of tuples representing the range of each parameter; if parameters are categorical, it's a simple 1D list of categories
     crossover_method : str
-        The method used for crossover (default is "Either Or")
+        The method used for crossover. Options are "Between", "Midpoint", "Either Or", or "None" (default is "Either Or")
     number_of_genes : int
         The number of parameters (default is the length of gene_ranges). This must be explicitly provided if parameters are categorical.
     mutation_mode : list
         The mode used for mutation (default is "additive" for numeric parameters and "categorical" for categorical parameters)
     mutation_rate : float
-        The rate of mutation (default is 1.0/number_of_genes). During cross-over, each gene is mutated with probability mutation_rate.
-    mutation: Mutation
-        An instance of the Mutation class used to mutate the genes
-    survivor_selection : SurvivorSelection
-        An instance of the SurvivorSelection class used to select the survivors from the population
+        The rate of mutation (default is 1.0/number_of_genes). During crossover, each gene is mutated with probability mutation_rate.
     measure : function or str
-        A function used to measure the distance between two points in the parameter space (default is Euclidean distance).
-        If "dynamic" is given, then the dynamic measure from arXiv:XXX.XXX is used. This is ignored for categorical parameters.
+        Defines the distance between two individuals in the parameter space. String options are "Hamming", "Euclidean", "Dynamic".
+        Alternatively, a custom function can be provided. This function takes the genes of two individuals and returns a distance.
     use_multiprocessing : bool
         Whether to use multiprocessing for fitness evaluations (default is False). 
         This speeds up the algorithm for computationally expensive fitness functions.
@@ -42,12 +38,11 @@ class GeneticAlgorithm:
 
     Methods
     -------
-    create_initial_population(n)
-        Creates an initial population of n individuals
-    evaluate_fitness(genes)
-        Evaluates the fitness of an individual defined by the given genes
     run(n_generations, population_size, initial_population, fitness_threshold)
-        Runs the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals
+        Runs the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals. 
+        This method returns a list of lists, where each sublist contains individuals in the population at each generation. The individuals are represented as Individual objects.
+    run_light(n_generations, population_size, initial_population, fitness_threshold)
+        Runs the genetic algorithm for a specified number of generations, returning only the gene values of the individuals in the population at each generation.
     """
     def __init__(self, fitness_function, gene_ranges, fitness_function_args=(), number_of_genes=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None, use_multiprocessing=False, ncpus=None, verbosity=1, selection_method="Diversity Enhanced"):
         # Verbosity level for printing out messages
@@ -195,9 +190,26 @@ class GeneticAlgorithm:
 
     def run(self, n_generations, population_size, init_genes=None, fitness_threshold=None, verbosity=1):
             '''
-            Run the genetic algorithm for a specified number of generations (n_generations), printing the average and top fitness at specified intervals. The number of individuals in the population is set by population_size.
-            A fitness threshold can be specified to stop the algorithm early if the fitness of the fittest individual exceeds the threshold.
-            init_gene_values can be specified to start the algorithm at an initial population given by population_size identical individuals with 'init_gene_values' as their genes.
+            Run the genetic algorithm and return the population at each generation. 
+
+            Parameters
+            ----------
+            n_generations : int
+                The number of generations to run the genetic algorithm
+            population_size : int
+                The number of individuals in the population
+            init_genes : list
+                A list of gene values to initialize the population with. If None, the population is initialized randomly.
+            fitness_threshold : float
+                The fitness threshold at which to stop the algorithm early. If None, the algorithm runs for n_generations.
+            verbosity : int
+                The verbosity level for printing out messages. 0 = silent, 1 = normal output, 2 = detailed output.
+
+            Returns
+            -------
+            list
+                A list of lists, where each sublist contains individuals in the population at each generation. The individuals are represented as Individual objects.
+
             '''
             self.verbosity = verbosity
             # Start multiprocessing pool if specified
@@ -259,5 +271,22 @@ class GeneticAlgorithm:
             return historical_population
     
     def run_light(self, n_generations, population_size, init_genes=None, fitness_threshold=None, verbosity=1):
+        ''' 
+        Run the genetic algorithm and return the gene values of the individuals in the population at each generation.
+
+        Parameters
+        ----------
+        n_generations : int
+            The number of generations to run the genetic algorithm
+        population_size : int
+            The number of individuals in the population
+        init_genes : list
+            A list of gene values to initialize the population with. If None, the population is initialized randomly.
+        fitness_threshold : float
+            The fitness threshold at which to stop the algorithm early. If None, the algorithm runs for n_generations.
+        verbosity : int
+            The verbosity level for printing out messages. 0 = silent, 1 = normal output, 2 = detailed output.
+        '''
+
         historical_population = self.run(n_generations, population_size, init_genes=init_genes, fitness_threshold=fitness_threshold, verbosity=verbosity)
         return [[individual.get_gene_values() for individual in population] for population in historical_population]

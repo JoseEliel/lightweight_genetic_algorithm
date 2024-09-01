@@ -19,7 +19,7 @@ classifiers=[
   'Topic :: Scientific/Engineering :: Artificial Intelligence',
 ]
 authors = [ {name="Eliel Camargo-Molina", email="eliel@camargo-molina.com" },
-			{name = "Jonas Wessén", email="jonas@wessen.com"},]
+			{name = "Jonas Wessén", email="jonas@jonas-wessen.com"},]
 
 [project.urls]
 "Homepage"="https://github.com/JoseEliel/lightweight_genetic_algorithm"
