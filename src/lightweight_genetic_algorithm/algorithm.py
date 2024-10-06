@@ -292,13 +292,8 @@ class GeneticAlgorithm:
                 if self.output_directory:
                     with open(f"{self.output_directory}/fitness.txt", "a") as f:
                         f.write(f"{generation} {average_fitness} {best_fitness}\n")
-
                     # Save the genes of the historical population to the output file.
                     np.save(f"{self.output_directory}/survivors.npy", [ [individual.get_gene_values() for individual in population] for population in historical_population ])
-                    
-
-
-
 
                 # Check if fitness threshold is reached
                 if fitness_threshold and best_fitness >= fitness_threshold:
