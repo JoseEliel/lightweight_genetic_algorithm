@@ -55,7 +55,6 @@ class Mutation:
         lowest = -range_size/2
         highest = range_size/2
 
-        # gene.set_value(gene.value + np.random.uniform(low=lowest, high=highest))
         # same as above but with gaussian
         gene.set_value(gene.value + np.random.normal(loc=0.0, scale= (highest-lowest)/10, size = None))
         return gene
