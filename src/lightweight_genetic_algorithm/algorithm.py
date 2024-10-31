@@ -247,6 +247,19 @@ class GeneticAlgorithm:
             if population is None:
                 raise ValueError("Failed to create initial population.")
             
+            # Set the values for r0
+            if isinstance(self.survivor_selection, DiversityEnhancedSurvivorSelection):                        
+                # Compute the average measure between two individuals, including only non-zero distances
+                initial_population_distances = [self.survivor_selection.measure(p1.get_gene_values(), p2.get_gene_values()) for p1 in population for p2 in population]
+                # drop the zeros
+                initial_population_distances = [d for d in initial_population_distances if d > 0]
+                # get the average distance
+                avg_measure = np.mean(initial_population_distances)
+                # set r0
+                avg_distance = np.sqrt(avg_measure)
+                self.survivor_selection.r0 = avg_distance/10
+                
+            
             # Determine the generations at which to print the averages
             print_generations = np.linspace(0, n_generations, 6, dtype=int)[1:]
             # Run the genetic algorithm for the specified number of generations

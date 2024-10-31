@@ -83,7 +83,14 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
 
         """
 
+        # If r0 or D0 are not provided, set them to 1
+
+        if r0 is None:
+            r0 = 1
         self.r0 = r0
+        
+        if D0 is None:
+            D0 = 1
         self.D0 = D0
 
         # If the measure is a string, then use the corresponding measure function
@@ -105,7 +112,7 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
 
         distance_sq = self.measure(point, survivor_point)
 
-        diversity_result = self.D0 * np.exp(-distance_sq / self.r0)
+        diversity_result = self.D0 * np.exp(-distance_sq / self.r0**2)
         return diversity_result
 
     # Select survivors from a population
@@ -127,9 +134,6 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
         """ 
 
         diversity_scores = [individual.fitness for individual in population]
-
-        self.D0 = 1
-        self.r0 = 1
 
         # List to keep selected survivors
         survivors = []
