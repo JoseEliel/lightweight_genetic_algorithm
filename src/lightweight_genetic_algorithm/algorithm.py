@@ -4,7 +4,8 @@ from .crossover import CrossoverBetween, CrossoverMidpoint, CrossoverEitherOr
 from .mutation import Mutation
 from .population import Individual, NumericGene, CategoricalGene
 import warnings
-import os
+import os, glob
+import datetime 
 
 class GeneticAlgorithm:
     """
@@ -39,9 +40,9 @@ class GeneticAlgorithm:
     selection_method : str
         The method used for selecting the best individuals for the next generation. Options are "Diversity Enhanced" or "Fitness Proportionate".
     output_directory : str
-        The directory to save output files (default is None). If specified, the algorithm saves the genes of the selected survivors in each generation to a file "survivors.npy" in the output directory. The average fitness and best fitness at each generation are saved to "fitness.txt". A log file is saved to "log.txt" containing the output of the algorithm printed to the console. 
+        The directory to save output files (default is None). If specified, the algorithm saves the genes of the selected survivors in each generation to a file "<datetime>_survivors.npy" in the output directory. The average fitness and best fitness at each generation are saved to "<datetime>_fitness.txt". A log file is saved to "log.txt" containing the output of the algorithm printed to the console. 
 
-        The "survivors.npy" file can be loaded using numpy.load(file, allow_pickle=True) to access the gene values of the individuals in each generation. The loaded array has shape (n_generations+1, population_size, number_of_genes) since the initial population is also saved.
+        The "<datetime>_survivors.npy" file can be loaded using numpy.load(file, allow_pickle=True) to access the gene values of the individuals in each generation. The loaded array has shape (n_generations+1, population_size, number_of_genes) since the initial population is also saved.
 
     Methods
     -------
@@ -165,15 +166,22 @@ class GeneticAlgorithm:
         if self.output_directory[-1] != '/':
             self.output_directory += '/'
 
+        now = datetime.datetime.now()
         if not os.path.exists(self.output_directory):
             os.makedirs(self.output_directory)
+            self.log(f"{now.strftime('%Y-%m-%d %H:%M:%S')}", level=2)
             self.log(f"Output directory created at {self.output_directory}", level=1)
         else:
-            files_to_remove = ['log.txt', 'fitness.txt', 'survivors.npy']
-            for file in files_to_remove:
-                if os.path.exists(f"{self.output_directory}/{file}"):
-                    os.remove(f"{self.output_directory}/{file}")
-            self.log(f"Output directory {self.output_directory} already existed. Removed any previous log.txt/fitness.txt/survivors.npy files.", level=1)
+            self.log('\n'+f"{now.strftime('%Y-%m-%d %H:%M:%S')}", level=2)
+
+        file_id = now.strftime('%Y%m%d_%H%M%S')
+        self.fitness_file = f"{self.output_directory}{file_id}_fitness.txt"
+        self.survivors_file = f"{self.output_directory}{file_id}_survivors.npy"
+        self.log(f'Writing fitness values to {self.fitness_file}', level=1)
+        self.log(f'Writing gene values to {self.survivors_file}', level=1)
+
+        with open(self.fitness_file, "w") as f:
+            f.write("# Generation Average_Fitness Best_Fitness\n")
 
     def start_pool(self):
         if self.use_multiprocessing and self.pool is None:
@@ -303,10 +311,10 @@ class GeneticAlgorithm:
                 historical_population.append( [individual.copy() for individual in population ] )
 
                 if self.output_directory:
-                    with open(f"{self.output_directory}/fitness.txt", "a") as f:
+                    with open(self.fitness_file, "a") as f:
                         f.write(f"{generation} {average_fitness} {best_fitness}\n")
                     # Save the genes of the historical population to the output file.
-                    np.save(f"{self.output_directory}/survivors.npy", [ [individual.get_gene_values() for individual in population] for population in historical_population ])
+                    np.save(self.survivors_file, [ [individual.get_gene_values() for individual in population] for population in historical_population ])
 
                 # Check if fitness threshold is reached
                 if fitness_threshold and best_fitness >= fitness_threshold:
