@@ -4,12 +4,12 @@ from .crossover import CrossoverBetween, CrossoverMidpoint, CrossoverEitherOr
 from .mutation import Mutation
 from .population import Individual, NumericGene, CategoricalGene
 import warnings
-import os, glob
+import os
 import datetime 
 
 class GeneticAlgorithm:
     """
-    A class used to represent a Genetic Algorithm
+    A class used to represent a Genetic Algorithm. 
 
     Attributes
     ----------
