@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightweight_genetic_algorithm.crossover &#8212; Lightweight Genetic Algorithm 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for lightweight_genetic_algorithm.crossover</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">.population</span> <span class="kn">import</span> <span class="n">Individual</span><span class="p">,</span> <span class="n">NumericGene</span>
+
+<div class="viewcode-block" id="Crossover">
+<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.crossover.Crossover">[docs]</a>
+<span class="k">class</span> <span class="nc">Crossover</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a base class for all crossover methods. Crossover methods take the lists of genes of the parents as input.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Crossover.crossover">
+<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.crossover.Crossover.crossover">[docs]</a>
+    <span class="k">def</span> <span class="nf">crossover</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent1_genes</span><span class="p">,</span> <span class="n">parent2_genes</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform crossover between two parents.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            parent1_genes (List of Gene objects): The first parent genes.</span>
+<span class="sd">            parent2_genes (List of Gene objects): The second parent genes.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of Gene objects: The child genes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Subclass must implement this method&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CrossoverBetween">
+<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.crossover.CrossoverBetween">[docs]</a>
+<span class="k">class</span> <span class="nc">CrossoverBetween</span><span class="p">(</span><span class="n">Crossover</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a crossover method where the child&#39;s genes are chosen </span>
+<span class="sd">    to be a random value between the corresponding genes of the two parents.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CrossoverBetween.crossover">
+<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.crossover.CrossoverBetween.crossover">[docs]</a>
+    <span class="k">def</span> <span class="nf">crossover</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent1_genes</span><span class="p">,</span> <span class="n">parent2_genes</span><span class="p">):</span>
+        <span class="n">child_genes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">parent1_genes</span><span class="p">,</span> <span class="n">parent2_genes</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">&quot;between&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">g1</span><span class="o">.</span><span class="n">crossover_methods</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The crossover method &#39;between&#39; is not compatible with the gene type.&quot;</span><span class="p">)</span>
+            <span class="n">low</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">g1</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">g2</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">high</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">g1</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">g2</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">high</span><span class="p">)</span>
+            <span class="n">child_genes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">NumericGene</span><span class="p">([</span><span class="n">g1</span><span class="o">.</span><span class="n">low</span><span class="p">,</span> <span class="n">g1</span><span class="o">.</span><span class="n">high</span><span class="p">],</span> <span class="n">value</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">child_genes</span></div>
+</div>
+
+
+<div class="viewcode-block" id="CrossoverMidpoint">
+<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.crossover.CrossoverMidpoint">[docs]</a>
+<span class="k">class</span> <span class="nc">CrossoverMidpoint</span><span class="p">(</span><span class="n">Crossover</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a crossover method where the child&#39;s genes are chosen </span>
+<span class="sd">    to be the average of the corresponding genes of the two parents.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CrossoverMidpoint.crossover">
+<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.crossover.CrossoverMidpoint.crossover">[docs]</a>
+    <span class="k">def</span> <span class="nf">crossover</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent1_genes</span><span class="p">,</span> <span class="n">parent2_genes</span><span class="p">):</span>
+        <span class="n">child_genes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">parent1_genes</span><span class="p">,</span> <span class="n">parent2_genes</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">&quot;midpoint&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">g1</span><span class="o">.</span><span class="n">crossover_methods</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The crossover method &#39;midpoint&#39; is not compatible with the gene type.&quot;</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">g1</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="n">g2</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">child_genes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">NumericGene</span><span class="p">([</span><span class="n">g1</span><span class="o">.</span><span class="n">low</span><span class="p">,</span> <span class="n">g1</span><span class="o">.</span><span class="n">high</span><span class="p">],</span> <span class="n">value</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">child_genes</span></div>
+</div>
+
+
+<div class="viewcode-block" id="CrossoverEitherOr">
+<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.crossover.CrossoverEitherOr">[docs]</a>
+<span class="k">class</span> <span class="nc">CrossoverEitherOr</span><span class="p">(</span><span class="n">Crossover</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class represents a crossover method where the child&#39;s genes are chosen </span>
+<span class="sd">    to be either the corresponding gene of the first parent or the second parent.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CrossoverEitherOr.crossover">
+<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.crossover.CrossoverEitherOr.crossover">[docs]</a>
+    <span class="k">def</span> <span class="nf">crossover</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent1_genes</span><span class="p">,</span> <span class="n">parent2_genes</span><span class="p">):</span>
+        <span class="n">child_genes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">parent1_genes</span><span class="p">,</span> <span class="n">parent2_genes</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">&quot;either or&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">g1</span><span class="o">.</span><span class="n">crossover_methods</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The crossover method &#39;either or&#39; is not compatible with the gene type.&quot;</span><span class="p">)</span>
+            <span class="n">child_genes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g1</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="k">else</span> <span class="n">g2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">child_genes</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Lightweight Genetic Algorithm</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Eliel Camargo-Molina, Jonas Wessén.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lightweight_genetic_algorithm.selection &#8212; Lightweight Genetic Algorithm 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for lightweight_genetic_algorithm.selection</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># Base class for survivor selection methods</span>
+<div class="viewcode-block" id="SurvivorSelection">
+<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.selection.SurvivorSelection">[docs]</a>
+<span class="k">class</span> <span class="nc">SurvivorSelection</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A base class for survivor selection methods.</span>
+
+<span class="sd">    This class is used to define the interface for survivor selection methods.</span>
+<span class="sd">    The class is not intended to be used directly, but rather to be inherited</span>
+<span class="sd">    by other classes that define specific survivor selection methods.</span>
+
+<span class="sd">    ...</span>
+<span class="sd">    </span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    None</span>
+<span class="sd">    </span>
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    select_survivors(self, population, surviving_population_size):</span>
+<span class="sd">        Selects the survivors from a population. Returns a list of individuals of size surviving_population_size.</span>
+<span class="sd">    &quot;&quot;&quot;</span> 
+
+    <span class="c1"># Select survivors from a population</span>
+<div class="viewcode-block" id="SurvivorSelection.select_survivors">
+<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.selection.SurvivorSelection.select_survivors">[docs]</a>
+    <span class="k">def</span> <span class="nf">select_survivors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">surviving_population_size</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Selects the survivors from a population. Returns a list of individuals of size surviving_population_size.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        population : list</span>
+<span class="sd">            A list of individuals.</span>
+<span class="sd">        surviving_population_size : int</span>
+<span class="sd">            The number of individuals to select from the population.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of individuals of size surviving_population_size.</span>
+<span class="sd">        &quot;&quot;&quot;</span> 
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;select_survivors() method not implemented.&quot;</span><span class="p">)</span></div>
+</div>
+
+    
+
+<span class="c1"># Diversity enhanced survivor selection</span>
+<div class="viewcode-block" id="DiversityEnhancedSurvivorSelection">
+<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection">[docs]</a>
+<span class="k">class</span> <span class="nc">DiversityEnhancedSurvivorSelection</span><span class="p">(</span><span class="n">SurvivorSelection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for diversity enhanced survivor selection.</span>
+
+<span class="sd">    This class implements the diversity enhanced survivor selection method.</span>
+<span class="sd">    The method selects the survivors from the population based both the fitness</span>
+<span class="sd">    and the diversity of the individuals.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    r0 : float</span>
+<span class="sd">        The characteristic distance beyond which there is no diversity punishment.</span>
+<span class="sd">    D0 : float</span>
+<span class="sd">        Diversity punishment for identical individuals.</span>
+<span class="sd">    measure : function</span>
+<span class="sd">        The function used to measure the &quot;distance&quot; or &quot;dissimilarity&quot; between two individuals.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    select_survivors(self, population, surviving_population_size):</span>
+<span class="sd">        Selects the survivors from a population. Returns a list of individuals of size surviving_population_size.</span>
+<span class="sd">    </span>
+<span class="sd">    compute_diversity(self, point, survivor):</span>
+<span class="sd">        Compute diversity punishment for an individual (point) given a survivor.</span>
+<span class="sd">    &quot;&quot;&quot;</span> 
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measure</span><span class="p">,</span> <span class="n">r0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">D0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs all the necessary attributes for the diversity enhanced survivor selection method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        measure : function or string</span>
+<span class="sd">            The function used to measure the &quot;distance&quot; or &quot;dissimilarity&quot; between two individuals.</span>
+<span class="sd">        r0 : float</span>
+<span class="sd">            The characteristic distance beyond which there is no diversity punishment.</span>
+<span class="sd">        D0 : float</span>
+<span class="sd">            Diversity punishment for identical individuals.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># If r0 or D0 are not provided, set them to 1</span>
+
+        <span class="k">if</span> <span class="n">r0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">r0</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r0</span> <span class="o">=</span> <span class="n">r0</span>
+        
+        <span class="k">if</span> <span class="n">D0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">D0</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">D0</span> <span class="o">=</span> <span class="n">D0</span>
+
+        <span class="c1"># If the measure is a string, then use the corresponding measure function</span>
+        <span class="k">if</span> <span class="n">measure</span> <span class="o">==</span> <span class="s2">&quot;euclidean&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">measure</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>   
+        <span class="k">elif</span> <span class="n">measure</span> <span class="o">==</span> <span class="s2">&quot;hamming&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">measure</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span> <span class="o">!=</span> <span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> 
+        <span class="k">elif</span> <span class="n">measure</span> <span class="o">==</span> <span class="s2">&quot;dynamic&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">measure</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">measure</span> <span class="o">=</span> <span class="n">measure</span>
+
+    <span class="c1"># Compute diversity between an individual and a survivor</span>
+<div class="viewcode-block" id="DiversityEnhancedSurvivorSelection.compute_diversity">
+<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection.compute_diversity">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_diversity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">individual</span><span class="p">,</span> <span class="n">survivor</span><span class="p">):</span>
+
+        <span class="c1"># Extract gene values from individuals</span>
+        <span class="n">point</span> <span class="o">=</span> <span class="n">individual</span><span class="o">.</span><span class="n">get_gene_values</span><span class="p">()</span>
+        <span class="n">survivor_point</span> <span class="o">=</span> <span class="n">survivor</span><span class="o">.</span><span class="n">get_gene_values</span><span class="p">()</span>
+
+        <span class="n">distance_sq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">survivor_point</span><span class="p">)</span>
+
+        <span class="n">diversity_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">D0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">distance_sq</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">r0</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">diversity_result</span></div>
+
+
+    <span class="c1"># Select survivors from a population</span>
+<div class="viewcode-block" id="DiversityEnhancedSurvivorSelection.select_survivors">
+<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection.select_survivors">[docs]</a>
+    <span class="k">def</span> <span class="nf">select_survivors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">surviving_population_size</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Selects the survivors from a population. Returns a list of individuals of size surviving_population_size.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        population : list</span>
+<span class="sd">            A list of individuals.</span>
+<span class="sd">        surviving_population_size : int</span>
+<span class="sd">            The number of individuals to select from the population.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of individuals of size surviving_population_size.</span>
+<span class="sd">        &quot;&quot;&quot;</span> 
+
+        <span class="n">diversity_scores</span> <span class="o">=</span> <span class="p">[</span><span class="n">individual</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">individual</span> <span class="ow">in</span> <span class="n">population</span><span class="p">]</span>
+
+        <span class="c1"># List to keep selected survivors</span>
+        <span class="n">survivors</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">surviving_population_size</span><span class="p">):</span>
+            <span class="c1"># Get the best survivor and remove it from population</span>
+            <span class="n">best_survivor_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">diversity_scores</span><span class="p">)</span>
+            <span class="n">survivors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">population</span><span class="p">[</span><span class="n">best_survivor_idx</span><span class="p">])</span>
+            <span class="n">population</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">best_survivor_idx</span><span class="p">)</span>
+            <span class="n">diversity_scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">diversity_scores</span><span class="p">,</span> <span class="n">best_survivor_idx</span><span class="p">)</span>
+        
+            <span class="c1"># Update the diversity score of remaining individuals</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">individual</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">population</span><span class="p">):</span>
+                <span class="n">diversity_punishment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_diversity</span><span class="p">(</span><span class="n">individual</span><span class="p">,</span> <span class="n">survivors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">diversity_scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">diversity_punishment</span>
+
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">([</span><span class="o">-</span><span class="n">individual</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">individual</span> <span class="ow">in</span> <span class="n">survivors</span><span class="p">])</span>
+        <span class="n">survivors</span> <span class="o">=</span> <span class="p">[</span><span class="n">survivors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">survivors</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="FitnessProportionalSurvivorSelection">
+<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.selection.FitnessProportionalSurvivorSelection">[docs]</a>
+<span class="k">class</span> <span class="nc">FitnessProportionalSurvivorSelection</span><span class="p">(</span><span class="n">SurvivorSelection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for fitness proportional survivor selection.</span>
+
+<span class="sd">    This class implements the fitness proportional survivor selection method.</span>
+<span class="sd">    The method selects the survivors from the population based on the fitness</span>
+<span class="sd">    of the individuals.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    select_survivors(self, population, surviving_population_size):</span>
+<span class="sd">        Selects the survivors from a population. Returns a list of individuals of size surviving_population_size.</span>
+<span class="sd">    &quot;&quot;&quot;</span> 
+
+<div class="viewcode-block" id="FitnessProportionalSurvivorSelection.select_survivors">
+<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.selection.FitnessProportionalSurvivorSelection.select_survivors">[docs]</a>
+    <span class="k">def</span> <span class="nf">select_survivors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">surviving_population_size</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Selects the survivors from a population. Returns a list of individuals of size surviving_population_size.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        population : list</span>
+<span class="sd">            A list of individuals.</span>
+<span class="sd">        surviving_population_size : int</span>
+<span class="sd">            The number of individuals to select from the population.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of individuals of size surviving_population_size.</span>
+<span class="sd">        &quot;&quot;&quot;</span> 
+
+        <span class="n">fitness_scores</span> <span class="o">=</span> <span class="p">[</span><span class="n">individual</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">individual</span> <span class="ow">in</span> <span class="n">population</span><span class="p">]</span>
+        <span class="n">survivors_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">fitness_scores</span><span class="p">)[</span><span class="o">-</span><span class="n">surviving_population_size</span><span class="p">:]</span>
+        <span class="n">survivors</span> <span class="o">=</span> <span class="p">[</span><span class="n">population</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">survivors_idx</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">survivors</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Lightweight Genetic Algorithm</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Eliel Camargo-Molina, Jonas Wessén.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.4.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
