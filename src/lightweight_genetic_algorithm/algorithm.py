@@ -407,7 +407,7 @@ class GeneticAlgorithm:
             population = self.survivor_selection.select_survivors(combined_population, population_size)
 
             best_fitness = np.max( [individual.fitness for individual in population])
-            average_fitness = np.mean([individual.fitness for individual in population]))
+            average_fitness = np.mean([individual.fitness for individual in population])
 
             if generation in print_generations or generation == 0:
                 self.log(f"Generation {generation}, Average Fitness: {average_fitness}, Best Fitness: {best_fitness}", level=1)
