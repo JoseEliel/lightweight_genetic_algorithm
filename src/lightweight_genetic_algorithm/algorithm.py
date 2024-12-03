@@ -9,50 +9,107 @@ import datetime
 
 class GeneticAlgorithm:
     """
-    A class used to represent a Genetic Algorithm. 
+    A class to represent a Genetic Algorithm.
+
+    This class provides methods to perform optimization using genetic algorithms
+    for both numerical and categorical parameters.
+
+    Parameters
+    ----------
+    fitness_function : callable
+        A function that calculates the fitness score of an individual.
+    gene_ranges : list
+        A list specifying the possible values or ranges for each gene.
+        For numerical genes, it is a list of tuples specifying the (min, max) range for each gene.
+        For categorical genes, it is a simple list of possible categories.
+    fitness_function_args : tuple, optional
+        Additional arguments to pass to the fitness_function (default is ()).
+    number_of_genes : int, optional
+        The number of genes in each individual. If genes are numerical,
+        it defaults to the length of gene_ranges. Must be specified if genes are categorical.
+    crossover_method : str, optional
+        The method used for crossover. Options are "Between", "Midpoint", "Either Or", or "None".
+        Default is "Either Or".
+    mutation_mode : list of str, optional
+        The mode used for mutation for each gene.
+        Available options are: "additive", "multiplicative", "random", "categorical".
+        Default is ["additive"]*number_of_genes for numerical genes and ["categorical"]*number_of_genes for categorical genes.
+    mutation_rate : float, optional
+        The rate of mutation for each gene. Default is 1.0 / number_of_genes.
+    measure : str or callable, optional
+        Defines the distance measure between two individuals for diversity.
+        Options are "Hamming", "Euclidean", "Dynamic", or a custom function.
+        Default depends on gene type: "Hamming" for categorical genes, "Euclidean" for numerical genes.
+    use_multiprocessing : bool, optional
+        Whether to use multiprocessing for fitness evaluations (default is False).
+    ncpus : int, optional
+        The number of processes to use for multiprocessing (default is the number of CPUs minus one).
+    verbosity : int, optional
+        The verbosity level. 0 = silent, 1 = normal output, 2 = detailed output (default is 1).
+    selection_method : str, optional
+        The method used for selecting the best individuals for the next generation.
+        Options are "Diversity Enhanced" or "Fitness Proportionate" (default is "Diversity Enhanced").
+    output_directory : str, optional
+        The directory to save output files (default is None).
+        If specified, the algorithm saves the genes of the selected survivors in each generation
+        to a file "<datetime>_survivors.npy" in the output directory.
+        The average fitness and best fitness at each generation are saved to "<datetime>_fitness.txt".
+        A log file is saved to "log.txt" containing the output of the algorithm printed to the console.
+
+        The "<datetime>_survivors.npy" file can be loaded using
+        numpy.load(file, allow_pickle=True) to access the gene values of the individuals
+        in each generation. The loaded array has shape
+        (n_generations+1, population_size, number_of_genes) since the initial population is also saved.
 
     Attributes
     ----------
-    fitness_function : function
-        A function that calculates the fitness score of an individual
-    fitness_function_args: tuple
-        Wildcard arguments to pass to the fitness_function
+    fitness_function : callable
+        The fitness function used to evaluate individuals.
+    fitness_function_args : tuple
+        Additional arguments for the fitness function.
     gene_ranges : list
-        A list of tuples representing the range of each parameter; if parameters are categorical, it's a simple 1D list of categories
-    crossover_method : str
-        The method used for crossover. Options are "Between", "Midpoint", "Either Or", or "None" (default is "Either Or")
+        The ranges or categories for each gene.
     number_of_genes : int
-        The number of parameters (default is the length of gene_ranges). This must be explicitly provided if parameters are categorical.
-    mutation_mode : list
-        The mode used for mutation (default is "additive" for numeric parameters and "categorical" for categorical parameters)
+        The number of genes in each individual.
+    is_discrete : bool
+        Indicates whether the genes are categorical.
+    mutation_mode : list of str
+        Mutation modes for each gene.
     mutation_rate : float
-        The rate of mutation (default is 1.0/number_of_genes). During crossover, each gene is mutated with probability mutation_rate.
-    measure : function or str
-        Defines the distance between two individuals in the parameter space. String options are "Hamming", "Euclidean", "Dynamic".
-        Alternatively, a custom function can be provided. This function takes the genes of two individuals and returns a distance.
+        Mutation rate for each gene.
+    mutation : Mutation
+        The mutation operator.
+    crossover_method : Crossover or str
+        The crossover operator or "none" if no crossover.
+    survivor_selection : SurvivorSelection
+        The survivor selection strategy.
     use_multiprocessing : bool
-        Whether to use multiprocessing for fitness evaluations (default is False). 
-        This speeds up the algorithm for computationally expensive fitness functions.
+        Indicates whether multiprocessing is used.
     ncpus : int
-        The number of processes to use for multiprocessing (default is the number of CPUs on the system minus 1)
+        Number of CPUs used if multiprocessing.
+    pool : multiprocessing.Pool or None
+        The multiprocessing Pool object if multiprocessing is used.
     verbosity : int
-        The verbosity level for printing out messages (default is 1). 0 = silent, 1 = normal output, 2 = detailed output.
-    selection_method : str
-        The method used for selecting the best individuals for the next generation. Options are "Diversity Enhanced" or "Fitness Proportionate".
+        Verbosity level.
     output_directory : str
-        The directory to save output files (default is None). If specified, the algorithm saves the genes of the selected survivors in each generation to a file "<datetime>_survivors.npy" in the output directory. The average fitness and best fitness at each generation are saved to "<datetime>_fitness.txt". A log file is saved to "log.txt" containing the output of the algorithm printed to the console. 
-
-        The "<datetime>_survivors.npy" file can be loaded using numpy.load(file, allow_pickle=True) to access the gene values of the individuals in each generation. The loaded array has shape (n_generations+1, population_size, number_of_genes) since the initial population is also saved.
+        Directory for output files.
+    fitness_file : str
+        Path to the file where fitness values are saved (if output_directory is specified).
+    survivors_file : str
+        Path to the file where survivor gene values are saved (if output_directory is specified).
 
     Methods
     -------
-    run(n_generations, population_size, initial_population, fitness_threshold)
-        Runs the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals. 
-        This method returns a list of lists, where each sublist contains individuals in the population at each generation. The individuals are represented as Individual objects.
-    run_light(n_generations, population_size, initial_population, fitness_threshold)
-        Runs the genetic algorithm for a specified number of generations, returning only the gene values of the individuals in the population at each generation.
+    run(n_generations, population_size, init_genes=None, fitness_threshold=None, verbosity=1)
+        Runs the genetic algorithm and returns the population at each generation.
+    run_light(n_generations, population_size, init_genes=None, fitness_threshold=None, verbosity=1)
+        Runs the genetic algorithm and returns the gene values at each generation.
     """
-    def __init__(self, fitness_function, gene_ranges, fitness_function_args=(), number_of_genes=None, crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None, use_multiprocessing=False, ncpus=None, verbosity=1, selection_method="Diversity Enhanced", output_directory=None):
+
+    def __init__(self, fitness_function, gene_ranges, fitness_function_args=(), number_of_genes=None, 
+                 crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None, 
+                 use_multiprocessing=False, ncpus=None, verbosity=1, selection_method="Diversity Enhanced", 
+                 output_directory=None):
         # Verbosity level for printing out messages
         self.verbosity = verbosity
         self.output_directory = output_directory
@@ -156,6 +213,16 @@ class GeneticAlgorithm:
             self.pool = None
     
     def log(self, message, level=1):
+        """
+        Logs a message to the console and, if specified, to the output directory log file.
+
+        Parameters
+        ----------
+        message : str
+            The message to log.
+        level : int, optional
+            The level of verbosity required to print the message (default is 1).
+        """
         if self.verbosity >= level:
             print(message)
         if self.output_directory:
@@ -163,6 +230,9 @@ class GeneticAlgorithm:
                 f.write(message + "\n")
 
     def setup_output_directory(self):
+        """
+        Sets up the output directory for saving logs and output files.
+        """
         if self.output_directory[-1] != '/':
             self.output_directory += '/'
 
@@ -184,19 +254,53 @@ class GeneticAlgorithm:
             f.write("# Generation Average_Fitness Best_Fitness\n")
 
     def start_pool(self):
+        """
+        Starts the multiprocessing Pool if multiprocessing is enabled.
+        """
         if self.use_multiprocessing and self.pool is None:
             self.pool = self.mp.Pool(self.ncpus)
 
     def stop_pool(self):
+        """
+        Closes the multiprocessing Pool if it is open.
+        """
         if self.pool is not None:
             self.pool.close()
             self.pool.join()
             self.pool = None
 
-    def evaluate_fitness(self,genes):
-        return self.fitness_function(genes,*self.fitness_function_args)
+    def evaluate_fitness(self, genes):
+        """
+        Evaluates the fitness of a set of genes using the fitness function.
+
+        Parameters
+        ----------
+        genes : list
+            The genes to evaluate.
+
+        Returns
+        -------
+        float
+            The fitness value of the genes.
+        """
+        return self.fitness_function(genes, *self.fitness_function_args)
 
     def create_initial_population(self, n, init_gene_values=None):
+        """
+        Creates the initial population of individuals.
+
+        Parameters
+        ----------
+        n : int
+            The number of individuals in the population.
+        init_gene_values : list, optional
+            Initial gene values to seed the population. If None, the population is initialized randomly.
+
+        Returns
+        -------
+        list of Individual
+            The initial population of individuals.
+        """
         self.log(f"Creating initial population of size {n}.", level=2)
 
         # Create genes of the population
@@ -223,124 +327,128 @@ class GeneticAlgorithm:
         population = [Individual(g, self.fitness_function, self.fitness_function_args) for g in genes]
         return population
 
-
     def run(self, n_generations, population_size, init_genes=None, fitness_threshold=None, verbosity=1):
-            '''
-            Run the genetic algorithm and return the population at each generation. 
-
-            Parameters
-            ----------
-            n_generations : int
-                The number of generations to run the genetic algorithm
-            population_size : int
-                The number of individuals in the population
-            init_genes : list
-                A list of gene values to initialize the population with. If None, the population is initialized randomly.
-            fitness_threshold : float
-                The fitness threshold at which to stop the algorithm early. If None, the algorithm runs for n_generations.
-            verbosity : int
-                The verbosity level for printing out messages. 0 = silent, 1 = normal output, 2 = detailed output.
-
-            Returns
-            -------
-            list
-                A list of lists, where each sublist contains individuals in the population at each generation. The individuals are represented as Individual objects.
-
-            '''
-            self.verbosity = verbosity
-            # Start multiprocessing pool if specified
-            self.start_pool()
-            # Create initial population
-            population = self.create_initial_population(population_size, init_genes)
-            if population is None:
-                raise ValueError("Failed to create initial population.")
-            
-            # Set the values for r0
-            if isinstance(self.survivor_selection, DiversityEnhancedSurvivorSelection):                        
-                # Compute the average measure between two individuals, including only non-zero distances
-                initial_population_distances = [self.survivor_selection.measure(p1.get_gene_values(), p2.get_gene_values()) for p1 in population for p2 in population]
-                # drop the zeros
-                initial_population_distances = [d for d in initial_population_distances if d > 0]
-                # get the average distance
-                avg_measure = np.mean(initial_population_distances)
-                # set r0
-                avg_distance = np.sqrt(avg_measure)
-                self.survivor_selection.r0 = avg_distance/10
-                
-            
-            # Determine the generations at which to print the averages
-            print_generations = np.linspace(0, n_generations, 6, dtype=int)[1:]
-            # Run the genetic algorithm for the specified number of generations
-
-            historical_population = [ [ individual.copy() for individual in population ] ]
-            for generation in range(n_generations):                
-                
-                # Create genes of the offspring
-                if self.crossover_method == "none":
-                        # If no crossover, take the individual directly from the current population and apply mutation. 
-                        # Set force_mutate to True to ensure that at least one gene is mutated.
-                        offspring_genes = [self.mutation.mutate_genes(individual.get_genes(),force_mutate=True) for individual in population]
-                else:
-                    # Select two parents randomly
-                    random_indices = np.random.choice(population_size, 2*population_size, replace=True)
-                    parents = np.array(population)[random_indices].reshape(population_size, 2)
-                    
-                    # Create genes of the offspring by crossover
-                    offspring_genes = [self.crossover_method.crossover(parent1.get_genes(), parent2.get_genes()) for parent1, parent2 in parents]
-
-                    # Apply mutation
-                    offspring_genes = [self.mutation.mutate_genes(genes) for genes in offspring_genes]
-
-                # Create offspring Individual objects using multiprocessing if specified
-                if self.use_multiprocessing:
-                    offspring = self.pool.starmap(Individual, [(g, self.fitness_function, self.fitness_function_args) for g in offspring_genes] )
-                else:
-                    offspring = [Individual(genes, self.fitness_function, self.fitness_function_args) for genes in offspring_genes]
-
-                # Combine parent and offspring populations (Elitism)
-                combined_population = population + offspring 
-
-                # Select the best individuals to form the next generation
-                population = self.survivor_selection.select_survivors(combined_population, population_size)
-
-                best_fitness = np.max( [individual.fitness for individual in population] )
-                if generation in print_generations or generation == 0:
-                    average_fitness = np.mean([individual.fitness for individual in population])
-                    self.log(f"Generation {generation}, Average Fitness: {average_fitness}, Best Fitness: {best_fitness}", level=1)
-
-                historical_population.append( [individual.copy() for individual in population ] )
-
-                if self.output_directory:
-                    with open(self.fitness_file, "a") as f:
-                        f.write(f"{generation} {average_fitness} {best_fitness}\n")
-                    # Save the genes of the historical population to the output file.
-                    np.save(self.survivors_file, [ [individual.get_gene_values() for individual in population] for population in historical_population ])
-
-                # Check if fitness threshold is reached
-                if fitness_threshold and best_fitness >= fitness_threshold:
-                    self.log(f"Fitness threshold reached at generation {generation}!", level=1)
-                    break
-            # Stop multiprocessing pool if specified    
-            self.stop_pool()
-            
-            return historical_population
-    
-    def run_light(self, n_generations, population_size, init_genes=None, fitness_threshold=None, verbosity=1):
-        ''' 
-        Run the genetic algorithm and return the gene values of the individuals in the population at each generation.
+        '''
+        Runs the genetic algorithm for a specified number of generations.
 
         Parameters
         ----------
         n_generations : int
-            The number of generations to run the genetic algorithm
+            The number of generations to run the genetic algorithm.
         population_size : int
-            The number of individuals in the population
-        init_genes : list
-            A list of gene values to initialize the population with. If None, the population is initialized randomly.
-        fitness_threshold : float
-            The fitness threshold at which to stop the algorithm early. If None, the algorithm runs for n_generations.
-        verbosity : int
-            The verbosity level for printing out messages. 0 = silent, 1 = normal output, 2 = detailed output.
+            The number of individuals in the population.
+        init_genes : list, optional
+            Initial gene values to seed the population. If None, the population is initialized randomly.
+        fitness_threshold : float, optional
+            The fitness threshold to stop the algorithm early. If None, the algorithm runs for `n_generations`.
+        verbosity : int, optional
+            The verbosity level for printing messages. 0 = silent, 1 = normal output, 2 = detailed output (default is 1).
+
+        Returns
+        -------
+        list of list of Individual
+            A list containing the population at each generation.
+            Each population is a list of `Individual` objects.
+        '''
+        self.verbosity = verbosity
+        # Start multiprocessing pool if specified
+        self.start_pool()
+        # Create initial population
+        population = self.create_initial_population(population_size, init_genes)
+        if population is None:
+            raise ValueError("Failed to create initial population.")
+        
+        # Set the values for r0 for diversity enhanced selection
+        if isinstance(self.survivor_selection, DiversityEnhancedSurvivorSelection):                        
+            # Compute the average measure between two individuals, including only non-zero distances
+            initial_population_distances = [self.survivor_selection.measure(p1.get_gene_values(), p2.get_gene_values()) for p1 in population for p2 in population]
+            # drop the zeros
+            initial_population_distances = [d for d in initial_population_distances if d > 0]
+            # get the average distance
+            avg_measure = np.mean(initial_population_distances)
+            # set r0
+            avg_distance = np.sqrt(avg_measure)
+            self.survivor_selection.r0 = avg_distance/10
+            
+        
+        # Determine the generations at which to print the averages
+        print_generations = np.linspace(0, n_generations, 6, dtype=int)[1:]
+        # Run the genetic algorithm for the specified number of generations
+
+        historical_population = [ [ individual.copy() for individual in population ] ]
+        for generation in range(n_generations):                
+            
+            # Create genes of the offspring
+            if self.crossover_method == "none":
+                    # If no crossover, take the individual directly from the current population and apply mutation. 
+                    # Set force_mutate to True to ensure that at least one gene is mutated.
+                    offspring_genes = [self.mutation.mutate_genes(individual.get_genes(),force_mutate=True) for individual in population]
+            else:
+                # Select two parents randomly
+                random_indices = np.random.choice(population_size, 2*population_size, replace=True)
+                parents = np.array(population)[random_indices].reshape(population_size, 2)
+                
+                # Create genes of the offspring by crossover
+                offspring_genes = [self.crossover_method.crossover(parent1.get_genes(), parent2.get_genes()) for parent1, parent2 in parents]
+
+                # Apply mutation
+                offspring_genes = [self.mutation.mutate_genes(genes) for genes in offspring_genes]
+
+            # Create offspring Individual objects using multiprocessing if specified
+            if self.use_multiprocessing:
+                offspring = self.pool.starmap(Individual, [(g, self.fitness_function, self.fitness_function_args) for g in offspring_genes] )
+            else:
+                offspring = [Individual(genes, self.fitness_function, self.fitness_function_args) for genes in offspring_genes]
+
+            # Combine parent and offspring populations (Elitism)
+            combined_population = population + offspring 
+
+            # Select the best individuals to form the next generation
+            population = self.survivor_selection.select_survivors(combined_population, population_size)
+
+            best_fitness = np.max( [individual.fitness for individual in population] )
+            if generation in print_generations or generation == 0:
+                average_fitness = np.mean([individual.fitness for individual in population])
+                self.log(f"Generation {generation}, Average Fitness: {average_fitness}, Best Fitness: {best_fitness}", level=1)
+
+            historical_population.append( [individual.copy() for individual in population ] )
+
+            if self.output_directory:
+                with open(self.fitness_file, "a") as f:
+                    f.write(f"{generation} {average_fitness} {best_fitness}\n")
+                # Save the genes of the historical population to the output file.
+                np.save(self.survivors_file, [ [individual.get_gene_values() for individual in population] for population in historical_population ])
+
+            # Check if fitness threshold is reached
+            if fitness_threshold and best_fitness >= fitness_threshold:
+                self.log(f"Fitness threshold reached at generation {generation}!", level=1)
+                break
+        # Stop multiprocessing pool if specified    
+        self.stop_pool()
+        
+        return historical_population
+
+    def run_light(self, n_generations, population_size, init_genes=None, fitness_threshold=None, verbosity=1):
+        ''' 
+        Runs the genetic algorithm and returns only the gene values.
+
+        Parameters
+        ----------
+        n_generations : int
+            The number of generations to run the genetic algorithm.
+        population_size : int
+            The number of individuals in the population.
+        init_genes : list, optional
+            Initial gene values to seed the population. If None, the population is initialized randomly.
+        fitness_threshold : float, optional
+            The fitness threshold to stop the algorithm early. If None, the algorithm runs for `n_generations`.
+        verbosity : int, optional
+            The verbosity level for printing messages. 0 = silent, 1 = normal output, 2 = detailed output (default is 1).
+
+        Returns
+        -------
+        list of list
+            A list containing the gene values of the population at each generation.
         '''
 
         historical_population = self.run(n_generations, population_size, init_genes=init_genes, fitness_threshold=fitness_threshold, verbosity=verbosity)
