@@ -2,9 +2,18 @@
 
 <img src="graphical_abstract.png" width="400"/>
 
+- [About](#about)
+- [Installation](#installation)
+- [Features](#features)
+- [User Guide](#user-guide)
+    - [Overview](#overview)
+    - [Example 1: Numerical Genes](#example-1-numerical-genes)
+    - [Example 2: Categorical Genes](#example-2-categorical-genes)
+
+
 ### About
 
-This package provides an intuitive, flexible, and efficient implementation of a genetic algorithm in Python. It is designed to be easy to use while still providing a high degree of flexibility for a wide range of optimization problems. The package is developed by Eliel Camargo-Molina and Jonas Wessén. The genetic algorithm implemented in this package includes features such as multiple crossover methods, mutation modes, support for both numerical and categorical genes and a diversity-enhanced selection algorithm.
+This package provides an intuitive, flexible, and efficient implementation of a genetic algorithm in Python. It is designed to be easy to use while still providing a high degree of flexibility for a wide range of optimization problems. The package is developed by Eliel Camargo-Molina and Jonas Wessén. The source code is available at [github.com/JoseEliel/lightweight_genetic_algorithm](https://github.com/JoseEliel/lightweight_genetic_algorithm).
 
 ### Installation
 
@@ -13,8 +22,6 @@ The GA presented in this work is implemented in the `lightweight-genetic-algorit
 ```bash
 pip install lightweight-genetic-algorithm
 ```
-
-The source code is available at [github.com/JoseEliel/lightweight_genetic_algorithm](https://github.com/JoseEliel/lightweight_genetic_algorithm).
 
 ### Features
 
@@ -28,6 +35,8 @@ The `lightweight-genetic-algorithm` Python module contains several features that
 - **Multiprocessing**: The package supports multiprocessing for parallel fitness evaluations, which can dramatically speed up the genetic algorithm for problems where the fitness function is computationally expensive.
 
 ## User Guide
+
+### Overview
 
 The primary class in this package is `GeneticAlgorithm`. A `GeneticAlgorithm` instance is created with the following inputs:
 
@@ -60,11 +69,13 @@ The `run_light` method is similar to `run` but returns only the gene values of a
 
 ### Example 1: Numerical Genes
 
-Figure 1 contains the Python code for a simple example of how to use the package. In this example, an individual represents a point in the xy-plane, and the fitness function takes the form:
+In this example, an individual represents a point in the xy-plane, and the fitness function takes the form:
 
 $$ f(x,y) = - A \left( \sqrt{x^2 + y^2} - R \right)^2, $$
 
-which has an extended maximum on the circle centered at the origin with radius $R$. The overall factor $A$ can be chosen to balance the diversity punishment and the fitness reward. The genetic algorithm is run for 20 generations with a population size of 100 using the `Between` crossover method.
+which has an extended maximum on the circle centered at the origin with radius $R$. The overall factor $A$ can be chosen to balance the diversity punishment and the fitness reward. The goal of the algorithm is to find a set of points that are evenly distributed along the entire circle.
+
+The complete Python code for this example is shown below. The genetic algorithm is run for 20 generations with a population size of 100 using the `Between` crossover method.
 
 ```python
 from lightweight_genetic_algorithm import GeneticAlgorithm
@@ -89,12 +100,11 @@ all_populations = ga.run_light(n_generations=20, population_size=100)
 ```
 *Complete Python code for the simple example for numeric genes. In this example, an individual represents coordinates of a point in the xy-plane. The fitness function has an extended maximum on a circle with radius 5.0. The genetic algorithm is run for 20 generations with a population size of 100 using the `Between` crossover method.*
 
-The resulting population after 20 generations is depicted in Figure 2. In 20 generations, the individuals are evenly distributed along the circle.
+The resulting population after 20 generations is depicted below in Figure 1. In 20 generations, the individuals are evenly distributed along the circle.
 
-![Figure 2: Initial and final populations for the numerical genes example.](Figure_A2.png)
+![Figure 1: Initial and final populations for the numerical genes example.](Figure_A2.png)
 
 *Figure 1: The initial population is randomly distributed, while the final population is evenly distributed along the circle after 20 generations.*
-
 
 
 ### Example 2: Categorical Genes
@@ -103,7 +113,7 @@ Next, we turn to a slightly more complex example involving categorical genes. In
 
 The net charge of a sequence is the sum of the charges of the amino acids with Lysine (K) having a charge of +1 and Glutamic Acid (E) having a charge of -1. The SCD parameter is a single number that can be calculated given a sequence of charges. The SCD parameter is a measure of the "charge blockiness" (i.e., an alternating sequence `EKEKEK...EK` has SCD ≈ 0 while a di-block sequence `EEEE...EEEKKKK...KKK` gives a large, negative SCD) and correlates well with both the radius-of-gyration of isolated chains and with the upper-critical temperature for phase separation in multi-chain systems.
 
-The complete Python code for this example is shown in Figure 3. In this example, an individual corresponds to a list of `E`'s and `K`'s representing the amino-acid sequence. This code showcases two additional important features of the `lightweight-genetic-algorithm` module: multiprocessing and the usage of additional arguments to the fitness function.
+The complete Python code for this example is shown in below. In this example, an individual corresponds to a list of `E`'s and `K`'s representing the amino-acid sequence. This code showcases two additional important features of the `lightweight-genetic-algorithm` module: multiprocessing and the usage of additional arguments to the fitness function.
 
 
 ```python
@@ -152,7 +162,7 @@ if __name__ == '__main__':
 ```
 *Complete Python code for the categorical genes example, showcasing the usage of multiprocessing and additional fitness function arguments. The GA is run for 50 generations with a population size of 100. The final population of sequences is contained in `all_populations[-1]` which is a list of length 100 where each entry is a list of `E`'s and `K`'s representing the amino-acid sequence.*
 
-The net charges and SCD values for the initial and final populations are shown in Figure 4. Note that the SCD values are close to the target value of -10 while there is a wide range of net charges in the final population. This demonstrates the effect of the diversity-enhanced selection method.
+The net charges and SCD values for the initial and final populations are shown in Figure 2 below. Note that the SCD values are close to the target value of -10 while there is a wide range of net charges in the final population. This demonstrates the effect of the diversity-enhanced selection method.
 
 ![Figure 2: SCD values and net charges for initial and final populations of the categorical genes example.](Figure_A4.png)
 
