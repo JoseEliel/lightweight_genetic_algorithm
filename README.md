@@ -65,7 +65,6 @@ The `run` method returns the full list of `Individual` instances across all gene
 
 The `run_light` method is similar to `run` but returns only the gene values of all individuals across all generations, which is useful for large populations and generations.
 
-## Examples
 
 ### Example 1: Numerical Genes
 
