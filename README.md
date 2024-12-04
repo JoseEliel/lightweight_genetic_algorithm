@@ -1,220 +1,159 @@
 ## Lightweight Genetic Algorithm
 
+<img src="graphical_abstract.png" width="400"/>
+
 ### About
 
-This package provides an intuitive, flexible, and efficient implementation of a genetic algorithm in Python. It is designed to be easy to use while still providing a high degree of flexibility for a wide range of optimization problems. The package is developed by Eliel Camargo-Molina and Jonas Wessén.
-
-The genetic algorithm implemented in this package includes features such as multiple crossover methods, mutation modes, support for both numerical and categorical genes, and a unique diversity calculation that makes it effective even for small populations and few generations.
-
-In the context of this genetic algorithm, a "gene" can be understood as a parameter or variable that we want to optimize. It can be numeric when we explore the parameter space of a model or theory or categorical when we express discrete, non-numeric options, for example, the amino-acid sequence of in a protein. An "individual" is a set of genes that defines a point in the gene space. The user defines a "fitness function" that computes the fitness of an individual, which quantifies how good it is. The goal of the genetic algorithm is to find a set of individuals with high fitness, constituting optimal solutions to the optimization problem at hand.
-
-### Features
-
-- **Support for Numerical and Categorical Genes**: The GeneticAlgorithm class can handle both numeric and categorical genes, which enables users to solve a wide range of optimization problems.
-
-- **Multiple Crossover Methods**: The package provides four different crossover methods: "Between", "Midpoint", "Either Or", and "None". For categorical genes, "Either Or" must be used. For numeric genes, you can select the one that best matches your problem.
-
-- **Multiple Mutation Modes**: The package includes four mutation modes: "additive", "multiplicative", "random", and "categorical". This flexibility allows you to choose the mutation mode that best suits your problem, whether it uses numeric or categorical genes.
-
-- **Diversity Enhancement**: The package contains a unique survivor selection procedure that promotes both fitness and diversity among the surviving individuals in each generation. This can procedure provides not only the "best solution", but also a diverse set of solutions to the optimization problem. The diversity is quantified using a distance measure that quantifies the dissimilarity between two individuals. The default distance measure is the Euclidean distance for numeric genes and the Hamming distance for categorical genes. The package also allows you to supply your own distance measure to better match your problem. 
-
-- **Multiprocessing**: The package supports multiprocessing for parallelized fitness evaluations. This feature can dramatically speed up the genetic algorithm for problems where the fitness function is computationally expensive. 
+This package provides an intuitive, flexible, and efficient implementation of a genetic algorithm in Python. It is designed to be easy to use while still providing a high degree of flexibility for a wide range of optimization problems. The package is developed by Eliel Camargo-Molina and Jonas Wessén. The genetic algorithm implemented in this package includes features such as multiple crossover methods, mutation modes, support for both numerical and categorical genes and a diversity-enhanced selection algorithm.
 
 ### Installation
 
-You can install the package using pip:
+The GA presented in this work is implemented in the `lightweight-genetic-algorithm` Python module which is installable via pip as:
 
 ```bash
 pip install lightweight-genetic-algorithm
 ```
 
-### Usage
+The source code is available at [github.com/JoseEliel/lightweight_genetic_algorithm](https://github.com/JoseEliel/lightweight_genetic_algorithm).
+
+### Features
+
+The `lightweight-genetic-algorithm` Python module contains several features that allow the user to easily set up a GA for a wide range of optimization problems. These features include:
+
+- **Support for Numerical and Categorical Genes**: The package can handle optimization problems formulated either in terms of numerical or categorical genes.
+- **Multiple Crossover Methods**: The package provides four different crossover methods: `Between`, `Midpoint`, `Either Or`, and `None`.
+- **Multiple Mutation Modes**: The package includes three mutation modes for numerical genes: `additive`, `multiplicative`, `random`. For categorical genes, the algorithm assumes the `categorical` mutation mode.
+- **Diversity-Enhanced Selection**: The package uses the diversity-enhanced selection algorithm, allowing the algorithm to explore widely different regions in parameter space.
+- **Customizable Distance Measure**: The user can specify the distance function (used during selection) to be either `Euclidean` or `Dynamic` for numeric genes. For categorical genes, the Hamming distance is assumed. It is also possible for the user to supply their own distance function.
+- **Multiprocessing**: The package supports multiprocessing for parallel fitness evaluations, which can dramatically speed up the genetic algorithm for problems where the fitness function is computationally expensive.
+
+## User Guide
 
 The primary class in this package is `GeneticAlgorithm`. A `GeneticAlgorithm` instance is created with the following inputs:
 
-- `fitness_function`: A function computing the fitness score of an individual. This function should receive an array of genes as its first input argument and return a single number. Additional arguments can be passed to the fitness function using the `fitness_function_args` argument, described below.
-
-- `gene_ranges`: A list of tuples representing the range of each numeric gene. Each tuple should contain two numbers, with the first number being the lower bound and the second the upper bound. For categorical genes, it should be a one-dimensional list of possible categories.
-
+- `fitness_function`: A function computing the fitness score of an individual. This function should receive an array of genes as its first input argument and return a single number. Additional arguments can be passed to the fitness function using the `fitness_function_args` argument.
+- `gene_ranges`: A list of tuples representing the range of each numeric gene. Each tuple should contain two numbers, with the first number being the lower bound and the second the upper bound. For categorical genes, `gene_ranges` should instead be a one-dimensional list of possible categories.
 - `number_of_genes` (only needed for categorical genes): The number of genes defining an individual. For numeric genes, the `number_of_genes` is inferred from the length of `gene_ranges`.
-
 - `fitness_function_args` (optional): Additional arguments to pass to the fitness function. This should be a tuple of arguments.
+- `crossover_method` (optional): The method used for crossover. Available options are `Between`, `Midpoint`, `Either Or`, and `None`. Default is `Between` for numeric genes. For categorical genes, only `Either Or` or `None` is possible.
+- `mutation_mode` (optional): The mode used for mutation. Options available are `additive`, `multiplicative`, `random`, and `categorical`. Default is `additive` for numeric genes and `categorical` for categorical genes.
+- `mutation_rate` (optional): The rate of mutation. The default is 1.0/`number_of_genes`. During crossover, each gene is mutated with probability `mutation_rate`.
+- `measure` (optional): Specifies the distance function between two points in the gene space. This argument can be a string variable (`Euclidean`, `Dynamic`, or `Hamming`) corresponding to the three distance measures discussed in this work. The `measure` argument can also be a user-defined distance function. The default is Euclidean distance for numeric genes and Hamming distance for categorical genes.
+- `use_multiprocessing` (optional): Whether to use multiprocessing for parallel fitness evaluations. Default is False.
+- `ncpus` (optional): The number of CPUs to use for multiprocessing. Default is the number of CPUs on the system minus one. This argument is used only when `use_multiprocessing` is True.
+- `selection_method` (optional): The method used for survivor selection. Available options are `Diversity Enhanced` and `Fitness Proportionate`. Default is `Diversity Enhanced`.
+- `output_directory` (optional): The directory where the output files are saved. Default is None. If specified, the algorithm saves the genes of the selected survivors in each generation to a file `<date-time>_survivors.npy` in the output directory. The average fitness and best fitness at each generation are saved to `<date-time>_fitness.txt`. A log file is saved to `log.txt` containing the output of the algorithm printed to the console.
 
-- `crossover_method` (optional): The method used for crossover. Available options are "Between", "Midpoint", "Either Or", and "None". For categorical genes, "Either Or" must be used. Default is "Between".
-
-- `mutation_mode` (optional): The mode used for mutation. Options available are "additive", "multiplicative", "random", and "categorical". Default is "additive" for numeric genes and "categorical" for categorical genes.
-
-- `mutation_rate` (optional): The rate of mutation. The default is 1.0/number_of_genes. During crossover, each gene is mutated with probability mutation_rate.
-
-- `measure` (optional): A function to measure the distance between two points in the gene space. The default is Euclidean distance for numeric genes and Hamming distance for categorical genes.
-
-- `use_multiprocessing` (optional): Whether to use multiprocessing for parallelized fitness evaluations. Default is False.
-
-- `ncpus` (optional): The number of CPUs to use for multiprocessing. Default is the number of CPUs on the system minus one. This argument is only used if `use_multiprocessing` is True.
-
-Once an instance of the `GeneticAlgorithm` class has been created, the genetic algorithm is executed using the `run` method. The `run` method takes the following inputs:
+Once an instance of the `GeneticAlgorithm` class has been created, the genetic algorithm is executed using the `run` or `run_light` methods. These methods take the following arguments:
 
 - `n_generations`: The number of generations to run the genetic algorithm for.
-
 - `population_size`: The number of individuals in the population.
-
 - `fitness_threshold` (optional): The fitness threshold at which the genetic algorithm should stop. If this is set, the genetic algorithm will stop when the fitness of the best individual in the population is greater than or equal to the fitness threshold. Default is None.
+- `init_genes` (optional): An initial set of gene values for creating the initial population. Default is `None`.
+- `verbosity` (optional): The verbosity level for printing out messages. The options are `0` (silent), `1` (normal output), and `2` (detailed output). Default is `1`.
 
-#### Example 1: Numerical genes
+The `run` method returns the full list of `Individual` instances across all generations, where each `Individual` object has attributes such as fitness and gene values.
 
-Here's a toy example of how you use the package to run a genetic algorithm. In this example, we seek to find a population of points that are close to a circle with a radius of 5.0. The fitness function is defined as the negative squared distance from the circle. The genes are the x and y coordinates of the points.
+The `run_light` method is similar to `run` but returns only the gene values of all individuals across all generations, which is useful for large populations and generations.
 
-```python
-# Define the center and radius of a circle
-center = np.array([0.0, 0.0])
-radius = 5.0
+## Examples
 
-# Define your fitness function
-def fitness_function(individual):
-    distance = np.linalg.norm(individual - center)
-    fitness = -abs(distance - radius)**2
-    return fitness
+### Example 1: Numerical Genes
 
-# Define the range of your genes
-gene_ranges = [(-10, 10), (-10, 10)]
+Figure 1 contains the Python code for a simple example of how to use the package. In this example, an individual represents a point in the xy-plane, and the fitness function takes the form:
 
-# Create a GeneticAlgorithm instance
-ga = GeneticAlgorithm(fitness_function, 
-                      gene_ranges, 
-                      crossover_method="Between",
-                      number_of_genes=2, 
-                      mutation_mode=["Additive", "Multiplicative"], 
-                      mutation_rate=0.1)
+$$ f(x,y) = - A \left( \sqrt{x^2 + y^2} - R \right)^2, $$
 
-# Run the genetic algorithm
-population = ga.run(n_generations=20, population_size=100)
-
-# Plot the final population
-plt.figure(figsize=(6, 6))
-plt.scatter(population[:, 0], population[:, 1], color='blue')
-circle1 = plt.Circle(center1, radius1, fill=False, color='red')
-plt.gca().add_artist(circle1)
-plt.gca().set_aspect('equal', adjustable='box')
-plt.show()
-```
-
-![Image showing the resulting populations](example.png)
-
-In this example, we're using the genetic algorithm to approximate a circular shape based on a defined radial fitness function. The genes for the `GeneticAlgorithm` class can be adjusted to fit the needs of your specific problem, including both numerical and categorical genes.
-
-#### Example 2: Categorical genes
-
-Here's an example showing the intended usage for categorical genes. In this example, we seek to construct an array of Lysine (K) Glutamic acid (E) representing the amino-acid sequence of a model intrinsically disordered protein. The goal is to find a diverse set of sequences with a "sequence charge decoration" (SCD) parameter near a given target value (target_SCD). The net charge of a sequence is the sum of the charges of the amino acids with Lysine (K) having a charge of +1 and Glutamic Acid (E) having a charge of -1. The SCD parameter is defined in Sawle & Gosh J. Chem. Phys. 143, 085101 (2015), and is a single number that can be calculated given a sequence of charges. The SCD parameter is a measure of the "charge blockiness" (i.e., an alternating sequence 'EKEKEK...EK' gives SCD~0 while a di-block sequence 'EEEE...EEEKKKK...KKK' gives a large, negative SCD) and correlates well with both the radius-of-gyration of isolated chains and with the upper-critical temperature for phase separation in multi-chain systems. 
+which has an extended maximum on the circle centered at the origin with radius $R$. The overall factor $A$ can be chosen to balance the diversity punishment and the fitness reward. The genetic algorithm is run for 20 generations with a population size of 100 using the `Between` crossover method.
 
 ```python
 from lightweight_genetic_algorithm import GeneticAlgorithm
 
-# Convert a amino-acid sequence to a charge sequence
-def fasta_to_charge(fasta_sequence):
-    charge_sequence = []
-    for aa in fasta_sequence:
-        if aa=='K' or aa=='R': # Lysine (K) or Arginine (R)
-            charge_sequence.append(1)
-        elif aa=='E' or aa=='D': # Glutamic acid (E) or Aspartic acid (D)
-            charge_sequence.append(-1)
-        elif aa=='H': # Histidine (H)
-            charge_sequence.append(0.5)
-        else:
-            charge_sequence.append(0)
+# Define fitness function
+def fitness_function(individual): # individual is x,y coordinates
+    distance = (individual[0]**2 + individual[1]**2)**0.5
+    R = 5 # Circle radius
+    A = 5 # Overall fitness scaling 
+    fitness = -A*(distance - R)**2 
+    return fitness
+
+# Define the ranges of the genes
+gene_ranges = [ (-10,10), (-10,10) ]
+
+# Create a GeneticAlgorithm instance
+ga = GeneticAlgorithm(fitness_function, gene_ranges, crossover_method='Between')
+all_populations = ga.run_light(n_generations=20, population_size=100)
+
+# all_populations is a (n_generations, population_size, n_genes) list.
+# The final population is all_populations[-1]
+```
+*Complete Python code for the simple example for numeric genes. In this example, an individual represents coordinates of a point in the xy-plane. The fitness function has an extended maximum on a circle with radius 5.0. The genetic algorithm is run for 20 generations with a population size of 100 using the `Between` crossover method.*
+
+The resulting population after 20 generations is depicted in Figure 2. In 20 generations, the individuals are evenly distributed along the circle.
+
+![Figure 2: Initial and final populations for the numerical genes example.](Figure_A2.png)
+
+*Figure 1: The initial population is randomly distributed, while the final population is evenly distributed along the circle after 20 generations.*
+
+
+
+### Example 2: Categorical Genes
+
+Next, we turn to a slightly more complex example involving categorical genes. In this example, we seek to construct an array of Lysine (K) and Glutamic acid (E) representing the amino-acid sequence of a model intrinsically disordered protein. The goal is to find a diverse set of sequences with a sequence charge decoration ($ \mathrm{SCD}$) parameter near a given target value.
+
+The net charge of a sequence is the sum of the charges of the amino acids with Lysine (K) having a charge of $+1$ and Glutamic Acid (E) having a charge of $-1$. The SCD parameter is defined in [Sawle2015], and is a single number that can be calculated given a sequence of charges. The SCD parameter is a measure of the "charge blockiness" (i.e., an alternating sequence `EKEKEK...EK` has $ \mathrm{SCD} \approx 0 $ while a di-block sequence `EEEE...EEEKKKK...KKK` gives a large, negative SCD) and correlates well with both the radius-of-gyration of isolated chains and with the upper-critical temperature for phase separation in multi-chain systems.
+
+The complete Python code for this example is shown in Figure 3. In this example, an individual corresponds to a list of `E`'s and `K`'s representing the amino-acid sequence. This code showcases two additional important features of the `lightweight-genetic-algorithm` module: multiprocessing and the usage of additional arguments to the fitness function.
+
+
+```python
+from lightweight_genetic_algorithm import GeneticAlgorithm
+
+# Converts a sequence of amino acids to a sequence of charges
+def aa_to_charge(sequence):
+    aa_charges = {'K':1, 'E':-1} # Amino acid electric charges
+    charge_sequence = [ aa_charges[aa] for aa in sequence ]
     return charge_sequence
-    
+
 # Calculates the sequence charge decoration (SCD) parameter
-def calculate_SCD(charge_sequence):
+def calculate_SCD(sequence):
+    charge_sequence = aa_to_charge(sequence)
     SCD = 0
-    for a in range(len(seq)-1):
-        for b in range(a+1,len(seq)):
-            SCD += charge_sequence[a] * charge_sequence[b] * np.sqrt(np.abs(a-b))
-    SCD *= 2/len(charge_sequence)
+    for a in range(len(charge_sequence)-1):
+        for b in range(a+1,len(charge_sequence)):
+            SCD += charge_sequence[a] * charge_sequence[b] * abs(a-b)**0.5
+    SCD /= len(charge_sequence)
     return SCD
 
 # Define fitness function
-def fitness_function(fasta_sequence, target_SCD):
-    charge_sequence = fasta_to_charge(fasta_sequence)
-    SCD = calculate_SCD(charge_sequence)
-    f = -(SCD-target_SCD)**2 
-    return f
+def fitness_function(sequence, target_SCD):
+    SCD = calculate_SCD(sequence)
+    fitness = -(SCD - target_SCD)**2
+    return fitness
 
-# Because it is a one-dimensional list, categorical genes are automatically recognized.  
-# gene_ranges is then the list of categories, which in this example is the list of available amino acids.
-gene_ranges = [ 'E', 'K' ] # Glutamic acid ('E'), Lysine ('K'),
+def main():
+    # Define the ranges of the genes. Categorical genes are recognized automatically since it is a one-dimensional list. 
+    gene_ranges = ['E', 'K'] # Glutamic acid (E, charge=-1) , Lysine (K, charge=+1)
 
-N = 50 # sequence length
-target_SCD = -15
+    N = 50 # sequence length
+    target_SCD = -10 # Target SCD value
 
-# Create a GeneticAlgorithm instance
-ga = lga.GeneticAlgorithm(fitness_function, gene_ranges, 
-                          number_of_genes = N, 
-                          fitness_function_args = (target_SCD,)
-)
+    # Create a GeneticAlgorithm instance
+    ga = GeneticAlgorithm(fitness_function, gene_ranges, 
+                        number_of_genes = N, 
+                        fitness_function_args = (target_SCD,), 
+                        use_multiprocessing = True)
 
-# Run the genetic algorithm
- population = ga.run(n_generations=300, population_size=100)
+    # Run the genetic algorithm
+    all_populations = ga.run_light(n_generations=50, population_size=100)
 
+if __name__ == '__main__':
+    main()
 ```
-The genetic algorithm produces a population of sequences with SCD values and net charges as depicted below.
+*Complete Python code for the categorical genes example, showcasing the usage of multiprocessing and additional fitness function arguments. The GA is run for 50 generations with a population size of 100. The final population of sequences is contained in `all_populations[-1]` which is a list of length 100 where each entry is a list of `E`'s and `K`'s representing the amino-acid sequence.*
 
-<img src="example_readme_categorical.png" width="800"/>
+The net charges and SCD values for the initial and final populations are shown in Figure 4. Note that the SCD values are close to the target value of -10 while there is a wide range of net charges in the final population. This demonstrates the effect of the diversity-enhanced selection method.
 
-We can print the 10 sequences with SCD values closest to the target value using the following code:
+![Figure 2: SCD values and net charges for initial and final populations of the categorical genes example.](Figure_A4.png)
 
-```python
-# Keep the 10 best sequences
-population = population[:10]
-
-# Calculate their SCD values and net charges
-charge_sequences = [ fasta_to_charge(s) for s in population ]
-all_SCD = np.array([ calculate_SCD(s) for s in charge_sequences])
-all_net_charges = np.array([ np.sum(s) for s in charge_sequences])
-
-# Print the n_print best sequences
-for i in range(n_print):
-    print(f"Sequence {i}:",''.join(population[i]),'SCD:',np.round(all_SCD[i],decimals=2), 'Net charge:', all_net_charges[i])
-```
-
-The output is shown below. The sequences are all different from each other but have SCD values near the target value. This is a consequence of the diversity enhancement of the genetic algorithm.
-
-```bash
-Sequence 0: KKKKKKEKKKKEKKKEEKEEEEKEKEKEEKEKEKKEEEEEKEEEEEEEEK SCD: -15.01 Net charge: -4
-Sequence 1: EEEEEEKEEEKEKEEEKEEKEKKEEKEKKEKKKEKKKKEEEEKKKKKKKK SCD: -15.02 Net charge: 0
-Sequence 2: KKKEKKKEKEKKKKEKKEKEKEKEKKKKEEEKEEEEEEEEKKEKEEEEEE SCD: -14.98 Net charge: -2
-Sequence 3: KKKKEKEKKKKKKEKEKEKKKEEEEEKEEKEKKKKKEEEEEEKEEEEEEE SCD: -14.96 Net charge: -2
-Sequence 4: KEEEEEEEEEEEEKEKKKKKEKEEKKKKEKEEEKKEEKKKKKKKEKKKKK SCD: -15.06 Net charge: 4
-Sequence 5: KKKKKKKKKKKKKKKKKKKKKEKEEKEKKEKKKKEKEEKKEEEEEEEEEE SCD: -15.06 Net charge: 14
-Sequence 6: KKEKKKKKKEEKKKKKKEEEEKKEKKEKKKEKEKEEKEKKEEEEEEEEEE SCD: -14.9 Net charge: 2
-Sequence 7: KKKKEEEKKKKKKKKEEEEKKKKEKKKEEEEKEEEEEEEEEEKEKEEEEE SCD: -15.12 Net charge: -6
-Sequence 8: EKKEKEEKEEEEEEEKEEKEKEEEEEEEKEKEKKKKKKEKKKEKKKKKEK SCD: -14.83 Net charge: -2
-Sequence 9: KKKKEKEKKEKEKKKKEKKKEEKEEEEKKKKEEEEEEEKEEEEEEEEEEE SCD: -15.15 Net charge: -8
-```
-
-The above example also shows the use of the `fitness_function_args` argument, which allows you to pass additional arguments to the fitness function. In this case, we pass the target SCD value to the fitness function.
-
-### Crossover Methods
-
-The package provides four different crossover methods:
-
-- **Between**: In this method, the child's genes are chosen to be a random value between the corresponding genes of the two parents. This method is suitable for numeric genes.
-
-- **Midpoint**: In this method, the child's genes are chosen to be the average of the corresponding genes of the two parents. This method is also suitable for numeric genes.
-
-- **Either Or**: In this method, the child's genes are chosen to be either the corresponding gene of the first parent or the second parent. This method is suitable for both numeric and categorical genes. However, for categorical genes, this is the only method that should be used.
-
-- **None**: No crossover is performed. This method can be used when you want to run the genetic algorithm without any crossover.
-
-### Diversity Enhanced Survivor Selection
-
-The package includes a unique selection procedure that promotes diversity among the surviving individuals in each generation (i.e., the individuals that are selected to constitute the parents in the next-generation population). This leads to an efficient non-local exploration of the gene space, which is particularly useful for problems with many local optima. The selection procedure works as follows:
-
-1. The individual in the population with the highest (most optimal) fitness is selected as a survivor and is removed from the population.
-
-2. A "diversity punishment" is subtracted from the fitness of each individual in the remaining population. The diversity punishment is based on similarity with the previously selected survivor, with similar individuals receiving a higher punishment. 
-
-3. Steps 1 and 2 are iterated until a desired  number of survivors has been selected.
-
-The diversity punishment is calculated using a "measure" function that defines a distance between two points in the gene space. The default measure function is the Euclidean distance for numeric genes and the Hamming distance for categorical genes. Given the distance between two individuals, the diversity punishment is obtained using an exponential function that leaves the fitness essentially unchanged for individuals further apart than certain distance `r0`. 
-
-The package also allows you to supply your own function to measure the distance between two points in the gene space. This allows you to customize the diversity calculation to better match your problem. 
+*Figure 2: The initial population has a wide range of SCD values and net charges, while the final population has SCD values close to the target value of -10.0.*
