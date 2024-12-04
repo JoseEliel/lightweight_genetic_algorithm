@@ -118,19 +118,15 @@ The complete Python code for this example is shown in below. In this example, an
 ```python
 from lightweight_genetic_algorithm import GeneticAlgorithm
 
-# Converts a sequence of amino acids to a sequence of charges
-def aa_to_charge(sequence):
-    aa_charges = {'K':1, 'E':-1} # Amino acid electric charges
-    charge_sequence = [ aa_charges[aa] for aa in sequence ]
-    return charge_sequence
-
 # Calculates the sequence charge decoration (SCD) parameter
 def calculate_SCD(sequence):
-    charge_sequence = aa_to_charge(sequence)
+    aa_charges = {'K':1, 'E':-1} # Amino acid electric charges
+    charge_sequence = [ aa_charges[aa] for aa in sequence ]
+    
     SCD = 0
     for a in range(len(charge_sequence)-1):
         for b in range(a+1,len(charge_sequence)):
-            SCD += charge_sequence[a] * charge_sequence[b] * abs(a-b)**0.5
+            SCD += charge_sequence[a] * charge_sequence[b] * (b-a)**0.5
     SCD /= len(charge_sequence)
     return SCD
 
