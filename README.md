@@ -13,15 +13,17 @@
 
 ### About
 
-This package provides an intuitive, flexible, and efficient implementation of a genetic algorithm in Python. It is designed to be easy to use while still providing a high degree of flexibility for a wide range of optimization problems. The package is developed by Eliel Camargo-Molina and Jonas Wessén. The source code is available at [github.com/JoseEliel/lightweight_genetic_algorithm](https://github.com/JoseEliel/lightweight_genetic_algorithm).
+This package provides an intuitive, flexible, and efficient implementation of a genetic algorithm in Python. It is designed to be easy to use while still providing a high degree of flexibility for a wide range of optimization problems. The package is developed by Eliel Camargo-Molina and Jonas Wessén. 
 
 ### Installation
 
-The GA presented in this work is implemented in the `lightweight-genetic-algorithm` Python module which is installable via pip as:
+The `lightweight-genetic-algorithm` Python module can be installed using `pip`:
 
 ```bash
 pip install lightweight-genetic-algorithm
 ```
+
+The source code is available at [github.com/JoseEliel/lightweight_genetic_algorithm](https://github.com/JoseEliel/lightweight_genetic_algorithm).
 
 ### Features
 
