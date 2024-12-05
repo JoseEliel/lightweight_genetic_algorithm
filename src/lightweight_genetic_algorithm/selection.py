@@ -33,6 +33,7 @@ class SurvivorSelection:
         """
         raise NotImplementedError("select_survivors() method not implemented.")
 
+
 # Diversity enhanced survivor selection
 class DiversityEnhancedSurvivorSelection(SurvivorSelection):
     """
@@ -109,9 +110,11 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
         Parameters
         ----------
         individual : object
-            An individual from the population.
+            An individual from the population. Must have a method `get_gene_values()`
+            that returns a numpy array of gene values.
         survivor : object
-            A survivor individual already selected.
+            A survivor individual already selected. Must have a method `get_gene_values()`
+            that returns a numpy array of gene values.
 
         Returns
         -------
@@ -131,10 +134,16 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
         """
         Select survivors from the population based on fitness and diversity.
 
+        The method iteratively selects the best individual (based on adjusted fitness),
+        adds it to the list of survivors, and updates the fitness of the remaining
+        individuals by subtracting the diversity penalty with respect to the newly
+        added survivor.
+
         Parameters
         ----------
         population : list
             A list of individuals in the current population.
+            Each individual must have a `fitness` attribute and a `get_gene_values()` method.
         surviving_population_size : int
             The number of individuals to select as survivors.
 
@@ -142,6 +151,10 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
         -------
         list
             A list of selected individuals of length `surviving_population_size`.
+
+        Notes
+        -----
+        The method modifies the input `population` list by removing selected survivors.
         """
         # Initialize diversity-adjusted fitness scores
         adjusted_fitness = np.array([individual.fitness for individual in population])
@@ -169,6 +182,7 @@ class DiversityEnhancedSurvivorSelection(SurvivorSelection):
 
         return survivors
 
+
 class FitnessProportionalSurvivorSelection(SurvivorSelection):
     """
     Fitness-proportional survivor selection strategy.
@@ -176,7 +190,6 @@ class FitnessProportionalSurvivorSelection(SurvivorSelection):
     This class implements a survivor selection method where individuals
     are selected based solely on their fitness values. Individuals with
     higher fitness have a higher chance of being selected.
-
     """
 
     def select_survivors(self, population, surviving_population_size):
@@ -187,6 +200,7 @@ class FitnessProportionalSurvivorSelection(SurvivorSelection):
         ----------
         population : list
             A list of individuals in the current population.
+            Each individual must have a `fitness` attribute.
         surviving_population_size : int
             The number of individuals to select as survivors.
 
