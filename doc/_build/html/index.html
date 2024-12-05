@@ -5,15 +5,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Lightweight Genetic Algorithm documentation &#8212; Lightweight Genetic Algorithm 1.0.0 documentation</title>
+    <title>Lightweight Genetic Algorithm &#8212; Lightweight Genetic Algorithm 1.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
     <script src="_static/documentation_options.js?v=8d563738"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="src" href="modules.html" />
+    <link rel="next" title="lightweight_genetic_algorithm package" href="lightweight_genetic_algorithm.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -31,20 +32,201 @@
 
           <div class="body" role="main">
             
-  <section id="lightweight-genetic-algorithm-documentation">
-<h1>Lightweight Genetic Algorithm documentation<a class="headerlink" href="#lightweight-genetic-algorithm-documentation" title="Link to this heading">¶</a></h1>
-<p>Add your content using <code class="docutils literal notranslate"><span class="pre">reStructuredText</span></code> syntax. See the
-<a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html">reStructuredText</a>
-documentation for details.</p>
+  <section id="lightweight-genetic-algorithm">
+<h1>Lightweight Genetic Algorithm<a class="headerlink" href="#lightweight-genetic-algorithm" title="Link to this heading">¶</a></h1>
+<a class="reference internal image-reference" href="_images/graphical_abstract.png"><img alt="_images/graphical_abstract.png" src="_images/graphical_abstract.png" style="width: 800px;" />
+</a>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Link to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">src</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="lightweight_genetic_algorithm.html">lightweight_genetic_algorithm package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lightweight_genetic_algorithm.html">lightweight_genetic_algorithm package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lightweight_genetic_algorithm.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lightweight_genetic_algorithm.html#module-lightweight_genetic_algorithm.algorithm">lightweight_genetic_algorithm.algorithm module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm"><code class="docutils literal notranslate"><span class="pre">GeneticAlgorithm</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lightweight_genetic_algorithm.html#module-lightweight_genetic_algorithm.crossover">lightweight_genetic_algorithm.crossover module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.crossover.Crossover"><code class="docutils literal notranslate"><span class="pre">Crossover</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.crossover.CrossoverBetween"><code class="docutils literal notranslate"><span class="pre">CrossoverBetween</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.crossover.CrossoverEitherOr"><code class="docutils literal notranslate"><span class="pre">CrossoverEitherOr</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.crossover.CrossoverMidpoint"><code class="docutils literal notranslate"><span class="pre">CrossoverMidpoint</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lightweight_genetic_algorithm.html#module-lightweight_genetic_algorithm.mutation">lightweight_genetic_algorithm.mutation module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.mutation.Mutation"><code class="docutils literal notranslate"><span class="pre">Mutation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lightweight_genetic_algorithm.html#module-lightweight_genetic_algorithm.population">lightweight_genetic_algorithm.population module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.CategoricalGene"><code class="docutils literal notranslate"><span class="pre">CategoricalGene</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.Gene"><code class="docutils literal notranslate"><span class="pre">Gene</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.Individual"><code class="docutils literal notranslate"><span class="pre">Individual</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.NumericGene"><code class="docutils literal notranslate"><span class="pre">NumericGene</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lightweight_genetic_algorithm.html#module-lightweight_genetic_algorithm.selection">lightweight_genetic_algorithm.selection module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection"><code class="docutils literal notranslate"><span class="pre">DiversityEnhancedSurvivorSelection</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.selection.FitnessProportionalSurvivorSelection"><code class="docutils literal notranslate"><span class="pre">FitnessProportionalSurvivorSelection</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.selection.SurvivorSelection"><code class="docutils literal notranslate"><span class="pre">SurvivorSelection</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lightweight_genetic_algorithm.html#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </div>
+</section>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+<section id="about">
+<h2>About<a class="headerlink" href="#about" title="Link to this heading">¶</a></h2>
+<p>The <strong>lightweight-genetic-algorithm</strong> package provides an intuitive, flexible, and efficient implementation of a genetic algorithm in Python. It is designed to be easy to use while providing a high degree of flexibility for a wide range of optimization problems.</p>
+<p><em>Developed by Eliel Camargo-Molina and Jonas Wessén.</em></p>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<p>You can install the package using <cite>pip</cite>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>lightweight-genetic-algorithm
+</pre></div>
+</div>
+<p>The source code is available on <a class="reference external" href="https://github.com/JoseEliel/lightweight_genetic_algorithm">GitHub</a>.</p>
+</section>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h2>
+<p>The <strong>lightweight-genetic-algorithm</strong> package includes several features that allow users to easily set up a genetic algorithm for a wide range of optimization problems:</p>
+<ul class="simple">
+<li><p><strong>Support for Numerical and Categorical Genes</strong>: Handles optimization problems formulated with either numerical or categorical genes.</p></li>
+<li><p><strong>Multiple Crossover Methods</strong>: Provides four different crossover methods: <code class="docutils literal notranslate"><span class="pre">Between</span></code>, <code class="docutils literal notranslate"><span class="pre">Midpoint</span></code>, <code class="docutils literal notranslate"><span class="pre">Either</span> <span class="pre">Or</span></code>, and <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>Multiple Mutation Modes</strong>: Includes three mutation modes for numerical genes: <code class="docutils literal notranslate"><span class="pre">additive</span></code>, <code class="docutils literal notranslate"><span class="pre">multiplicative</span></code>, and <code class="docutils literal notranslate"><span class="pre">random</span></code>. For categorical genes, a <code class="docutils literal notranslate"><span class="pre">categorical</span></code> mutation mode is used.</p></li>
+<li><p><strong>Diversity-Enhanced Selection</strong>: Utilizes a diversity-enhanced selection algorithm, allowing exploration of widely different regions in parameter space.</p></li>
+<li><p><strong>Customizable Distance Measure</strong>: Users can specify the distance function (used during selection) as either <code class="docutils literal notranslate"><span class="pre">Euclidean</span></code> or <code class="docutils literal notranslate"><span class="pre">Dynamic</span></code> for numerical genes. For categorical genes, the Hamming distance is used. Custom distance functions can also be provided.</p></li>
+<li><p><strong>Multiprocessing</strong>: Supports multiprocessing for parallel fitness evaluations, which can significantly speed up the genetic algorithm for computationally expensive fitness functions.</p></li>
+</ul>
+</section>
+<section id="user-guide">
+<h2>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading">¶</a></h2>
+<section id="overview">
+<h3>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h3>
+<p>The primary class is <code class="docutils literal notranslate"><span class="pre">GeneticAlgorithm</span></code>. An instance is created with the following inputs:</p>
+<ul class="simple">
+<li><p><strong>fitness_function</strong>: A function that computes the fitness score of an individual. It should accept an array of genes as its first argument and return a single number. Additional arguments can be passed via <code class="docutils literal notranslate"><span class="pre">fitness_function_args</span></code>.</p></li>
+<li><p><strong>gene_ranges</strong>: For numerical genes, a list of tuples representing the range of each gene. For categorical genes, a one-dimensional list of possible categories.</p></li>
+<li><p><strong>number_of_genes</strong> <em>(for categorical genes)</em>: The number of genes defining an individual. For numerical genes, this is inferred from <code class="docutils literal notranslate"><span class="pre">gene_ranges</span></code>.</p></li>
+</ul>
+<p>Optional arguments include:</p>
+<ul class="simple">
+<li><p><strong>fitness_function_args</strong>: Additional arguments for the fitness function.</p></li>
+<li><p><strong>crossover_method</strong>: Method used for crossover (default is <code class="docutils literal notranslate"><span class="pre">Between</span></code> for numerical genes).</p></li>
+<li><p><strong>mutation_mode</strong>: Mode used for mutation (default is <code class="docutils literal notranslate"><span class="pre">additive</span></code> for numerical genes, <code class="docutils literal notranslate"><span class="pre">categorical</span></code> for categorical genes).</p></li>
+<li><p><strong>mutation_rate</strong>: Rate of mutation (default is <code class="docutils literal notranslate"><span class="pre">1.0/number_of_genes</span></code>).</p></li>
+<li><p><strong>measure</strong>: Specifies the distance function between points in gene space (default is Euclidean distance for numerical genes, Hamming distance for categorical genes).</p></li>
+<li><p><strong>use_multiprocessing</strong>: Whether to use multiprocessing for parallel fitness evaluations (default is <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+<li><p><strong>ncpus</strong>: Number of CPUs to use for multiprocessing.</p></li>
+<li><p><strong>selection_method</strong>: Method used for survivor selection (default is <code class="docutils literal notranslate"><span class="pre">Diversity</span> <span class="pre">Enhanced</span></code>).</p></li>
+<li><p><strong>output_directory</strong>: Directory where output files are saved.</p></li>
+</ul>
+<p>The genetic algorithm is executed using the <code class="docutils literal notranslate"><span class="pre">run</span></code> or <code class="docutils literal notranslate"><span class="pre">run_light</span></code> methods, which require:</p>
+<ul class="simple">
+<li><p><strong>n_generations</strong>: Number of generations to run.</p></li>
+<li><p><strong>population_size</strong>: Number of individuals in the population.</p></li>
+</ul>
+<p>Optional arguments include:</p>
+<ul class="simple">
+<li><p><strong>fitness_threshold</strong>: Fitness threshold to stop the algorithm early.</p></li>
+<li><p><strong>init_genes</strong>: Initial set of gene values for the initial population.</p></li>
+<li><p><strong>verbosity</strong>: Level of verbosity (<code class="docutils literal notranslate"><span class="pre">0</span></code> for silent, <code class="docutils literal notranslate"><span class="pre">1</span></code> for normal output, <code class="docutils literal notranslate"><span class="pre">2</span></code> for detailed output).</p></li>
+</ul>
+</section>
+<section id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h3>
+<section id="example-1-numerical-genes">
+<h4>Example 1: Numerical Genes<a class="headerlink" href="#example-1-numerical-genes" title="Link to this heading">¶</a></h4>
+<p>In this example, each individual represents a point in the xy-plane, and the fitness function is:</p>
+<div class="math notranslate nohighlight">
+\[f(x, y) = -A \left( \sqrt{x^2 + y^2} - R \right)^2\]</div>
+<p>which has an extended maximum on the circle centered at the origin with radius <span class="math notranslate nohighlight">\(R\)</span>. The goal is to find points evenly distributed along the circle.</p>
+<p><strong>Python Code:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lightweight_genetic_algorithm</span> <span class="kn">import</span> <span class="n">GeneticAlgorithm</span>
+
+<span class="c1"># Define fitness function</span>
+<span class="k">def</span> <span class="nf">fitness_function</span><span class="p">(</span><span class="n">individual</span><span class="p">):</span>  <span class="c1"># individual is x, y coordinates</span>
+    <span class="n">distance</span> <span class="o">=</span> <span class="p">(</span><span class="n">individual</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">individual</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># Circle radius</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># Overall fitness scaling</span>
+    <span class="n">fitness</span> <span class="o">=</span> <span class="o">-</span><span class="n">A</span> <span class="o">*</span> <span class="p">(</span><span class="n">distance</span> <span class="o">-</span> <span class="n">R</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="k">return</span> <span class="n">fitness</span>
+
+<span class="c1"># Define ranges of the genes</span>
+<span class="n">gene_ranges</span> <span class="o">=</span> <span class="p">[(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]</span>
+
+<span class="c1"># Create GeneticAlgorithm instance</span>
+<span class="n">ga</span> <span class="o">=</span> <span class="n">GeneticAlgorithm</span><span class="p">(</span><span class="n">fitness_function</span><span class="p">,</span> <span class="n">gene_ranges</span><span class="p">,</span> <span class="n">crossover_method</span><span class="o">=</span><span class="s1">&#39;Between&#39;</span><span class="p">)</span>
+
+<span class="c1"># Run the genetic algorithm</span>
+<span class="n">all_populations</span> <span class="o">=</span> <span class="n">ga</span><span class="o">.</span><span class="n">run_light</span><span class="p">(</span><span class="n">n_generations</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">population_size</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After 20 generations, the individuals are evenly distributed along the circle.</p>
+<img alt="Initial and final populations for the numerical genes example." src="_images/Figure_A2.png" />
+</section>
+<section id="example-2-categorical-genes">
+<h4>Example 2: Categorical Genes<a class="headerlink" href="#example-2-categorical-genes" title="Link to this heading">¶</a></h4>
+<p>In this example, each individual corresponds to an amino acid sequence composed of Lysine (K) and Glutamic acid (E). The goal is to find sequences with a sequence charge decoration (SCD) parameter near a given target value.</p>
+<p><strong>Python Code:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lightweight_genetic_algorithm</span> <span class="kn">import</span> <span class="n">GeneticAlgorithm</span>
+
+<span class="c1"># Calculate the sequence charge decoration (SCD) parameter</span>
+<span class="k">def</span> <span class="nf">calculate_SCD</span><span class="p">(</span><span class="n">sequence</span><span class="p">):</span>
+    <span class="n">aa_charges</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;K&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}</span>
+    <span class="n">charge_sequence</span> <span class="o">=</span> <span class="p">[</span><span class="n">aa_charges</span><span class="p">[</span><span class="n">aa</span><span class="p">]</span> <span class="k">for</span> <span class="n">aa</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">]</span>
+    <span class="n">SCD</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">charge_sequence</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">*</span> <span class="n">charge_sequence</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+              <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">charge_sequence</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+              <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">charge_sequence</span><span class="p">)))</span>
+    <span class="n">SCD</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="n">charge_sequence</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">SCD</span>
+
+<span class="c1"># Define fitness function</span>
+<span class="k">def</span> <span class="nf">fitness_function</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">target_SCD</span><span class="p">):</span>
+    <span class="n">SCD</span> <span class="o">=</span> <span class="n">calculate_SCD</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+    <span class="n">fitness</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">SCD</span> <span class="o">-</span> <span class="n">target_SCD</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="k">return</span> <span class="n">fitness</span>
+
+<span class="c1"># Main function</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">gene_ranges</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;K&#39;</span><span class="p">]</span>  <span class="c1"># Glutamic acid (E), Lysine (K)</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># Sequence length</span>
+    <span class="n">target_SCD</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span>  <span class="c1"># Target SCD value</span>
+
+    <span class="n">ga</span> <span class="o">=</span> <span class="n">GeneticAlgorithm</span><span class="p">(</span>
+        <span class="n">fitness_function</span><span class="p">,</span>
+        <span class="n">gene_ranges</span><span class="p">,</span>
+        <span class="n">number_of_genes</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
+        <span class="n">fitness_function_args</span><span class="o">=</span><span class="p">(</span><span class="n">target_SCD</span><span class="p">,),</span>
+        <span class="n">use_multiprocessing</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="n">all_populations</span> <span class="o">=</span> <span class="n">ga</span><span class="o">.</span><span class="n">run_light</span><span class="p">(</span><span class="n">n_generations</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">population_size</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>After 50 generations, the final population consists of sequences with SCD values close to the target value.</p>
+<img alt="SCD values and net charges for initial and final populations." src="_images/Figure_A4.png" />
+</section>
+</section>
+</section>
+<section id="further-reading">
+<h2>Further Reading<a class="headerlink" href="#further-reading" title="Link to this heading">¶</a></h2>
+<p>For more detailed examples and advanced usage, refer to the documentation and source code available on <a class="reference external" href="https://github.com/JoseEliel/lightweight_genetic_algorithm">GitHub</a>.</p>
+</section>
 </section>
 
 
@@ -66,14 +248,14 @@ documentation for details.</p>
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lightweight_genetic_algorithm.html">lightweight_genetic_algorithm package</a></li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="modules.html" title="next chapter">src</a></li>
+      <li>Next: <a href="lightweight_genetic_algorithm.html" title="next chapter">lightweight_genetic_algorithm package</a></li>
   </ul></li>
 </ul>
 </div>

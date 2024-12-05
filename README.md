@@ -99,6 +99,7 @@ all_populations = ga.run_light(n_generations=20, population_size=100)
 # all_populations is a (n_generations, population_size, n_genes) list.
 # The final population is all_populations[-1]
 ```
+
 *Complete Python code for the simple example for numeric genes. In this example, an individual represents coordinates of a point in the xy-plane. The fitness function has an extended maximum on a circle with radius 5.0. The genetic algorithm is run for 20 generations with a population size of 100 using the `Between` crossover method.*
 
 The resulting population after 20 generations is depicted below in Figure 1. In 20 generations, the individuals are evenly distributed along the circle.
@@ -115,7 +116,6 @@ Next, we turn to a slightly more complex example involving categorical genes. In
 The net charge of a sequence is the sum of the charges of the amino acids with Lysine (K) having a charge of +1 and Glutamic Acid (E) having a charge of -1. The SCD parameter is a single number that can be calculated given a sequence of charges. The SCD parameter is a measure of the "charge blockiness" (i.e., an alternating sequence `EKEKEK...EK` has SCD ≈ 0 while a di-block sequence `EEEE...EEEKKKK...KKK` gives a large, negative SCD) and correlates well with both the radius-of-gyration of isolated chains and with the upper-critical temperature for phase separation in multi-chain systems.
 
 The complete Python code for this example is shown in below. In this example, an individual corresponds to a list of `E`'s and `K`'s representing the amino-acid sequence. This code showcases two additional important features of the `lightweight-genetic-algorithm` module: multiprocessing and the usage of additional arguments to the fitness function.
-
 
 ```python
 from lightweight_genetic_algorithm import GeneticAlgorithm
@@ -157,6 +157,7 @@ def main():
 if __name__ == '__main__':
     main()
 ```
+
 *Complete Python code for the categorical genes example, showcasing the usage of multiprocessing and additional fitness function arguments. The GA is run for 50 generations with a population size of 100. The final population of sequences is contained in `all_populations[-1]` which is a list of length 100 where each entry is a list of `E`'s and `K`'s representing the amino-acid sequence.*
 
 The net charges and SCD values for the initial and final populations are shown in Figure 2 below. Note that the SCD values are close to the target value of -10 while there is a wide range of net charges in the final population. This demonstrates the effect of the diversity-enhanced selection method.
