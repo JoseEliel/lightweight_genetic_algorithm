@@ -1,6 +1,6 @@
 ## Lightweight Genetic Algorithm
 
-<img src="graphical_abstract.png" width="400"/>
+<img src="graphical_abstract.png" width="800"/>
 
 - [About](#about)
 - [Installation](#installation)
@@ -65,8 +65,7 @@ Once an instance of the `GeneticAlgorithm` class has been created, the genetic a
 
 The `run` method returns the full list of `Individual` instances across all generations, where each `Individual` object has attributes such as fitness and gene values.
 
-The `run_light` method is similar to `run` but returns only the gene values of all individuals across all generations, which is useful for large populations and generations.
-
+The `run_light` method is similar to `run` but returns only the gene values of all individuals across all generations.
 
 ### Example 1: Numerical Genes
 
@@ -100,7 +99,7 @@ all_populations = ga.run_light(n_generations=20, population_size=100)
 # The final population is all_populations[-1]
 ```
 
-*Complete Python code for the simple example for numeric genes. In this example, an individual represents coordinates of a point in the xy-plane. The fitness function has an extended maximum on a circle with radius 5.0. The genetic algorithm is run for 20 generations with a population size of 100 using the `Between` crossover method.*
+*Code for the categorical genes example. In this example, an individual represents coordinates of a point in the xy-plane. The fitness function has an extended maximum on a circle with radius 5.0. The genetic algorithm is run for 20 generations with a population size of 100 using the `Between` crossover method.*
 
 The resulting population after 20 generations is depicted below in Figure 1. In 20 generations, the individuals are evenly distributed along the circle.
 
