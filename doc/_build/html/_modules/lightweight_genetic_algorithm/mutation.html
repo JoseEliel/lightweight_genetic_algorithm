@@ -37,82 +37,158 @@
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.mutation.Mutation">[docs]</a>
 <span class="k">class</span> <span class="nc">Mutation</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class used to represent a Mutation</span>
+<span class="sd">    A class used to represent mutations in a genetic algorithm.</span>
+
+<span class="sd">    The Mutation class provides methods to mutate genes or individuals based on specified</span>
+<span class="sd">    mutation modes and probabilities.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        mutation_modes (list of str): List of mutation modes for each gene.</span>
+<span class="sd">        mutation_probability (float): Probability of mutating each gene.</span>
+<span class="sd">        param_ranges (list of tuple): List of parameter ranges for each gene.</span>
+<span class="sd">        is_categorical (bool): Indicates if the genes are categorical.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mutation_modes</span><span class="p">,</span> <span class="n">mutation_probability</span><span class="p">,</span> <span class="n">param_ranges</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the Mutation object with mutation modes, probability, and parameter ranges.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mutation_modes (list of str): A list of mutation modes for each gene.</span>
+<span class="sd">            mutation_probability (float): The probability of mutating each gene. If None, defaults to 1/len(param_ranges).</span>
+<span class="sd">            param_ranges (list of tuple): A list of parameter ranges (min, max) for each gene.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If mutation_probability is not between 0 and 1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mutation_probability</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">mutation_probability</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;mutation_probability must be between 0 and 1.&quot;</span><span class="p">)</span>
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">mutation_modes</span> <span class="o">=</span> <span class="n">mutation_modes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mutation_probability</span> <span class="o">=</span> <span class="n">mutation_probability</span> <span class="k">if</span> <span class="n">mutation_probability</span> <span class="k">else</span> <span class="mf">1.0</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">param_ranges</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mutation_probability</span> <span class="o">=</span> <span class="n">mutation_probability</span> <span class="k">if</span> <span class="n">mutation_probability</span> <span class="k">else</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">param_ranges</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">param_ranges</span> <span class="o">=</span> <span class="n">param_ranges</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_categorical</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">param_ranges</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mutation_modes</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Mutation.mutate_genes">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.mutation.Mutation.mutate_genes">[docs]</a>
     <span class="k">def</span> <span class="nf">mutate_genes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">genes</span><span class="p">,</span> <span class="n">force_mutate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Mutate a list of genes. Give a list of Gene objects as input, return a list of Gene objects.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mutates a list of genes based on the mutation probability and modes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            genes (list of Gene): A list of Gene objects to mutate.</span>
+<span class="sd">            force_mutate (bool, optional): If True, ensures at least one gene is mutated.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list of Gene: The mutated list of Gene objects.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If a mutation mode is not compatible with a gene type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Choose which genes to mutate</span>
-        <span class="n">genes_to_mutate</span> <span class="o">=</span> <span class="p">[</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">mutation_probability</span> <span class="k">else</span> <span class="kc">False</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">genes</span><span class="p">))]</span>
-        
+        <span class="n">genes_to_mutate</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">mutation_probability</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">genes</span><span class="p">))]</span>
+
         <span class="c1"># If no gene was chosen to mutate, force the mutation of one gene (unless force_mutate is False)</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">genes_to_mutate</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">force_mutate</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">genes_to_mutate</span><span class="p">)</span> <span class="ow">and</span> <span class="n">force_mutate</span><span class="p">:</span>
             <span class="n">genes_to_mutate</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">genes</span><span class="p">))]</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">gene</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">genes</span><span class="p">):</span>
-            <span class="c1"># Check if a mutation should occur based on the specified mutation rate.</span>
             <span class="k">if</span> <span class="n">genes_to_mutate</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
-                <span class="c1"># Check if the mutation mode is compatible with the gene</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mutation_modes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gene</span><span class="o">.</span><span class="n">mutation_methods</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The mutation mode &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mutation_modes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39; is not compatible with the gene type.&quot;</span><span class="p">)</span>
-                <span class="c1"># Call the mutation method and update the gene</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;The mutation mode &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mutation_modes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39; is not compatible with the gene type.&quot;</span>
+                    <span class="p">)</span>
+                <span class="c1"># Call the appropriate mutation method</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_categorical</span><span class="p">:</span>
-                    <span class="n">gene</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mutation_modes</span><span class="p">[</span><span class="n">i</span><span class="p">])(</span><span class="n">gene</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">categorical</span><span class="p">(</span><span class="n">gene</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="c1">#print(&quot;gene ranges from &quot;, self.param_ranges[i])</span>
-                    <span class="n">gene</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mutation_modes</span><span class="p">[</span><span class="n">i</span><span class="p">])(</span><span class="n">gene</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_ranges</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-                    <span class="c1">#print(&quot;to &quot;, self.param_ranges[i])</span>
+                    <span class="n">mutation_method</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mutation_modes</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">mutation_method</span><span class="p">(</span><span class="n">gene</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_ranges</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
-        
         <span class="k">return</span> <span class="n">genes</span></div>
 
 
 <div class="viewcode-block" id="Mutation.mutate_individual">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.mutation.Mutation.mutate_individual">[docs]</a>
     <span class="k">def</span> <span class="nf">mutate_individual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">individual</span><span class="p">,</span> <span class="n">force_mutate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Mutate an individual by mutating its genes. Give an Individual as input, return a mutated Individual.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mutates an individual by mutating its genes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            individual (Individual): The Individual object to mutate.</span>
+<span class="sd">            force_mutate (bool, optional): If True, ensures at least one gene is mutated.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Individual: A new Individual object with mutated genes.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            TypeError: If the input is not an instance of Individual.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">individual</span><span class="p">,</span> <span class="n">Individual</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The mutate method expects an instance of Individual.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The mutate_individual method expects an instance of Individual.&quot;</span><span class="p">)</span>
         
         <span class="n">mutated_genes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mutate_genes</span><span class="p">(</span><span class="n">individual</span><span class="o">.</span><span class="n">get_genes</span><span class="p">(),</span> <span class="n">force_mutate</span><span class="p">)</span>
-        <span class="n">mutated_individual</span> <span class="o">=</span> <span class="n">Individual</span><span class="p">(</span><span class="n">mutated_genes</span><span class="p">,</span><span class="n">individual</span><span class="o">.</span><span class="n">get_fitness_function</span><span class="p">(),</span><span class="n">individual</span><span class="o">.</span><span class="n">fitness_function_args</span><span class="p">)</span>
+        <span class="n">mutated_individual</span> <span class="o">=</span> <span class="n">Individual</span><span class="p">(</span>
+            <span class="n">mutated_genes</span><span class="p">,</span>
+            <span class="n">individual</span><span class="o">.</span><span class="n">get_fitness_function</span><span class="p">(),</span>
+            <span class="n">individual</span><span class="o">.</span><span class="n">fitness_function_args</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">mutated_individual</span></div>
 
-    
+
 <div class="viewcode-block" id="Mutation.additive">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.mutation.Mutation.additive">[docs]</a>
     <span class="k">def</span> <span class="nf">additive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gene</span><span class="p">,</span> <span class="n">param_range</span><span class="p">):</span>
-        <span class="n">range_size</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">param_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">param_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">lowest</span> <span class="o">=</span> <span class="o">-</span><span class="n">range_size</span><span class="o">/</span><span class="mi">2</span>
-        <span class="n">highest</span> <span class="o">=</span> <span class="n">range_size</span><span class="o">/</span><span class="mi">2</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies an additive mutation to a gene.</span>
 
-        <span class="c1"># same as above but with gaussian</span>
-        <span class="n">gene</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">gene</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span> <span class="p">(</span><span class="n">highest</span><span class="o">-</span><span class="n">lowest</span><span class="p">)</span><span class="o">/</span><span class="mi">10</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="kc">None</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">gene</span></div>
+<span class="sd">        The gene&#39;s value is adjusted by adding a random value drawn from a normal distribution.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gene (Gene): The gene to mutate.</span>
+<span class="sd">            param_range (tuple): The (min, max) range of the gene&#39;s parameter.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Gene: The mutated gene.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">range_size</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">param_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">param_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">std_dev</span> <span class="o">=</span> <span class="n">range_size</span> <span class="o">/</span> <span class="mi">10</span>  <span class="c1"># Standard deviation for mutation</span>
+        <span class="n">mutation_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">std_dev</span><span class="p">)</span>
+        <span class="n">gene</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">gene</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="n">mutation_value</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Mutation.multiplicative">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.mutation.Mutation.multiplicative">[docs]</a>
-    <span class="k">def</span> <span class="nf">multiplicative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gene</span><span class="p">,</span> <span class="n">param_range</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="n">gene</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">gene</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.5</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">gene</span></div>
+    <span class="k">def</span> <span class="nf">multiplicative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gene</span><span class="p">,</span> <span class="n">param_range</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies a multiplicative mutation to a gene.</span>
+
+<span class="sd">        The gene&#39;s value is adjusted by multiplying it by a random factor drawn from a normal distribution centered at 1.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gene (Gene): The gene to mutate.</span>
+<span class="sd">            param_range (tuple, optional): Not used in this method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Gene: The mutated gene.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mutation_factor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">gene</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">gene</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="n">mutation_factor</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Mutation.random">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.mutation.Mutation.random">[docs]</a>
     <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gene</span><span class="p">,</span> <span class="n">param_range</span><span class="p">):</span>
-        <span class="c1"># Randomly choose between additive and multiplicative mutation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies either an additive or multiplicative mutation to a gene at random.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gene (Gene): The gene to mutate.</span>
+<span class="sd">            param_range (tuple): The (min, max) range of the gene&#39;s parameter.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Gene: The mutated gene.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">multiplicative</span><span class="p">(</span><span class="n">gene</span><span class="p">,</span> <span class="n">param_range</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -121,9 +197,17 @@
 
 <div class="viewcode-block" id="Mutation.categorical">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.mutation.Mutation.categorical">[docs]</a>
-    <span class="k">def</span> <span class="nf">categorical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gene</span><span class="p">,</span> <span class="n">param_range</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="n">gene</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">gene</span><span class="o">.</span><span class="n">random_initialization</span><span class="p">())</span>
-        <span class="k">return</span> <span class="n">gene</span></div>
+    <span class="k">def</span> <span class="nf">categorical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gene</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mutates a categorical gene by randomly reinitializing its value.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gene (Gene): The categorical gene to mutate.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Gene: The mutated gene.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">gene</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">gene</span><span class="o">.</span><span class="n">random_initialization</span><span class="p">())</span></div>
 </div>
 
 </pre></div>

@@ -37,8 +37,9 @@
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.Gene">[docs]</a>
 <span class="k">class</span> <span class="nc">Gene</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The abstract base class for a gene.</span>
-<span class="sd">    Each subclass will define a gene in some genotype space.</span>
+<span class="sd">    Abstract base class for a gene.</span>
+
+<span class="sd">    Each subclass defines a gene in a specific genotype space.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -48,8 +49,8 @@
 <span class="sd">    Methods</span>
 <span class="sd">    -------</span>
 <span class="sd">    random_initialization()</span>
-<span class="sd">        Creates a gene with random value.</span>
-<span class="sd">    set_value(value)</span>
+<span class="sd">        Provides a random value appropriate for the gene.</span>
+<span class="sd">    set_value()</span>
 <span class="sd">        Sets the value of the gene.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mutation_methods</span> <span class="o">=</span> <span class="p">[]</span>
@@ -58,6 +59,14 @@
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.Gene.random_initialization">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">random_initialization</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides a random value appropriate for the gene.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        value</span>
+<span class="sd">            A random value suitable for initializing the gene.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
 
@@ -65,6 +74,13 @@
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.Gene.set_value">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the value of the gene.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Implementation should define how the value is set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 </div>
 
@@ -73,14 +89,14 @@
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.NumericGene">[docs]</a>
 <span class="k">class</span> <span class="nc">NumericGene</span><span class="p">(</span><span class="n">Gene</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A numeric gene is represented by a real number within a range.</span>
+<span class="sd">    A numeric gene represented by a real number within a range.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    gene_range : tuple</span>
-<span class="sd">        The range of the gene values.</span>
+<span class="sd">    gene_range : tuple of float</span>
+<span class="sd">        The range (low, high) of the gene values.</span>
 <span class="sd">    value : float, optional</span>
-<span class="sd">        The value of the gene. If not provided, the gene will be initialized randomly.</span>
+<span class="sd">        The value of the gene. If not provided, the gene will be initialized with a random value.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -89,20 +105,20 @@
 <span class="sd">    high : float</span>
 <span class="sd">        The upper bound of the gene values.</span>
 <span class="sd">    value : float</span>
-<span class="sd">        The value of the gene.</span>
+<span class="sd">        The current value of the gene.</span>
 
 <span class="sd">    Methods</span>
 <span class="sd">    -------</span>
 <span class="sd">    get_gene_range()</span>
-<span class="sd">        Returns the gene range.</span>
+<span class="sd">        Returns the gene range as a tuple (low, high).</span>
 <span class="sd">    random_initialization()</span>
-<span class="sd">        Creates a gene with random value.</span>
+<span class="sd">        Generates and returns a random value within the gene range.</span>
 <span class="sd">    set_value(value)</span>
-<span class="sd">        Sets the value of the gene.</span>
+<span class="sd">        Sets the value of the gene to the specified value.</span>
 <span class="sd">    copy()</span>
-<span class="sd">        Returns a copy of the gene.</span>
-
+<span class="sd">        Creates and returns a copy of the gene.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">mutation_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;additive&quot;</span><span class="p">,</span> <span class="s2">&quot;multiplicative&quot;</span><span class="p">,</span> <span class="s2">&quot;random&quot;</span><span class="p">]</span>
     <span class="n">crossover_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;between&quot;</span><span class="p">,</span> <span class="s2">&quot;midpoint&quot;</span><span class="p">,</span> <span class="s2">&quot;either or&quot;</span><span class="p">]</span>
 
@@ -113,24 +129,56 @@
 <div class="viewcode-block" id="NumericGene.get_gene_range">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.NumericGene.get_gene_range">[docs]</a>
     <span class="k">def</span> <span class="nf">get_gene_range</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the gene range.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple of float</span>
+<span class="sd">            A tuple (low, high) representing the gene range.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">low</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">high</span><span class="p">)</span></div>
 
     
 <div class="viewcode-block" id="NumericGene.random_initialization">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.NumericGene.random_initialization">[docs]</a>
     <span class="k">def</span> <span class="nf">random_initialization</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates and returns a random value within the gene range.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            A random value within the gene range.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">high</span><span class="p">)</span></div>
 
     
 <div class="viewcode-block" id="NumericGene.set_value">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.NumericGene.set_value">[docs]</a>
     <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the value of the gene to the specified value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : float</span>
+<span class="sd">            The new value for the gene.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span></div>
 
     
 <div class="viewcode-block" id="NumericGene.copy">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.NumericGene.copy">[docs]</a>
     <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates and returns a copy of the gene.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        NumericGene</span>
+<span class="sd">            A new instance of NumericGene with the same range and value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">NumericGene</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">low</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">high</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
 </div>
 
@@ -139,31 +187,37 @@
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.CategoricalGene">[docs]</a>
 <span class="k">class</span> <span class="nc">CategoricalGene</span><span class="p">(</span><span class="n">Gene</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A categorical gene can take any value from a set of categories.</span>
+<span class="sd">    A categorical gene that can take any value from a set of categories.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    categories : list</span>
 <span class="sd">        The allowed categories for the gene.</span>
 <span class="sd">    value : object, optional</span>
-<span class="sd">        The value of the gene. If not provided, the gene will be initialized randomly.</span>
+<span class="sd">        The value of the gene. Must be one of the allowed categories. If not provided, the gene will be initialized with a random value.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    categories : list</span>
 <span class="sd">        The allowed categories for the gene.</span>
 <span class="sd">    value : object</span>
-<span class="sd">        The value of the gene.</span>
+<span class="sd">        The current value of the gene.</span>
 
 <span class="sd">    Methods</span>
 <span class="sd">    -------</span>
 <span class="sd">    random_initialization()</span>
-<span class="sd">        Creates a gene with random value.</span>
+<span class="sd">        Selects and returns a random value from the categories.</span>
 <span class="sd">    set_value(value)</span>
-<span class="sd">        Sets the value of the gene.</span>
+<span class="sd">        Sets the value of the gene to the specified value.</span>
 <span class="sd">    copy()</span>
-<span class="sd">        Returns a copy of the gene.</span>
+<span class="sd">        Creates and returns a copy of the gene.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the provided `value` is not in the allowed categories.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">mutation_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;categorical&quot;</span><span class="p">]</span>
     <span class="n">crossover_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;either or&quot;</span><span class="p">]</span>
 
@@ -176,12 +230,33 @@
 <div class="viewcode-block" id="CategoricalGene.random_initialization">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.CategoricalGene.random_initialization">[docs]</a>
     <span class="k">def</span> <span class="nf">random_initialization</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Selects and returns a random value from the categories.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        object</span>
+<span class="sd">            A random value from the allowed categories.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">)</span></div>
 
     
 <div class="viewcode-block" id="CategoricalGene.set_value">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.CategoricalGene.set_value">[docs]</a>
     <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the value of the gene to the specified value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : object</span>
+<span class="sd">            The new value for the gene.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the provided `value` is not in the allowed categories.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;A categorical gene is being set to a value not in the allowed categories.&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -191,6 +266,14 @@
 <div class="viewcode-block" id="CategoricalGene.copy">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.CategoricalGene.copy">[docs]</a>
     <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates and returns a copy of the gene.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        CategoricalGene</span>
+<span class="sd">            A new instance of CategoricalGene with the same categories and value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">CategoricalGene</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">categories</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
 </div>
 
@@ -199,28 +282,30 @@
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.Individual">[docs]</a>
 <span class="k">class</span> <span class="nc">Individual</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Class representing an individual in the population. The individual is defined by its genes. </span>
+<span class="sd">    Represents an individual in the population, defined by its genes.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    genes : list of Gene objects</span>
+<span class="sd">    genes : list of Gene</span>
 <span class="sd">        The genes that define the individual.</span>
-<span class="sd">    fitness_function : function</span>
-<span class="sd">        The fitness function that is used to calculate the fitness of the individual. The function should take a list of gene values as first argument and return a scalar value.</span>
+<span class="sd">    fitness_function : callable</span>
+<span class="sd">        The fitness function used to calculate the fitness of the individual.</span>
+<span class="sd">        The function should take a list of gene values as its first argument and return a scalar value.</span>
 <span class="sd">    fitness_function_args : tuple</span>
 <span class="sd">        Additional arguments for the fitness function.</span>
 <span class="sd">    fitness : float, optional</span>
-<span class="sd">        The fitness of the individual. If not provided, the fitness function will be evaluated. Provides a way to avoid redundant evaluations of the fitness function.</span>
+<span class="sd">        The fitness of the individual. If not provided, the fitness function will be evaluated.</span>
+<span class="sd">        This allows avoiding redundant evaluations of the fitness function.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    genes : list of Gene objects</span>
-<span class="sd">        The genes that define the individual.</span>
-<span class="sd">    genes_values : numpy array</span>
-<span class="sd">        The values of the genes.</span>
-<span class="sd">    fitness_function : function</span>
-<span class="sd">        The fitness function that is used to calculate the fitness of the individual.</span>
-<span class="sd">    fitness_function_args : tuple   </span>
+<span class="sd">    genes : numpy.ndarray</span>
+<span class="sd">        An array containing the genes of the individual.</span>
+<span class="sd">    genes_values : numpy.ndarray</span>
+<span class="sd">        An array containing the values of the genes.</span>
+<span class="sd">    fitness_function : callable</span>
+<span class="sd">        The fitness function used to calculate the fitness of the individual.</span>
+<span class="sd">    fitness_function_args : tuple</span>
 <span class="sd">        Additional arguments for the fitness function.</span>
 <span class="sd">    fitness : float</span>
 <span class="sd">        The fitness of the individual.</span>
@@ -232,11 +317,16 @@
 <span class="sd">    get_gene_values()</span>
 <span class="sd">        Returns a copy of the gene values.</span>
 <span class="sd">    get_fitness_function()</span>
-<span class="sd">        Returns the fitness function.</span>
+<span class="sd">        Returns the fitness function used by the individual.</span>
 <span class="sd">    copy()</span>
-<span class="sd">        Returns a copy of the individual.</span>
+<span class="sd">        Creates and returns a copy of the individual.</span>
 
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the fitness function evaluation fails, indicating incompatibility with the individual&#39;s genes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">genes</span><span class="p">,</span> <span class="n">fitness_function</span><span class="p">,</span> <span class="n">fitness_function_args</span><span class="p">,</span> <span class="n">fitness</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">genes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="p">[</span><span class="n">gene</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">gene</span> <span class="ow">in</span> <span class="n">genes</span><span class="p">]</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">genes_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">gene</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">gene</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">genes</span><span class="p">])</span>
@@ -244,8 +334,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function_args</span> <span class="o">=</span> <span class="n">fitness_function_args</span>
         <span class="k">if</span> <span class="n">fitness</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">fitness_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genes_values</span><span class="p">,</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness_function_args</span><span class="p">)</span>
-            <span class="k">except</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">fitness_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genes_values</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness_function_args</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Error in fitness function evaluation. Your fitness function does not seem to be compatible with your individuals.&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">fitness</span>
@@ -253,27 +343,58 @@
 <div class="viewcode-block" id="Individual.get_genes">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.Individual.get_genes">[docs]</a>
     <span class="k">def</span> <span class="nf">get_genes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a copy of the genes.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.ndarray</span>
+<span class="sd">            An array containing copies of the individual&#39;s genes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">gene</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">gene</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">genes</span><span class="p">])</span></div>
 
     
 <div class="viewcode-block" id="Individual.get_gene_values">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.Individual.get_gene_values">[docs]</a>
     <span class="k">def</span> <span class="nf">get_gene_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a copy of the gene values.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.ndarray</span>
+<span class="sd">            An array containing the values of the individual&#39;s genes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">genes_values</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
     
 <div class="viewcode-block" id="Individual.get_fitness_function">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.Individual.get_fitness_function">[docs]</a>
     <span class="k">def</span> <span class="nf">get_fitness_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the fitness function used by the individual.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable</span>
+<span class="sd">            The fitness function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span></div>
 
     
 <div class="viewcode-block" id="Individual.copy">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.Individual.copy">[docs]</a>
     <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates and returns a copy of the individual.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Individual</span>
+<span class="sd">            A new Individual instance with the same genes and fitness.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Individual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_genes</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function_args</span><span class="p">,</span> <span class="n">fitness</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness</span><span class="p">)</span></div>
 </div>
-
 
 </pre></div>
 

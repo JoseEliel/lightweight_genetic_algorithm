@@ -45,6 +45,7 @@
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#U"><strong>U</strong></a>
@@ -136,6 +137,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.Individual.fitness">fitness (lightweight_genetic_algorithm.population.Individual attribute)</a>
 </li>
+      <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.fitness_file">fitness_file (lightweight_genetic_algorithm.algorithm.GeneticAlgorithm attribute)</a>
+</li>
       <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.fitness_function">fitness_function (lightweight_genetic_algorithm.algorithm.GeneticAlgorithm attribute)</a>
 
       <ul>
@@ -195,6 +198,12 @@
       <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.Individual">Individual (class in lightweight_genetic_algorithm.population)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.mutation.Mutation.is_categorical">is_categorical (lightweight_genetic_algorithm.mutation.Mutation attribute)</a>
+</li>
+      <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.is_discrete">is_discrete (lightweight_genetic_algorithm.algorithm.GeneticAlgorithm attribute)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="L">L</h2>
@@ -247,12 +256,8 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.measure">measure (lightweight_genetic_algorithm.algorithm.GeneticAlgorithm attribute)</a>
-
-      <ul>
-        <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection.measure">(lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection attribute)</a>
+      <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection.measure">measure (lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection attribute)</a>
 </li>
-      </ul></li>
       <li>
     module
 
@@ -268,15 +273,17 @@
         <li><a href="lightweight_genetic_algorithm.html#module-lightweight_genetic_algorithm.selection">lightweight_genetic_algorithm.selection</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.mutation.Mutation.multiplicative">multiplicative() (lightweight_genetic_algorithm.mutation.Mutation method)</a>
 </li>
       <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.mutation.Mutation.mutate_genes">mutate_genes() (lightweight_genetic_algorithm.mutation.Mutation method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.mutation.Mutation.mutate_individual">mutate_individual() (lightweight_genetic_algorithm.mutation.Mutation method)</a>
 </li>
       <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.mutation.Mutation">Mutation (class in lightweight_genetic_algorithm.mutation)</a>
+</li>
+      <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.mutation">mutation (lightweight_genetic_algorithm.algorithm.GeneticAlgorithm attribute)</a>
 </li>
       <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.CategoricalGene.mutation_methods">mutation_methods (lightweight_genetic_algorithm.population.CategoricalGene attribute)</a>
 
@@ -288,6 +295,10 @@
       </ul></li>
       <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.mutation_mode">mutation_mode (lightweight_genetic_algorithm.algorithm.GeneticAlgorithm attribute)</a>
 </li>
+      <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.mutation.Mutation.mutation_modes">mutation_modes (lightweight_genetic_algorithm.mutation.Mutation attribute)</a>
+</li>
+      <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.mutation.Mutation.mutation_probability">mutation_probability (lightweight_genetic_algorithm.mutation.Mutation attribute)</a>
+</li>
       <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.mutation_rate">mutation_rate (lightweight_genetic_algorithm.algorithm.GeneticAlgorithm attribute)</a>
 </li>
   </ul></td>
@@ -298,12 +309,6 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.ncpus">ncpus (lightweight_genetic_algorithm.algorithm.GeneticAlgorithm attribute)</a>
 </li>
-      <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.selection.FitnessProportionalSurvivorSelection.None">None (lightweight_genetic_algorithm.selection.FitnessProportionalSurvivorSelection attribute)</a>
-
-      <ul>
-        <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.selection.SurvivorSelection.None">(lightweight_genetic_algorithm.selection.SurvivorSelection attribute)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.number_of_genes">number_of_genes (lightweight_genetic_algorithm.algorithm.GeneticAlgorithm attribute)</a>
@@ -317,6 +322,18 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.output_directory">output_directory (lightweight_genetic_algorithm.algorithm.GeneticAlgorithm attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.mutation.Mutation.param_ranges">param_ranges (lightweight_genetic_algorithm.mutation.Mutation attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.pool">pool (lightweight_genetic_algorithm.algorithm.GeneticAlgorithm attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -356,8 +373,6 @@
         <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.selection.SurvivorSelection.select_survivors">(lightweight_genetic_algorithm.selection.SurvivorSelection method)</a>
 </li>
       </ul></li>
-      <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.selection_method">selection_method (lightweight_genetic_algorithm.algorithm.GeneticAlgorithm attribute)</a>
-</li>
       <li><a href="lightweight_genetic_algorithm.html#id4">set_value() (lightweight_genetic_algorithm.population.CategoricalGene method)</a>, <a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.population.CategoricalGene.set_value">[1]</a>
 
       <ul>
@@ -373,6 +388,10 @@
       <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.start_pool">start_pool() (lightweight_genetic_algorithm.algorithm.GeneticAlgorithm method)</a>
 </li>
       <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.stop_pool">stop_pool() (lightweight_genetic_algorithm.algorithm.GeneticAlgorithm method)</a>
+</li>
+      <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.survivor_selection">survivor_selection (lightweight_genetic_algorithm.algorithm.GeneticAlgorithm attribute)</a>
+</li>
+      <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.survivors_file">survivors_file (lightweight_genetic_algorithm.algorithm.GeneticAlgorithm attribute)</a>
 </li>
       <li><a href="lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.selection.SurvivorSelection">SurvivorSelection (class in lightweight_genetic_algorithm.selection)</a>
 </li>

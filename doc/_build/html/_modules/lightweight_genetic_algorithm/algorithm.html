@@ -37,55 +37,113 @@
 <span class="kn">from</span> <span class="nn">.population</span> <span class="kn">import</span> <span class="n">Individual</span><span class="p">,</span> <span class="n">NumericGene</span><span class="p">,</span> <span class="n">CategoricalGene</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">datetime</span> 
 
 <div class="viewcode-block" id="GeneticAlgorithm">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm">[docs]</a>
 <span class="k">class</span> <span class="nc">GeneticAlgorithm</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class used to represent a Genetic Algorithm</span>
+<span class="sd">    A class to represent a Genetic Algorithm.</span>
+
+<span class="sd">    This class provides methods to perform optimization using genetic algorithms</span>
+<span class="sd">    for both numerical and categorical parameters.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fitness_function : callable</span>
+<span class="sd">        A function that calculates the fitness score of an individual.</span>
+<span class="sd">    gene_ranges : list</span>
+<span class="sd">        A list specifying the possible values or ranges for each gene.</span>
+<span class="sd">        For numerical genes, it is a list of tuples specifying the (min, max) range for each gene.</span>
+<span class="sd">        For categorical genes, it is a simple list of possible categories.</span>
+<span class="sd">    fitness_function_args : tuple, optional</span>
+<span class="sd">        Additional arguments to pass to the fitness_function (default is ()).</span>
+<span class="sd">    number_of_genes : int, optional</span>
+<span class="sd">        The number of genes in each individual. If genes are numerical,</span>
+<span class="sd">        it defaults to the length of gene_ranges. Must be specified if genes are categorical.</span>
+<span class="sd">    crossover_method : str, optional</span>
+<span class="sd">        The method used for crossover. Options are &quot;Between&quot;, &quot;Midpoint&quot;, &quot;Either Or&quot;, or &quot;None&quot;.</span>
+<span class="sd">        Default is &quot;Either Or&quot;.</span>
+<span class="sd">    mutation_mode : list of str, optional</span>
+<span class="sd">        The mode used for mutation for each gene.</span>
+<span class="sd">        Available options are: &quot;additive&quot;, &quot;multiplicative&quot;, &quot;random&quot;, &quot;categorical&quot;.</span>
+<span class="sd">        Default is [&quot;additive&quot;]*number_of_genes for numerical genes and [&quot;categorical&quot;]*number_of_genes for categorical genes.</span>
+<span class="sd">    mutation_rate : float, optional</span>
+<span class="sd">        The rate of mutation for each gene. Default is 1.0 / number_of_genes.</span>
+<span class="sd">    measure : str or callable, optional</span>
+<span class="sd">        Defines the distance measure between two individuals for diversity.</span>
+<span class="sd">        Options are &quot;Hamming&quot;, &quot;Euclidean&quot;, &quot;Dynamic&quot;, or a custom function.</span>
+<span class="sd">        Default depends on gene type: &quot;Hamming&quot; for categorical genes, &quot;Euclidean&quot; for numerical genes.</span>
+<span class="sd">    use_multiprocessing : bool, optional</span>
+<span class="sd">        Whether to use multiprocessing for fitness evaluations (default is False).</span>
+<span class="sd">    ncpus : int, optional</span>
+<span class="sd">        The number of processes to use for multiprocessing (default is the number of CPUs minus one).</span>
+<span class="sd">    verbosity : int, optional</span>
+<span class="sd">        The verbosity level. 0 = silent, 1 = normal output, 2 = detailed output (default is 1).</span>
+<span class="sd">    selection_method : str, optional</span>
+<span class="sd">        The method used for selecting the best individuals for the next generation.</span>
+<span class="sd">        Options are &quot;Diversity Enhanced&quot; or &quot;Fitness Proportionate&quot; (default is &quot;Diversity Enhanced&quot;).</span>
+<span class="sd">    output_directory : str, optional</span>
+<span class="sd">        The directory to save output files (default is None).</span>
+<span class="sd">        If specified, the algorithm saves the genes of the selected survivors in each generation</span>
+<span class="sd">        to a file &quot;&lt;datetime&gt;_survivors.npy&quot; in the output directory.</span>
+<span class="sd">        The average fitness and best fitness at each generation are saved to &quot;&lt;datetime&gt;_fitness.txt&quot;.</span>
+<span class="sd">        A log file is saved to &quot;log.txt&quot; containing the output of the algorithm printed to the console.</span>
+
+<span class="sd">        The &quot;&lt;datetime&gt;_survivors.npy&quot; file can be loaded using</span>
+<span class="sd">        numpy.load(file, allow_pickle=True) to access the gene values of the individuals</span>
+<span class="sd">        in each generation. The loaded array has shape</span>
+<span class="sd">        (n_generations+1, population_size, number_of_genes) since the initial population is also saved.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    fitness_function : function</span>
-<span class="sd">        A function that calculates the fitness score of an individual</span>
-<span class="sd">    fitness_function_args: tuple</span>
-<span class="sd">        Wildcard arguments to pass to the fitness_function</span>
+<span class="sd">    fitness_function : callable</span>
+<span class="sd">        The fitness function used to evaluate individuals.</span>
+<span class="sd">    fitness_function_args : tuple</span>
+<span class="sd">        Additional arguments for the fitness function.</span>
 <span class="sd">    gene_ranges : list</span>
-<span class="sd">        A list of tuples representing the range of each parameter; if parameters are categorical, it&#39;s a simple 1D list of categories</span>
-<span class="sd">    crossover_method : str</span>
-<span class="sd">        The method used for crossover. Options are &quot;Between&quot;, &quot;Midpoint&quot;, &quot;Either Or&quot;, or &quot;None&quot; (default is &quot;Either Or&quot;)</span>
+<span class="sd">        The ranges or categories for each gene.</span>
 <span class="sd">    number_of_genes : int</span>
-<span class="sd">        The number of parameters (default is the length of gene_ranges). This must be explicitly provided if parameters are categorical.</span>
-<span class="sd">    mutation_mode : list</span>
-<span class="sd">        The mode used for mutation (default is &quot;additive&quot; for numeric parameters and &quot;categorical&quot; for categorical parameters)</span>
+<span class="sd">        The number of genes in each individual.</span>
+<span class="sd">    is_discrete : bool</span>
+<span class="sd">        Indicates whether the genes are categorical.</span>
+<span class="sd">    mutation_mode : list of str</span>
+<span class="sd">        Mutation modes for each gene.</span>
 <span class="sd">    mutation_rate : float</span>
-<span class="sd">        The rate of mutation (default is 1.0/number_of_genes). During crossover, each gene is mutated with probability mutation_rate.</span>
-<span class="sd">    measure : function or str</span>
-<span class="sd">        Defines the distance between two individuals in the parameter space. String options are &quot;Hamming&quot;, &quot;Euclidean&quot;, &quot;Dynamic&quot;.</span>
-<span class="sd">        Alternatively, a custom function can be provided. This function takes the genes of two individuals and returns a distance.</span>
+<span class="sd">        Mutation rate for each gene.</span>
+<span class="sd">    mutation : Mutation</span>
+<span class="sd">        The mutation operator.</span>
+<span class="sd">    crossover_method : Crossover or str</span>
+<span class="sd">        The crossover operator or &quot;none&quot; if no crossover.</span>
+<span class="sd">    survivor_selection : SurvivorSelection</span>
+<span class="sd">        The survivor selection strategy.</span>
 <span class="sd">    use_multiprocessing : bool</span>
-<span class="sd">        Whether to use multiprocessing for fitness evaluations (default is False). </span>
-<span class="sd">        This speeds up the algorithm for computationally expensive fitness functions.</span>
+<span class="sd">        Indicates whether multiprocessing is used.</span>
 <span class="sd">    ncpus : int</span>
-<span class="sd">        The number of processes to use for multiprocessing (default is the number of CPUs on the system minus 1)</span>
+<span class="sd">        Number of CPUs used if multiprocessing.</span>
+<span class="sd">    pool : multiprocessing.Pool or None</span>
+<span class="sd">        The multiprocessing Pool object if multiprocessing is used.</span>
 <span class="sd">    verbosity : int</span>
-<span class="sd">        The verbosity level for printing out messages (default is 1). 0 = silent, 1 = normal output, 2 = detailed output.</span>
-<span class="sd">    selection_method : str</span>
-<span class="sd">        The method used for selecting the best individuals for the next generation. Options are &quot;Diversity Enhanced&quot; or &quot;Fitness Proportionate&quot;.</span>
+<span class="sd">        Verbosity level.</span>
 <span class="sd">    output_directory : str</span>
-<span class="sd">        The directory to save output files (default is None). If specified, the algorithm saves the genes of the selected survivors in each generation to a file &quot;survivors.npy&quot; in the output directory. The average fitness and best fitness at each generation are saved to &quot;fitness.txt&quot;. A log file is saved to &quot;log.txt&quot; containing the output of the algorithm printed to the console. </span>
-
-<span class="sd">        The &quot;survivors.npy&quot; file can be loaded using numpy.load(file, allow_pickle=True) to access the gene values of the individuals in each generation. The loaded array has shape (n_generations+1, population_size, number_of_genes) since the initial population is also saved.</span>
+<span class="sd">        Directory for output files.</span>
+<span class="sd">    fitness_file : str</span>
+<span class="sd">        Path to the file where fitness values are saved (if output_directory is specified).</span>
+<span class="sd">    survivors_file : str</span>
+<span class="sd">        Path to the file where survivor gene values are saved (if output_directory is specified).</span>
 
 <span class="sd">    Methods</span>
 <span class="sd">    -------</span>
-<span class="sd">    run(n_generations, population_size, initial_population, fitness_threshold)</span>
-<span class="sd">        Runs the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals. </span>
-<span class="sd">        This method returns a list of lists, where each sublist contains individuals in the population at each generation. The individuals are represented as Individual objects.</span>
-<span class="sd">    run_light(n_generations, population_size, initial_population, fitness_threshold)</span>
-<span class="sd">        Runs the genetic algorithm for a specified number of generations, returning only the gene values of the individuals in the population at each generation.</span>
+<span class="sd">    run(n_generations, population_size, init_genes=None, fitness_threshold=None, verbosity=1)</span>
+<span class="sd">        Runs the genetic algorithm and returns the population at each generation.</span>
+<span class="sd">    run_light(n_generations, population_size, init_genes=None, fitness_threshold=None, verbosity=1)</span>
+<span class="sd">        Runs the genetic algorithm and returns the gene values at each generation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fitness_function</span><span class="p">,</span> <span class="n">gene_ranges</span><span class="p">,</span> <span class="n">fitness_function_args</span><span class="o">=</span><span class="p">(),</span> <span class="n">number_of_genes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crossover_method</span><span class="o">=</span><span class="s2">&quot;Either Or&quot;</span><span class="p">,</span> <span class="n">mutation_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mutation_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">measure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_multiprocessing</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ncpus</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">selection_method</span><span class="o">=</span><span class="s2">&quot;Diversity Enhanced&quot;</span><span class="p">,</span> <span class="n">output_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fitness_function</span><span class="p">,</span> <span class="n">gene_ranges</span><span class="p">,</span> <span class="n">fitness_function_args</span><span class="o">=</span><span class="p">(),</span> <span class="n">number_of_genes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">crossover_method</span><span class="o">=</span><span class="s2">&quot;Either Or&quot;</span><span class="p">,</span> <span class="n">mutation_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mutation_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">measure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">use_multiprocessing</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ncpus</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">selection_method</span><span class="o">=</span><span class="s2">&quot;Diversity Enhanced&quot;</span><span class="p">,</span> 
+                 <span class="n">output_directory</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># Verbosity level for printing out messages</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">=</span> <span class="n">verbosity</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span> <span class="o">=</span> <span class="n">output_directory</span>
@@ -191,6 +249,16 @@
 <div class="viewcode-block" id="GeneticAlgorithm.log">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.log">[docs]</a>
     <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Logs a message to the console and, if specified, to the output directory log file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        message : str</span>
+<span class="sd">            The message to log.</span>
+<span class="sd">        level : int, optional</span>
+<span class="sd">            The level of verbosity required to print the message (default is 1).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;=</span> <span class="n">level</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="p">:</span>
@@ -201,23 +269,36 @@
 <div class="viewcode-block" id="GeneticAlgorithm.setup_output_directory">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.setup_output_directory">[docs]</a>
     <span class="k">def</span> <span class="nf">setup_output_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets up the output directory for saving logs and output files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
 
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output directory created at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">files_to_remove</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;log.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;fitness.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;survivors.npy&#39;</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files_to_remove</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">):</span>
-                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output directory </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="si">}</span><span class="s2"> already existed. Removed any previous log.txt/fitness.txt/survivors.npy files.&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">file_id</span> <span class="o">=</span> <span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">_%H%M%S&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitness_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="si">}{</span><span class="n">file_id</span><span class="si">}</span><span class="s2">_fitness.txt&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">survivors_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="si">}{</span><span class="n">file_id</span><span class="si">}</span><span class="s2">_survivors.npy&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Writing fitness values to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness_file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Writing gene values to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">survivors_file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;# Generation Average_Fitness Best_Fitness</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="GeneticAlgorithm.start_pool">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.start_pool">[docs]</a>
     <span class="k">def</span> <span class="nf">start_pool</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Starts the multiprocessing Pool if multiprocessing is enabled.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ncpus</span><span class="p">)</span></div>
 
@@ -225,6 +306,9 @@
 <div class="viewcode-block" id="GeneticAlgorithm.stop_pool">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.stop_pool">[docs]</a>
     <span class="k">def</span> <span class="nf">stop_pool</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Closes the multiprocessing Pool if it is open.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
@@ -233,13 +317,41 @@
 
 <div class="viewcode-block" id="GeneticAlgorithm.evaluate_fitness">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.evaluate_fitness">[docs]</a>
-    <span class="k">def</span> <span class="nf">evaluate_fitness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">genes</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="p">(</span><span class="n">genes</span><span class="p">,</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness_function_args</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">evaluate_fitness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">genes</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates the fitness of a set of genes using the fitness function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        genes : list</span>
+<span class="sd">            The genes to evaluate.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The fitness value of the genes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="p">(</span><span class="n">genes</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness_function_args</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="GeneticAlgorithm.create_initial_population">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.create_initial_population">[docs]</a>
     <span class="k">def</span> <span class="nf">create_initial_population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">init_gene_values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates the initial population of individuals.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n : int</span>
+<span class="sd">            The number of individuals in the population.</span>
+<span class="sd">        init_gene_values : list, optional</span>
+<span class="sd">            Initial gene values to seed the population. If None, the population is initialized randomly.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of Individual</span>
+<span class="sd">            The initial population of individuals.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Creating initial population of size </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># Create genes of the population</span>
@@ -267,129 +379,134 @@
         <span class="k">return</span> <span class="n">population</span></div>
 
 
-
 <div class="viewcode-block" id="GeneticAlgorithm.run">
 <a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.run">[docs]</a>
     <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_generations</span><span class="p">,</span> <span class="n">population_size</span><span class="p">,</span> <span class="n">init_genes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fitness_threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">            </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">            Run the genetic algorithm and return the population at each generation. </span>
-
-<span class="sd">            Parameters</span>
-<span class="sd">            ----------</span>
-<span class="sd">            n_generations : int</span>
-<span class="sd">                The number of generations to run the genetic algorithm</span>
-<span class="sd">            population_size : int</span>
-<span class="sd">                The number of individuals in the population</span>
-<span class="sd">            init_genes : list</span>
-<span class="sd">                A list of gene values to initialize the population with. If None, the population is initialized randomly.</span>
-<span class="sd">            fitness_threshold : float</span>
-<span class="sd">                The fitness threshold at which to stop the algorithm early. If None, the algorithm runs for n_generations.</span>
-<span class="sd">            verbosity : int</span>
-<span class="sd">                The verbosity level for printing out messages. 0 = silent, 1 = normal output, 2 = detailed output.</span>
-
-<span class="sd">            Returns</span>
-<span class="sd">            -------</span>
-<span class="sd">            list</span>
-<span class="sd">                A list of lists, where each sublist contains individuals in the population at each generation. The individuals are represented as Individual objects.</span>
-
-<span class="sd">            &#39;&#39;&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">=</span> <span class="n">verbosity</span>
-            <span class="c1"># Start multiprocessing pool if specified</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">start_pool</span><span class="p">()</span>
-            <span class="c1"># Create initial population</span>
-            <span class="n">population</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_initial_population</span><span class="p">(</span><span class="n">population_size</span><span class="p">,</span> <span class="n">init_genes</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">population</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Failed to create initial population.&quot;</span><span class="p">)</span>
-            
-            <span class="c1"># Set the values for r0</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">survivor_selection</span><span class="p">,</span> <span class="n">DiversityEnhancedSurvivorSelection</span><span class="p">):</span>                        
-                <span class="c1"># Compute the average measure between two individuals, including only non-zero distances</span>
-                <span class="n">initial_population_distances</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">survivor_selection</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">get_gene_values</span><span class="p">(),</span> <span class="n">p2</span><span class="o">.</span><span class="n">get_gene_values</span><span class="p">())</span> <span class="k">for</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">population</span> <span class="k">for</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">population</span><span class="p">]</span>
-                <span class="c1"># drop the zeros</span>
-                <span class="n">initial_population_distances</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">initial_population_distances</span> <span class="k">if</span> <span class="n">d</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
-                <span class="c1"># get the average distance</span>
-                <span class="n">avg_measure</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">initial_population_distances</span><span class="p">)</span>
-                <span class="c1"># set r0</span>
-                <span class="n">avg_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">avg_measure</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">survivor_selection</span><span class="o">.</span><span class="n">r0</span> <span class="o">=</span> <span class="n">avg_distance</span><span class="o">/</span><span class="mi">10</span>
-                
-            
-            <span class="c1"># Determine the generations at which to print the averages</span>
-            <span class="n">print_generations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_generations</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
-            <span class="c1"># Run the genetic algorithm for the specified number of generations</span>
-
-            <span class="n">historical_population</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">individual</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">individual</span> <span class="ow">in</span> <span class="n">population</span> <span class="p">]</span> <span class="p">]</span>
-            <span class="k">for</span> <span class="n">generation</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_generations</span><span class="p">):</span>                
-                
-                <span class="c1"># Create genes of the offspring</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossover_method</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
-                        <span class="c1"># If no crossover, take the individual directly from the current population and apply mutation. </span>
-                        <span class="c1"># Set force_mutate to True to ensure that at least one gene is mutated.</span>
-                        <span class="n">offspring_genes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mutation</span><span class="o">.</span><span class="n">mutate_genes</span><span class="p">(</span><span class="n">individual</span><span class="o">.</span><span class="n">get_genes</span><span class="p">(),</span><span class="n">force_mutate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">individual</span> <span class="ow">in</span> <span class="n">population</span><span class="p">]</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="c1"># Select two parents randomly</span>
-                    <span class="n">random_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">population_size</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">population_size</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                    <span class="n">parents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">population</span><span class="p">)[</span><span class="n">random_indices</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">population_size</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-                    
-                    <span class="c1"># Create genes of the offspring by crossover</span>
-                    <span class="n">offspring_genes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">crossover_method</span><span class="o">.</span><span class="n">crossover</span><span class="p">(</span><span class="n">parent1</span><span class="o">.</span><span class="n">get_genes</span><span class="p">(),</span> <span class="n">parent2</span><span class="o">.</span><span class="n">get_genes</span><span class="p">())</span> <span class="k">for</span> <span class="n">parent1</span><span class="p">,</span> <span class="n">parent2</span> <span class="ow">in</span> <span class="n">parents</span><span class="p">]</span>
-
-                    <span class="c1"># Apply mutation</span>
-                    <span class="n">offspring_genes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mutation</span><span class="o">.</span><span class="n">mutate_genes</span><span class="p">(</span><span class="n">genes</span><span class="p">)</span> <span class="k">for</span> <span class="n">genes</span> <span class="ow">in</span> <span class="n">offspring_genes</span><span class="p">]</span>
-
-                <span class="c1"># Create offspring Individual objects using multiprocessing if specified</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span><span class="p">:</span>
-                    <span class="n">offspring</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">Individual</span><span class="p">,</span> <span class="p">[(</span><span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function_args</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">offspring_genes</span><span class="p">]</span> <span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">offspring</span> <span class="o">=</span> <span class="p">[</span><span class="n">Individual</span><span class="p">(</span><span class="n">genes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function_args</span><span class="p">)</span> <span class="k">for</span> <span class="n">genes</span> <span class="ow">in</span> <span class="n">offspring_genes</span><span class="p">]</span>
-
-                <span class="c1"># Combine parent and offspring populations (Elitism)</span>
-                <span class="n">combined_population</span> <span class="o">=</span> <span class="n">population</span> <span class="o">+</span> <span class="n">offspring</span> 
-
-                <span class="c1"># Select the best individuals to form the next generation</span>
-                <span class="n">population</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">survivor_selection</span><span class="o">.</span><span class="n">select_survivors</span><span class="p">(</span><span class="n">combined_population</span><span class="p">,</span> <span class="n">population_size</span><span class="p">)</span>
-
-                <span class="n">best_fitness</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span> <span class="p">[</span><span class="n">individual</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">individual</span> <span class="ow">in</span> <span class="n">population</span><span class="p">]</span> <span class="p">)</span>
-                <span class="k">if</span> <span class="n">generation</span> <span class="ow">in</span> <span class="n">print_generations</span> <span class="ow">or</span> <span class="n">generation</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">average_fitness</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">individual</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">individual</span> <span class="ow">in</span> <span class="n">population</span><span class="p">])</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generation </span><span class="si">{</span><span class="n">generation</span><span class="si">}</span><span class="s2">, Average Fitness: </span><span class="si">{</span><span class="n">average_fitness</span><span class="si">}</span><span class="s2">, Best Fitness: </span><span class="si">{</span><span class="n">best_fitness</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-                <span class="n">historical_population</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span><span class="n">individual</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">individual</span> <span class="ow">in</span> <span class="n">population</span> <span class="p">]</span> <span class="p">)</span>
-
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="p">:</span>
-                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="si">}</span><span class="s2">/fitness.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">generation</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">average_fitness</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">best_fitness</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-                    <span class="c1"># Save the genes of the historical population to the output file.</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="si">}</span><span class="s2">/survivors.npy&quot;</span><span class="p">,</span> <span class="p">[</span> <span class="p">[</span><span class="n">individual</span><span class="o">.</span><span class="n">get_gene_values</span><span class="p">()</span> <span class="k">for</span> <span class="n">individual</span> <span class="ow">in</span> <span class="n">population</span><span class="p">]</span> <span class="k">for</span> <span class="n">population</span> <span class="ow">in</span> <span class="n">historical_population</span> <span class="p">])</span>
-
-                <span class="c1"># Check if fitness threshold is reached</span>
-                <span class="k">if</span> <span class="n">fitness_threshold</span> <span class="ow">and</span> <span class="n">best_fitness</span> <span class="o">&gt;=</span> <span class="n">fitness_threshold</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fitness threshold reached at generation </span><span class="si">{</span><span class="n">generation</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-                    <span class="k">break</span>
-            <span class="c1"># Stop multiprocessing pool if specified    </span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">stop_pool</span><span class="p">()</span>
-            
-            <span class="k">return</span> <span class="n">historical_population</span></div>
-
-    
-<div class="viewcode-block" id="GeneticAlgorithm.run_light">
-<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.run_light">[docs]</a>
-    <span class="k">def</span> <span class="nf">run_light</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_generations</span><span class="p">,</span> <span class="n">population_size</span><span class="p">,</span> <span class="n">init_genes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fitness_threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39; </span>
-<span class="sd">        Run the genetic algorithm and return the gene values of the individuals in the population at each generation.</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Runs the genetic algorithm for a specified number of generations.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        n_generations : int</span>
-<span class="sd">            The number of generations to run the genetic algorithm</span>
+<span class="sd">            The number of generations to run the genetic algorithm.</span>
 <span class="sd">        population_size : int</span>
-<span class="sd">            The number of individuals in the population</span>
-<span class="sd">        init_genes : list</span>
-<span class="sd">            A list of gene values to initialize the population with. If None, the population is initialized randomly.</span>
-<span class="sd">        fitness_threshold : float</span>
-<span class="sd">            The fitness threshold at which to stop the algorithm early. If None, the algorithm runs for n_generations.</span>
-<span class="sd">        verbosity : int</span>
-<span class="sd">            The verbosity level for printing out messages. 0 = silent, 1 = normal output, 2 = detailed output.</span>
+<span class="sd">            The number of individuals in the population.</span>
+<span class="sd">        init_genes : list, optional</span>
+<span class="sd">            Initial gene values to seed the population. If None, the population is initialized randomly.</span>
+<span class="sd">        fitness_threshold : float, optional</span>
+<span class="sd">            The fitness threshold to stop the algorithm early. If None, the algorithm runs for `n_generations`.</span>
+<span class="sd">        verbosity : int, optional</span>
+<span class="sd">            The verbosity level for printing messages. 0 = silent, 1 = normal output, 2 = detailed output (default is 1).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of list of Individual</span>
+<span class="sd">            A list containing the population at each generation.</span>
+<span class="sd">            Each population is a list of `Individual` objects.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">=</span> <span class="n">verbosity</span>
+        <span class="c1"># Start multiprocessing pool if specified</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_pool</span><span class="p">()</span>
+        <span class="c1"># Create initial population</span>
+        <span class="n">population</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_initial_population</span><span class="p">(</span><span class="n">population_size</span><span class="p">,</span> <span class="n">init_genes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">population</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Failed to create initial population.&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Set the values for r0 for diversity enhanced selection</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">survivor_selection</span><span class="p">,</span> <span class="n">DiversityEnhancedSurvivorSelection</span><span class="p">):</span>                        
+            <span class="c1"># Compute the average measure between two individuals, including only non-zero distances</span>
+            <span class="n">initial_population_distances</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">survivor_selection</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">get_gene_values</span><span class="p">(),</span> <span class="n">p2</span><span class="o">.</span><span class="n">get_gene_values</span><span class="p">())</span> <span class="k">for</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">population</span> <span class="k">for</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">population</span><span class="p">]</span>
+            <span class="c1"># drop the zeros</span>
+            <span class="n">initial_population_distances</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">initial_population_distances</span> <span class="k">if</span> <span class="n">d</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># get the average distance</span>
+            <span class="n">avg_measure</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">initial_population_distances</span><span class="p">)</span>
+            <span class="c1"># set r0</span>
+            <span class="n">avg_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">avg_measure</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">survivor_selection</span><span class="o">.</span><span class="n">r0</span> <span class="o">=</span> <span class="n">avg_distance</span><span class="o">/</span><span class="mi">10</span>
+            
+        
+        <span class="c1"># Determine the generations at which to print the averages</span>
+        <span class="n">print_generations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_generations</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="c1"># Run the genetic algorithm for the specified number of generations</span>
+
+        <span class="n">historical_population</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">individual</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">individual</span> <span class="ow">in</span> <span class="n">population</span> <span class="p">]</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">generation</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_generations</span><span class="p">):</span>                
+            
+            <span class="c1"># Create genes of the offspring</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossover_method</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+                    <span class="c1"># If no crossover, take the individual directly from the current population and apply mutation. </span>
+                    <span class="c1"># Set force_mutate to True to ensure that at least one gene is mutated.</span>
+                    <span class="n">offspring_genes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mutation</span><span class="o">.</span><span class="n">mutate_genes</span><span class="p">(</span><span class="n">individual</span><span class="o">.</span><span class="n">get_genes</span><span class="p">(),</span><span class="n">force_mutate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">individual</span> <span class="ow">in</span> <span class="n">population</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Select two parents randomly</span>
+                <span class="n">random_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">population_size</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">population_size</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">parents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">population</span><span class="p">)[</span><span class="n">random_indices</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">population_size</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+                
+                <span class="c1"># Create genes of the offspring by crossover</span>
+                <span class="n">offspring_genes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">crossover_method</span><span class="o">.</span><span class="n">crossover</span><span class="p">(</span><span class="n">parent1</span><span class="o">.</span><span class="n">get_genes</span><span class="p">(),</span> <span class="n">parent2</span><span class="o">.</span><span class="n">get_genes</span><span class="p">())</span> <span class="k">for</span> <span class="n">parent1</span><span class="p">,</span> <span class="n">parent2</span> <span class="ow">in</span> <span class="n">parents</span><span class="p">]</span>
+
+                <span class="c1"># Apply mutation</span>
+                <span class="n">offspring_genes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mutation</span><span class="o">.</span><span class="n">mutate_genes</span><span class="p">(</span><span class="n">genes</span><span class="p">)</span> <span class="k">for</span> <span class="n">genes</span> <span class="ow">in</span> <span class="n">offspring_genes</span><span class="p">]</span>
+
+            <span class="c1"># Create offspring Individual objects using multiprocessing if specified</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span><span class="p">:</span>
+                <span class="n">offspring</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">Individual</span><span class="p">,</span> <span class="p">[(</span><span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function_args</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">offspring_genes</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">offspring</span> <span class="o">=</span> <span class="p">[</span><span class="n">Individual</span><span class="p">(</span><span class="n">genes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function_args</span><span class="p">)</span> <span class="k">for</span> <span class="n">genes</span> <span class="ow">in</span> <span class="n">offspring_genes</span><span class="p">]</span>
+
+            <span class="c1"># Combine parent and offspring populations (Elitism)</span>
+            <span class="n">combined_population</span> <span class="o">=</span> <span class="n">population</span> <span class="o">+</span> <span class="n">offspring</span> 
+
+            <span class="c1"># Select the best individuals to form the next generation</span>
+            <span class="n">population</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">survivor_selection</span><span class="o">.</span><span class="n">select_survivors</span><span class="p">(</span><span class="n">combined_population</span><span class="p">,</span> <span class="n">population_size</span><span class="p">)</span>
+
+            <span class="n">best_fitness</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span> <span class="p">[</span><span class="n">individual</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">individual</span> <span class="ow">in</span> <span class="n">population</span><span class="p">])</span>
+            <span class="n">average_fitness</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">individual</span><span class="o">.</span><span class="n">fitness</span> <span class="k">for</span> <span class="n">individual</span> <span class="ow">in</span> <span class="n">population</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">generation</span> <span class="ow">in</span> <span class="n">print_generations</span> <span class="ow">or</span> <span class="n">generation</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generation </span><span class="si">{</span><span class="n">generation</span><span class="si">}</span><span class="s2">, Average Fitness: </span><span class="si">{</span><span class="n">average_fitness</span><span class="si">}</span><span class="s2">, Best Fitness: </span><span class="si">{</span><span class="n">best_fitness</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="n">historical_population</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span><span class="n">individual</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">individual</span> <span class="ow">in</span> <span class="n">population</span> <span class="p">]</span> <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_directory</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness_file</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">generation</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">average_fitness</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">best_fitness</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="c1"># Save the genes of the historical population to the output file.</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">survivors_file</span><span class="p">,</span> <span class="p">[</span> <span class="p">[</span><span class="n">individual</span><span class="o">.</span><span class="n">get_gene_values</span><span class="p">()</span> <span class="k">for</span> <span class="n">individual</span> <span class="ow">in</span> <span class="n">population</span><span class="p">]</span> <span class="k">for</span> <span class="n">population</span> <span class="ow">in</span> <span class="n">historical_population</span> <span class="p">])</span>
+
+            <span class="c1"># Check if fitness threshold is reached</span>
+            <span class="k">if</span> <span class="n">fitness_threshold</span> <span class="ow">and</span> <span class="n">best_fitness</span> <span class="o">&gt;=</span> <span class="n">fitness_threshold</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fitness threshold reached at generation </span><span class="si">{</span><span class="n">generation</span><span class="si">}</span><span class="s2">!&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="c1"># Stop multiprocessing pool if specified    </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_pool</span><span class="p">()</span>
+        
+        <span class="k">return</span> <span class="n">historical_population</span></div>
+
+
+<div class="viewcode-block" id="GeneticAlgorithm.run_light">
+<a class="viewcode-back" href="../../lightweight_genetic_algorithm.html#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.run_light">[docs]</a>
+    <span class="k">def</span> <span class="nf">run_light</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_generations</span><span class="p">,</span> <span class="n">population_size</span><span class="p">,</span> <span class="n">init_genes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fitness_threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; </span>
+<span class="sd">        Runs the genetic algorithm and returns only the gene values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n_generations : int</span>
+<span class="sd">            The number of generations to run the genetic algorithm.</span>
+<span class="sd">        population_size : int</span>
+<span class="sd">            The number of individuals in the population.</span>
+<span class="sd">        init_genes : list, optional</span>
+<span class="sd">            Initial gene values to seed the population. If None, the population is initialized randomly.</span>
+<span class="sd">        fitness_threshold : float, optional</span>
+<span class="sd">            The fitness threshold to stop the algorithm early. If None, the algorithm runs for `n_generations`.</span>
+<span class="sd">        verbosity : int, optional</span>
+<span class="sd">            The verbosity level for printing messages. 0 = silent, 1 = normal output, 2 = detailed output (default is 1).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of list</span>
+<span class="sd">            A list containing the gene values of the population at each generation.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">historical_population</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">n_generations</span><span class="p">,</span> <span class="n">population_size</span><span class="p">,</span> <span class="n">init_genes</span><span class="o">=</span><span class="n">init_genes</span><span class="p">,</span> <span class="n">fitness_threshold</span><span class="o">=</span><span class="n">fitness_threshold</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="n">verbosity</span><span class="p">)</span>

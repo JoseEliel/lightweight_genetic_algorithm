@@ -42,14 +42,53 @@
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightweight_genetic_algorithm.algorithm.</span></span><span class="sig-name descname"><span class="pre">GeneticAlgorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fitness_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gene_ranges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_function_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_genes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossover_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Either</span> <span class="pre">Or'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutation_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutation_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_multiprocessing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncpus</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Diversity</span> <span class="pre">Enhanced'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/algorithm.html#GeneticAlgorithm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A class used to represent a Genetic Algorithm</p>
+<p>A class to represent a Genetic Algorithm.</p>
+<p>This class provides methods to perform optimization using genetic algorithms
+for both numerical and categorical parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fitness_function</strong> (<em>callable</em>) – A function that calculates the fitness score of an individual.</p></li>
+<li><p><strong>gene_ranges</strong> (<em>list</em>) – A list specifying the possible values or ranges for each gene.
+For numerical genes, it is a list of tuples specifying the (min, max) range for each gene.
+For categorical genes, it is a simple list of possible categories.</p></li>
+<li><p><strong>fitness_function_args</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Additional arguments to pass to the fitness_function (default is ()).</p></li>
+<li><p><strong>number_of_genes</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of genes in each individual. If genes are numerical,
+it defaults to the length of gene_ranges. Must be specified if genes are categorical.</p></li>
+<li><p><strong>crossover_method</strong> (<em>str</em><em>, </em><em>optional</em>) – The method used for crossover. Options are “Between”, “Midpoint”, “Either Or”, or “None”.
+Default is “Either Or”.</p></li>
+<li><p><strong>mutation_mode</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – The mode used for mutation for each gene.
+Available options are: “additive”, “multiplicative”, “random”, “categorical”.
+Default is [“additive”]*number_of_genes for numerical genes and [“categorical”]*number_of_genes for categorical genes.</p></li>
+<li><p><strong>mutation_rate</strong> (<em>float</em><em>, </em><em>optional</em>) – The rate of mutation for each gene. Default is 1.0 / number_of_genes.</p></li>
+<li><p><strong>measure</strong> (<em>str</em><em> or </em><em>callable</em><em>, </em><em>optional</em>) – Defines the distance measure between two individuals for diversity.
+Options are “Hamming”, “Euclidean”, “Dynamic”, or a custom function.
+Default depends on gene type: “Hamming” for categorical genes, “Euclidean” for numerical genes.</p></li>
+<li><p><strong>use_multiprocessing</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to use multiprocessing for fitness evaluations (default is False).</p></li>
+<li><p><strong>ncpus</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of processes to use for multiprocessing (default is the number of CPUs minus one).</p></li>
+<li><p><strong>verbosity</strong> (<em>int</em><em>, </em><em>optional</em>) – The verbosity level. 0 = silent, 1 = normal output, 2 = detailed output (default is 1).</p></li>
+<li><p><strong>selection_method</strong> (<em>str</em><em>, </em><em>optional</em>) – The method used for selecting the best individuals for the next generation.
+Options are “Diversity Enhanced” or “Fitness Proportionate” (default is “Diversity Enhanced”).</p></li>
+<li><p><strong>output_directory</strong> (<em>str</em><em>, </em><em>optional</em>) – <p>The directory to save output files (default is None).
+If specified, the algorithm saves the genes of the selected survivors in each generation
+to a file “&lt;datetime&gt;_survivors.npy” in the output directory.
+The average fitness and best fitness at each generation are saved to “&lt;datetime&gt;_fitness.txt”.
+A log file is saved to “log.txt” containing the output of the algorithm printed to the console.</p>
+<p>The “&lt;datetime&gt;_survivors.npy” file can be loaded using
+numpy.load(file, allow_pickle=True) to access the gene values of the individuals
+in each generation. The loaded array has shape
+(n_generations+1, population_size, number_of_genes) since the initial population is also saved.</p>
+</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.fitness_function">
 <span class="sig-name descname"><span class="pre">fitness_function</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.fitness_function" title="Link to this definition">¶</a></dt>
-<dd><p>A function that calculates the fitness score of an individual</p>
+<dd><p>The fitness function used to evaluate individuals.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>function</p>
+<dd class="field-odd"><p>callable</p>
 </dd>
 </dl>
 </dd></dl>
@@ -57,7 +96,7 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.fitness_function_args">
 <span class="sig-name descname"><span class="pre">fitness_function_args</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.fitness_function_args" title="Link to this definition">¶</a></dt>
-<dd><p>Wildcard arguments to pass to the fitness_function</p>
+<dd><p>Additional arguments for the fitness function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>tuple</p>
@@ -68,7 +107,7 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.gene_ranges">
 <span class="sig-name descname"><span class="pre">gene_ranges</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.gene_ranges" title="Link to this definition">¶</a></dt>
-<dd><p>A list of tuples representing the range of each parameter; if parameters are categorical, it’s a simple 1D list of categories</p>
+<dd><p>The ranges or categories for each gene.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
@@ -77,20 +116,9 @@
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.crossover_method">
-<span class="sig-name descname"><span class="pre">crossover_method</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.crossover_method" title="Link to this definition">¶</a></dt>
-<dd><p>The method used for crossover. Options are “Between”, “Midpoint”, “Either Or”, or “None” (default is “Either Or”)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.number_of_genes">
 <span class="sig-name descname"><span class="pre">number_of_genes</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.number_of_genes" title="Link to this definition">¶</a></dt>
-<dd><p>The number of parameters (default is the length of gene_ranges). This must be explicitly provided if parameters are categorical.</p>
+<dd><p>The number of genes in each individual.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int</p>
@@ -99,12 +127,23 @@
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.mutation_mode">
-<span class="sig-name descname"><span class="pre">mutation_mode</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.mutation_mode" title="Link to this definition">¶</a></dt>
-<dd><p>The mode used for mutation (default is “additive” for numeric parameters and “categorical” for categorical parameters)</p>
+<dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.is_discrete">
+<span class="sig-name descname"><span class="pre">is_discrete</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.is_discrete" title="Link to this definition">¶</a></dt>
+<dd><p>Indicates whether the genes are categorical.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.mutation_mode">
+<span class="sig-name descname"><span class="pre">mutation_mode</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.mutation_mode" title="Link to this definition">¶</a></dt>
+<dd><p>Mutation modes for each gene.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of str</p>
 </dd>
 </dl>
 </dd></dl>
@@ -112,7 +151,7 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.mutation_rate">
 <span class="sig-name descname"><span class="pre">mutation_rate</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.mutation_rate" title="Link to this definition">¶</a></dt>
-<dd><p>The rate of mutation (default is 1.0/number_of_genes). During crossover, each gene is mutated with probability mutation_rate.</p>
+<dd><p>Mutation rate for each gene.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
@@ -121,13 +160,34 @@
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.measure">
-<span class="sig-name descname"><span class="pre">measure</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.measure" title="Link to this definition">¶</a></dt>
-<dd><p>Defines the distance between two individuals in the parameter space. String options are “Hamming”, “Euclidean”, “Dynamic”.
-Alternatively, a custom function can be provided. This function takes the genes of two individuals and returns a distance.</p>
+<dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.mutation">
+<span class="sig-name descname"><span class="pre">mutation</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.mutation" title="Link to this definition">¶</a></dt>
+<dd><p>The mutation operator.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>function or str</p>
+<dd class="field-odd"><p><a class="reference internal" href="#lightweight_genetic_algorithm.mutation.Mutation" title="lightweight_genetic_algorithm.mutation.Mutation">Mutation</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.crossover_method">
+<span class="sig-name descname"><span class="pre">crossover_method</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.crossover_method" title="Link to this definition">¶</a></dt>
+<dd><p>The crossover operator or “none” if no crossover.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lightweight_genetic_algorithm.crossover.Crossover" title="lightweight_genetic_algorithm.crossover.Crossover">Crossover</a> or str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.survivor_selection">
+<span class="sig-name descname"><span class="pre">survivor_selection</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.survivor_selection" title="Link to this definition">¶</a></dt>
+<dd><p>The survivor selection strategy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lightweight_genetic_algorithm.selection.SurvivorSelection" title="lightweight_genetic_algorithm.selection.SurvivorSelection">SurvivorSelection</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -135,8 +195,7 @@ Alternatively, a custom function can be provided. This function takes the genes 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.use_multiprocessing">
 <span class="sig-name descname"><span class="pre">use_multiprocessing</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.use_multiprocessing" title="Link to this definition">¶</a></dt>
-<dd><p>Whether to use multiprocessing for fitness evaluations (default is False).
-This speeds up the algorithm for computationally expensive fitness functions.</p>
+<dd><p>Indicates whether multiprocessing is used.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bool</p>
@@ -147,10 +206,21 @@ This speeds up the algorithm for computationally expensive fitness functions.</p
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.ncpus">
 <span class="sig-name descname"><span class="pre">ncpus</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.ncpus" title="Link to this definition">¶</a></dt>
-<dd><p>The number of processes to use for multiprocessing (default is the number of CPUs on the system minus 1)</p>
+<dd><p>Number of CPUs used if multiprocessing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.pool">
+<span class="sig-name descname"><span class="pre">pool</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.pool" title="Link to this definition">¶</a></dt>
+<dd><p>The multiprocessing Pool object if multiprocessing is used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>multiprocessing.Pool or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -158,7 +228,7 @@ This speeds up the algorithm for computationally expensive fitness functions.</p
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.verbosity">
 <span class="sig-name descname"><span class="pre">verbosity</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.verbosity" title="Link to this definition">¶</a></dt>
-<dd><p>The verbosity level for printing out messages (default is 1). 0 = silent, 1 = normal output, 2 = detailed output.</p>
+<dd><p>Verbosity level.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>int</p>
@@ -167,9 +237,9 @@ This speeds up the algorithm for computationally expensive fitness functions.</p
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.selection_method">
-<span class="sig-name descname"><span class="pre">selection_method</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.selection_method" title="Link to this definition">¶</a></dt>
-<dd><p>The method used for selecting the best individuals for the next generation. Options are “Diversity Enhanced” or “Fitness Proportionate”.</p>
+<dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.output_directory">
+<span class="sig-name descname"><span class="pre">output_directory</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.output_directory" title="Link to this definition">¶</a></dt>
+<dd><p>Directory for output files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
@@ -178,10 +248,20 @@ This speeds up the algorithm for computationally expensive fitness functions.</p
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.output_directory">
-<span class="sig-name descname"><span class="pre">output_directory</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.output_directory" title="Link to this definition">¶</a></dt>
-<dd><p>The directory to save output files (default is None). If specified, the algorithm saves the genes of the selected survivors in each generation to a file “survivors.npy” in the output directory. The average fitness and best fitness at each generation are saved to “fitness.txt”. A log file is saved to “log.txt” containing the output of the algorithm printed to the console.</p>
-<p>The “survivors.npy” file can be loaded using numpy.load(file, allow_pickle=True) to access the gene values of the individuals in each generation. The loaded array has shape (n_generations+1, population_size, number_of_genes) since the initial population is also saved.</p>
+<dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.fitness_file">
+<span class="sig-name descname"><span class="pre">fitness_file</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.fitness_file" title="Link to this definition">¶</a></dt>
+<dd><p>Path to the file where fitness values are saved (if output_directory is specified).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.survivors_file">
+<span class="sig-name descname"><span class="pre">survivors_file</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.survivors_file" title="Link to this definition">¶</a></dt>
+<dd><p>Path to the file where survivor gene values are saved (if output_directory is specified).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
@@ -191,51 +271,87 @@ This speeds up the algorithm for computationally expensive fitness functions.</p
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_generations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">population_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_population</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_threshold</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/algorithm.html#GeneticAlgorithm.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.run" title="Link to this definition">¶</a></dt>
-<dd><p>Runs the genetic algorithm for a specified number of generations, printing the average fitness at specified intervals.
-This method returns a list of lists, where each sublist contains individuals in the population at each generation. The individuals are represented as Individual objects.</p>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_generations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">population_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_genes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/algorithm.html#GeneticAlgorithm.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.run" title="Link to this definition">¶</a></dt>
+<dd><p>Runs the genetic algorithm and returns the population at each generation.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.run_light">
-<span class="sig-name descname"><span class="pre">run_light</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_generations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">population_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_population</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_threshold</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/algorithm.html#GeneticAlgorithm.run_light"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.run_light" title="Link to this definition">¶</a></dt>
-<dd><p>Runs the genetic algorithm for a specified number of generations, returning only the gene values of the individuals in the population at each generation.</p>
+<span class="sig-name descname"><span class="pre">run_light</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_generations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">population_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_genes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/algorithm.html#GeneticAlgorithm.run_light"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.run_light" title="Link to this definition">¶</a></dt>
+<dd><p>Runs the genetic algorithm and returns the gene values at each generation.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.create_initial_population">
 <span class="sig-name descname"><span class="pre">create_initial_population</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_gene_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/algorithm.html#GeneticAlgorithm.create_initial_population"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.create_initial_population" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Creates the initial population of individuals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em>) – The number of individuals in the population.</p></li>
+<li><p><strong>init_gene_values</strong> (<em>list</em><em>, </em><em>optional</em>) – Initial gene values to seed the population. If None, the population is initialized randomly.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The initial population of individuals.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of <a class="reference internal" href="#lightweight_genetic_algorithm.population.Individual" title="lightweight_genetic_algorithm.population.Individual">Individual</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.evaluate_fitness">
 <span class="sig-name descname"><span class="pre">evaluate_fitness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">genes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/algorithm.html#GeneticAlgorithm.evaluate_fitness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.evaluate_fitness" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Evaluates the fitness of a set of genes using the fitness function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>genes</strong> (<em>list</em>) – The genes to evaluate.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The fitness value of the genes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.log">
 <span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/algorithm.html#GeneticAlgorithm.log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.log" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Logs a message to the console and, if specified, to the output directory log file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – The message to log.</p></li>
+<li><p><strong>level</strong> (<em>int</em><em>, </em><em>optional</em>) – The level of verbosity required to print the message (default is 1).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="id0">
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_generations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">population_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_genes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/algorithm.html#GeneticAlgorithm.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
-<dd><p>Run the genetic algorithm and return the population at each generation.</p>
+<dd><p>Runs the genetic algorithm for a specified number of generations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>n_generations</strong> (<em>int</em>) – The number of generations to run the genetic algorithm</p></li>
-<li><p><strong>population_size</strong> (<em>int</em>) – The number of individuals in the population</p></li>
-<li><p><strong>init_genes</strong> (<em>list</em>) – A list of gene values to initialize the population with. If None, the population is initialized randomly.</p></li>
-<li><p><strong>fitness_threshold</strong> (<em>float</em>) – The fitness threshold at which to stop the algorithm early. If None, the algorithm runs for n_generations.</p></li>
-<li><p><strong>verbosity</strong> (<em>int</em>) – The verbosity level for printing out messages. 0 = silent, 1 = normal output, 2 = detailed output.</p></li>
+<li><p><strong>n_generations</strong> (<em>int</em>) – The number of generations to run the genetic algorithm.</p></li>
+<li><p><strong>population_size</strong> (<em>int</em>) – The number of individuals in the population.</p></li>
+<li><p><strong>init_genes</strong> (<em>list</em><em>, </em><em>optional</em>) – Initial gene values to seed the population. If None, the population is initialized randomly.</p></li>
+<li><p><strong>fitness_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – The fitness threshold to stop the algorithm early. If None, the algorithm runs for <cite>n_generations</cite>.</p></li>
+<li><p><strong>verbosity</strong> (<em>int</em><em>, </em><em>optional</em>) – The verbosity level for printing messages. 0 = silent, 1 = normal output, 2 = detailed output (default is 1).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list of lists, where each sublist contains individuals in the population at each generation. The individuals are represented as Individual objects.</p>
+<dd class="field-even"><p>A list containing the population at each generation.
+Each population is a list of <cite>Individual</cite> objects.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p>list of list of <a class="reference internal" href="#lightweight_genetic_algorithm.population.Individual" title="lightweight_genetic_algorithm.population.Individual">Individual</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -243,16 +359,22 @@ This method returns a list of lists, where each sublist contains individuals in 
 <dl class="py method">
 <dt class="sig sig-object py" id="id1">
 <span class="sig-name descname"><span class="pre">run_light</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_generations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">population_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_genes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/algorithm.html#GeneticAlgorithm.run_light"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Link to this definition">¶</a></dt>
-<dd><p>Run the genetic algorithm and return the gene values of the individuals in the population at each generation.</p>
+<dd><p>Runs the genetic algorithm and returns only the gene values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>n_generations</strong> (<em>int</em>) – The number of generations to run the genetic algorithm</p></li>
-<li><p><strong>population_size</strong> (<em>int</em>) – The number of individuals in the population</p></li>
-<li><p><strong>init_genes</strong> (<em>list</em>) – A list of gene values to initialize the population with. If None, the population is initialized randomly.</p></li>
-<li><p><strong>fitness_threshold</strong> (<em>float</em>) – The fitness threshold at which to stop the algorithm early. If None, the algorithm runs for n_generations.</p></li>
-<li><p><strong>verbosity</strong> (<em>int</em>) – The verbosity level for printing out messages. 0 = silent, 1 = normal output, 2 = detailed output.</p></li>
+<li><p><strong>n_generations</strong> (<em>int</em>) – The number of generations to run the genetic algorithm.</p></li>
+<li><p><strong>population_size</strong> (<em>int</em>) – The number of individuals in the population.</p></li>
+<li><p><strong>init_genes</strong> (<em>list</em><em>, </em><em>optional</em>) – Initial gene values to seed the population. If None, the population is initialized randomly.</p></li>
+<li><p><strong>fitness_threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – The fitness threshold to stop the algorithm early. If None, the algorithm runs for <cite>n_generations</cite>.</p></li>
+<li><p><strong>verbosity</strong> (<em>int</em><em>, </em><em>optional</em>) – The verbosity level for printing messages. 0 = silent, 1 = normal output, 2 = detailed output (default is 1).</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list containing the gene values of the population at each generation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of list</p>
 </dd>
 </dl>
 </dd></dl>
@@ -260,17 +382,20 @@ This method returns a list of lists, where each sublist contains individuals in 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.setup_output_directory">
 <span class="sig-name descname"><span class="pre">setup_output_directory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/algorithm.html#GeneticAlgorithm.setup_output_directory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.setup_output_directory" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sets up the output directory for saving logs and output files.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.start_pool">
 <span class="sig-name descname"><span class="pre">start_pool</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/algorithm.html#GeneticAlgorithm.start_pool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.start_pool" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Starts the multiprocessing Pool if multiprocessing is enabled.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.stop_pool">
 <span class="sig-name descname"><span class="pre">stop_pool</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/algorithm.html#GeneticAlgorithm.stop_pool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.algorithm.GeneticAlgorithm.stop_pool" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Closes the multiprocessing Pool if it is open.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -289,15 +414,15 @@ This method returns a list of lists, where each sublist contains individuals in 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>parent1_genes</strong> (<em>List</em><em> of </em><em>Gene objects</em>) – The first parent genes.</p></li>
-<li><p><strong>parent2_genes</strong> (<em>List</em><em> of </em><em>Gene objects</em>) – The second parent genes.</p></li>
+<li><p><strong>parent1_genes</strong> (<em>List</em><em>[</em><a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene"><em>Gene</em></a><em>]</em>) – The first parent’s genes.</p></li>
+<li><p><strong>parent2_genes</strong> (<em>List</em><em>[</em><a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene"><em>Gene</em></a><em>]</em>) – The second parent’s genes.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The child genes.</p>
+<dd class="field-even"><p>The child genes resulting from crossover.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Gene objects</p>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene">Gene</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -308,24 +433,36 @@ This method returns a list of lists, where each sublist contains individuals in 
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.crossover.CrossoverBetween">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightweight_genetic_algorithm.crossover.</span></span><span class="sig-name descname"><span class="pre">CrossoverBetween</span></span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/crossover.html#CrossoverBetween"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.crossover.CrossoverBetween" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lightweight_genetic_algorithm.crossover.Crossover" title="lightweight_genetic_algorithm.crossover.Crossover"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crossover</span></code></a></p>
-<p>This class represents a crossover method where the child’s genes are chosen
-to be a random value between the corresponding genes of the two parents.</p>
+<p>Implements a ‘between’ crossover method where each child’s gene is a random value
+between the corresponding genes of the two parents.</p>
+<p>Each gene in the child is generated by uniformly sampling a value between the values
+of the corresponding genes in the parents.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>The genes must have a ‘crossover_methods’ attribute that includes ‘between’.</p></li>
+<li><p>The genes must have ‘value’, ‘low’, and ‘high’ attributes.</p></li>
+</ul>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.crossover.CrossoverBetween.crossover">
 <span class="sig-name descname"><span class="pre">crossover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent1_genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent2_genes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/crossover.html#CrossoverBetween.crossover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.crossover.CrossoverBetween.crossover" title="Link to this definition">¶</a></dt>
-<dd><p>Perform crossover between two parents.</p>
+<dd><p>Perform ‘between’ crossover between two parents.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>parent1_genes</strong> (<em>List</em><em> of </em><em>Gene objects</em>) – The first parent genes.</p></li>
-<li><p><strong>parent2_genes</strong> (<em>List</em><em> of </em><em>Gene objects</em>) – The second parent genes.</p></li>
+<li><p><strong>parent1_genes</strong> (<em>List</em><em>[</em><a class="reference internal" href="#lightweight_genetic_algorithm.population.NumericGene" title="lightweight_genetic_algorithm.population.NumericGene"><em>NumericGene</em></a><em>]</em>) – The genes from the first parent.</p></li>
+<li><p><strong>parent2_genes</strong> (<em>List</em><em>[</em><a class="reference internal" href="#lightweight_genetic_algorithm.population.NumericGene" title="lightweight_genetic_algorithm.population.NumericGene"><em>NumericGene</em></a><em>]</em>) – The genes from the second parent.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The child genes.</p>
+<dd class="field-even"><p>The child genes resulting from crossover.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Gene objects</p>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#lightweight_genetic_algorithm.population.NumericGene" title="lightweight_genetic_algorithm.population.NumericGene">NumericGene</a>]</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the ‘between’ crossover method is not compatible with the gene type.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -336,26 +473,40 @@ to be a random value between the corresponding genes of the two parents.</p>
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.crossover.CrossoverEitherOr">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightweight_genetic_algorithm.crossover.</span></span><span class="sig-name descname"><span class="pre">CrossoverEitherOr</span></span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/crossover.html#CrossoverEitherOr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.crossover.CrossoverEitherOr" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lightweight_genetic_algorithm.crossover.Crossover" title="lightweight_genetic_algorithm.crossover.Crossover"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crossover</span></code></a></p>
-<p>This class represents a crossover method where the child’s genes are chosen
-to be either the corresponding gene of the first parent or the second parent.</p>
+<p>Implements an ‘either or’ crossover method where each child’s gene is randomly chosen
+to be either the corresponding gene from the first parent or from the second parent,
+with equal probability.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>The genes must have a ‘crossover_methods’ attribute that includes ‘either or’.</p></li>
+</ul>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.crossover.CrossoverEitherOr.crossover">
 <span class="sig-name descname"><span class="pre">crossover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent1_genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent2_genes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/crossover.html#CrossoverEitherOr.crossover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.crossover.CrossoverEitherOr.crossover" title="Link to this definition">¶</a></dt>
-<dd><p>Perform crossover between two parents.</p>
+<dd><p>Perform ‘either or’ crossover between two parents.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>parent1_genes</strong> (<em>List</em><em> of </em><em>Gene objects</em>) – The first parent genes.</p></li>
-<li><p><strong>parent2_genes</strong> (<em>List</em><em> of </em><em>Gene objects</em>) – The second parent genes.</p></li>
+<li><p><strong>parent1_genes</strong> (<em>List</em><em>[</em><a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene"><em>Gene</em></a><em>]</em>) – The genes from the first parent.</p></li>
+<li><p><strong>parent2_genes</strong> (<em>List</em><em>[</em><a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene"><em>Gene</em></a><em>]</em>) – The genes from the second parent.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The child genes.</p>
+<dd class="field-even"><p>The child genes resulting from crossover. Each gene is chosen randomly from either parent.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Gene objects</p>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene">Gene</a>]</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the ‘either or’ crossover method is not compatible with the gene type.</p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>The returned genes are copies of the parent genes. This prevents unintended side effects if genes are mutable.</p></li>
+</ul>
 </dd></dl>
 
 </dd></dl>
@@ -364,24 +515,34 @@ to be either the corresponding gene of the first parent or the second parent.</p
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.crossover.CrossoverMidpoint">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightweight_genetic_algorithm.crossover.</span></span><span class="sig-name descname"><span class="pre">CrossoverMidpoint</span></span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/crossover.html#CrossoverMidpoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.crossover.CrossoverMidpoint" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lightweight_genetic_algorithm.crossover.Crossover" title="lightweight_genetic_algorithm.crossover.Crossover"><code class="xref py py-class docutils literal notranslate"><span class="pre">Crossover</span></code></a></p>
-<p>This class represents a crossover method where the child’s genes are chosen
-to be the average of the corresponding genes of the two parents.</p>
+<p>Implements a ‘midpoint’ crossover method where each child’s gene is the average
+(midpoint) of the corresponding genes of the two parents.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>The genes must have a ‘crossover_methods’ attribute that includes ‘midpoint’.</p></li>
+<li><p>The genes must have ‘value’, ‘low’, and ‘high’ attributes.</p></li>
+</ul>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.crossover.CrossoverMidpoint.crossover">
 <span class="sig-name descname"><span class="pre">crossover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent1_genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent2_genes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/crossover.html#CrossoverMidpoint.crossover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.crossover.CrossoverMidpoint.crossover" title="Link to this definition">¶</a></dt>
-<dd><p>Perform crossover between two parents.</p>
+<dd><p>Perform ‘midpoint’ crossover between two parents.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>parent1_genes</strong> (<em>List</em><em> of </em><em>Gene objects</em>) – The first parent genes.</p></li>
-<li><p><strong>parent2_genes</strong> (<em>List</em><em> of </em><em>Gene objects</em>) – The second parent genes.</p></li>
+<li><p><strong>parent1_genes</strong> (<em>List</em><em>[</em><a class="reference internal" href="#lightweight_genetic_algorithm.population.NumericGene" title="lightweight_genetic_algorithm.population.NumericGene"><em>NumericGene</em></a><em>]</em>) – The genes from the first parent.</p></li>
+<li><p><strong>parent2_genes</strong> (<em>List</em><em>[</em><a class="reference internal" href="#lightweight_genetic_algorithm.population.NumericGene" title="lightweight_genetic_algorithm.population.NumericGene"><em>NumericGene</em></a><em>]</em>) – The genes from the second parent.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The child genes.</p>
+<dd class="field-even"><p>The child genes resulting from crossover.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List of Gene objects</p>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#lightweight_genetic_algorithm.population.NumericGene" title="lightweight_genetic_algorithm.population.NumericGene">NumericGene</a>]</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the ‘midpoint’ crossover method is not compatible with the gene type.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -395,38 +556,177 @@ to be the average of the corresponding genes of the two parents.</p>
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.mutation.Mutation">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightweight_genetic_algorithm.mutation.</span></span><span class="sig-name descname"><span class="pre">Mutation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mutation_modes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutation_probability</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_ranges</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/mutation.html#Mutation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.mutation.Mutation" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A class used to represent a Mutation</p>
+<p>A class used to represent mutations in a genetic algorithm.</p>
+<p>The Mutation class provides methods to mutate genes or individuals based on specified
+mutation modes and probabilities.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lightweight_genetic_algorithm.mutation.Mutation.mutation_modes">
+<span class="sig-name descname"><span class="pre">mutation_modes</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.mutation.Mutation.mutation_modes" title="Link to this definition">¶</a></dt>
+<dd><p>List of mutation modes for each gene.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lightweight_genetic_algorithm.mutation.Mutation.mutation_probability">
+<span class="sig-name descname"><span class="pre">mutation_probability</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.mutation.Mutation.mutation_probability" title="Link to this definition">¶</a></dt>
+<dd><p>Probability of mutating each gene.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lightweight_genetic_algorithm.mutation.Mutation.param_ranges">
+<span class="sig-name descname"><span class="pre">param_ranges</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.mutation.Mutation.param_ranges" title="Link to this definition">¶</a></dt>
+<dd><p>List of parameter ranges for each gene.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lightweight_genetic_algorithm.mutation.Mutation.is_categorical">
+<span class="sig-name descname"><span class="pre">is_categorical</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.mutation.Mutation.is_categorical" title="Link to this definition">¶</a></dt>
+<dd><p>Indicates if the genes are categorical.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.mutation.Mutation.additive">
 <span class="sig-name descname"><span class="pre">additive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gene</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_range</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/mutation.html#Mutation.additive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.mutation.Mutation.additive" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Applies an additive mutation to a gene.</p>
+<p>The gene’s value is adjusted by adding a random value drawn from a normal distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gene</strong> (<a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene"><em>Gene</em></a>) – The gene to mutate.</p></li>
+<li><p><strong>param_range</strong> (<em>tuple</em>) – The (min, max) range of the gene’s parameter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mutated gene.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene">Gene</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.mutation.Mutation.categorical">
-<span class="sig-name descname"><span class="pre">categorical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gene</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/mutation.html#Mutation.categorical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.mutation.Mutation.categorical" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">categorical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gene</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/mutation.html#Mutation.categorical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.mutation.Mutation.categorical" title="Link to this definition">¶</a></dt>
+<dd><p>Mutates a categorical gene by randomly reinitializing its value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gene</strong> (<a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene"><em>Gene</em></a>) – The categorical gene to mutate.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mutated gene.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene">Gene</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.mutation.Mutation.multiplicative">
 <span class="sig-name descname"><span class="pre">multiplicative</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gene</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/mutation.html#Mutation.multiplicative"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.mutation.Mutation.multiplicative" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Applies a multiplicative mutation to a gene.</p>
+<p>The gene’s value is adjusted by multiplying it by a random factor drawn from a normal distribution centered at 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gene</strong> (<a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene"><em>Gene</em></a>) – The gene to mutate.</p></li>
+<li><p><strong>param_range</strong> (<em>tuple</em><em>, </em><em>optional</em>) – Not used in this method.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mutated gene.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene">Gene</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.mutation.Mutation.mutate_genes">
 <span class="sig-name descname"><span class="pre">mutate_genes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_mutate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/mutation.html#Mutation.mutate_genes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.mutation.Mutation.mutate_genes" title="Link to this definition">¶</a></dt>
-<dd><p>Mutate a list of genes. Give a list of Gene objects as input, return a list of Gene objects.</p>
+<dd><p>Mutates a list of genes based on the mutation probability and modes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>genes</strong> (<em>list</em><em> of </em><a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene"><em>Gene</em></a>) – A list of Gene objects to mutate.</p></li>
+<li><p><strong>force_mutate</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, ensures at least one gene is mutated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mutated list of Gene objects.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of <a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene">Gene</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If a mutation mode is not compatible with a gene type.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.mutation.Mutation.mutate_individual">
 <span class="sig-name descname"><span class="pre">mutate_individual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individual</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_mutate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/mutation.html#Mutation.mutate_individual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.mutation.Mutation.mutate_individual" title="Link to this definition">¶</a></dt>
-<dd><p>Mutate an individual by mutating its genes. Give an Individual as input, return a mutated Individual.</p>
+<dd><p>Mutates an individual by mutating its genes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>individual</strong> (<a class="reference internal" href="#lightweight_genetic_algorithm.population.Individual" title="lightweight_genetic_algorithm.population.Individual"><em>Individual</em></a>) – The Individual object to mutate.</p></li>
+<li><p><strong>force_mutate</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, ensures at least one gene is mutated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new Individual object with mutated genes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lightweight_genetic_algorithm.population.Individual" title="lightweight_genetic_algorithm.population.Individual">Individual</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TypeError</strong> – If the input is not an instance of Individual.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.mutation.Mutation.random">
 <span class="sig-name descname"><span class="pre">random</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gene</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_range</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/mutation.html#Mutation.random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.mutation.Mutation.random" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Applies either an additive or multiplicative mutation to a gene at random.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gene</strong> (<a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene"><em>Gene</em></a>) – The gene to mutate.</p></li>
+<li><p><strong>param_range</strong> (<em>tuple</em>) – The (min, max) range of the gene’s parameter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mutated gene.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene">Gene</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -437,12 +737,12 @@ to be the average of the corresponding genes of the two parents.</p>
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.CategoricalGene">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightweight_genetic_algorithm.population.</span></span><span class="sig-name descname"><span class="pre">CategoricalGene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">categories</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#CategoricalGene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.population.CategoricalGene" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gene</span></code></a></p>
-<p>A categorical gene can take any value from a set of categories.</p>
+<p>A categorical gene that can take any value from a set of categories.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>categories</strong> (<em>list</em>) – The allowed categories for the gene.</p></li>
-<li><p><strong>value</strong> (<em>object</em><em>, </em><em>optional</em>) – The value of the gene. If not provided, the gene will be initialized randomly.</p></li>
+<li><p><strong>value</strong> (<em>object</em><em>, </em><em>optional</em>) – The value of the gene. Must be one of the allowed categories. If not provided, the gene will be initialized with a random value.</p></li>
 </ul>
 </dd>
 </dl>
@@ -460,7 +760,7 @@ to be the average of the corresponding genes of the two parents.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.CategoricalGene.value">
 <span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.population.CategoricalGene.value" title="Link to this definition">¶</a></dt>
-<dd><p>The value of the gene.</p>
+<dd><p>The current value of the gene.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>object</p>
@@ -471,25 +771,39 @@ to be the average of the corresponding genes of the two parents.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.CategoricalGene.random_initialization">
 <span class="sig-name descname"><span class="pre">random_initialization</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#CategoricalGene.random_initialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.population.CategoricalGene.random_initialization" title="Link to this definition">¶</a></dt>
-<dd><p>Creates a gene with random value.</p>
+<dd><p>Selects and returns a random value from the categories.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.CategoricalGene.set_value">
 <span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#CategoricalGene.set_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.population.CategoricalGene.set_value" title="Link to this definition">¶</a></dt>
-<dd><p>Sets the value of the gene.</p>
+<dd><p>Sets the value of the gene to the specified value.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.CategoricalGene.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#CategoricalGene.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.population.CategoricalGene.copy" title="Link to this definition">¶</a></dt>
-<dd><p>Returns a copy of the gene.</p>
+<dd><p>Creates and returns a copy of the gene.</p>
 </dd></dl>
 
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the provided <cite>value</cite> is not in the allowed categories.</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="id2">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#CategoricalGene.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Creates and returns a copy of the gene.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new instance of CategoricalGene with the same categories and value.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#lightweight_genetic_algorithm.population.CategoricalGene" title="lightweight_genetic_algorithm.population.CategoricalGene">CategoricalGene</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.CategoricalGene.crossover_methods">
@@ -504,12 +818,30 @@ to be the average of the corresponding genes of the two parents.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="id3">
 <span class="sig-name descname"><span class="pre">random_initialization</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#CategoricalGene.random_initialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Selects and returns a random value from the categories.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A random value from the allowed categories.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="id4">
 <span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#CategoricalGene.set_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id4" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sets the value of the gene to the specified value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>object</em>) – The new value for the gene.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the provided <cite>value</cite> is not in the allowed categories.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -517,8 +849,8 @@ to be the average of the corresponding genes of the two parents.</p>
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.Gene">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightweight_genetic_algorithm.population.</span></span><span class="sig-name descname"><span class="pre">Gene</span></span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#Gene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.population.Gene" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
-<p>The abstract base class for a gene.
-Each subclass will define a gene in some genotype space.</p>
+<p>Abstract base class for a gene.</p>
+<p>Each subclass defines a gene in a specific genotype space.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.Gene.mutation_methods">
 <span class="sig-name descname"><span class="pre">mutation_methods</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.population.Gene.mutation_methods" title="Link to this definition">¶</a></dt>
@@ -533,12 +865,12 @@ Each subclass will define a gene in some genotype space.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.Gene.random_initialization">
 <span class="sig-name descname"><span class="pre">random_initialization</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#Gene.random_initialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.population.Gene.random_initialization" title="Link to this definition">¶</a></dt>
-<dd><p>Creates a gene with random value.</p>
+<dd><p>Provides a random value appropriate for the gene.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.Gene.set_value">
-<span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#Gene.set_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.population.Gene.set_value" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#Gene.set_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.population.Gene.set_value" title="Link to this definition">¶</a></dt>
 <dd><p>Sets the value of the gene.</p>
 </dd></dl>
 
@@ -550,12 +882,26 @@ Each subclass will define a gene in some genotype space.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="id6">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">random_initialization</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#Gene.random_initialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id6" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Provides a random value appropriate for the gene.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A random value suitable for initializing the gene.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>value</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="id7">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#Gene.set_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id7" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sets the value of the gene.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Implementation should define how the value is set.</p>
+</div>
+</dd></dl>
 
 </dd></dl>
 
@@ -563,24 +909,26 @@ Each subclass will define a gene in some genotype space.</p>
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.Individual">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightweight_genetic_algorithm.population.</span></span><span class="sig-name descname"><span class="pre">Individual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_function_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#Individual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.population.Individual" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class representing an individual in the population. The individual is defined by its genes.</p>
+<p>Represents an individual in the population, defined by its genes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>genes</strong> (<em>list</em><em> of </em><em>Gene objects</em>) – The genes that define the individual.</p></li>
-<li><p><strong>fitness_function</strong> (<em>function</em>) – The fitness function that is used to calculate the fitness of the individual. The function should take a list of gene values as first argument and return a scalar value.</p></li>
+<li><p><strong>genes</strong> (<em>list</em><em> of </em><a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene"><em>Gene</em></a>) – The genes that define the individual.</p></li>
+<li><p><strong>fitness_function</strong> (<em>callable</em>) – The fitness function used to calculate the fitness of the individual.
+The function should take a list of gene values as its first argument and return a scalar value.</p></li>
 <li><p><strong>fitness_function_args</strong> (<em>tuple</em>) – Additional arguments for the fitness function.</p></li>
-<li><p><strong>fitness</strong> (<em>float</em><em>, </em><em>optional</em>) – The fitness of the individual. If not provided, the fitness function will be evaluated. Provides a way to avoid redundant evaluations of the fitness function.</p></li>
+<li><p><strong>fitness</strong> (<em>float</em><em>, </em><em>optional</em>) – The fitness of the individual. If not provided, the fitness function will be evaluated.
+This allows avoiding redundant evaluations of the fitness function.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.Individual.genes">
 <span class="sig-name descname"><span class="pre">genes</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.population.Individual.genes" title="Link to this definition">¶</a></dt>
-<dd><p>The genes that define the individual.</p>
+<dd><p>An array containing the genes of the individual.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list of Gene objects</p>
+<dd class="field-odd"><p>numpy.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -588,10 +936,10 @@ Each subclass will define a gene in some genotype space.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.Individual.genes_values">
 <span class="sig-name descname"><span class="pre">genes_values</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.population.Individual.genes_values" title="Link to this definition">¶</a></dt>
-<dd><p>The values of the genes.</p>
+<dd><p>An array containing the values of the genes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>numpy array</p>
+<dd class="field-odd"><p>numpy.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -599,10 +947,10 @@ Each subclass will define a gene in some genotype space.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.Individual.fitness_function">
 <span class="sig-name descname"><span class="pre">fitness_function</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.population.Individual.fitness_function" title="Link to this definition">¶</a></dt>
-<dd><p>The fitness function that is used to calculate the fitness of the individual.</p>
+<dd><p>The fitness function used to calculate the fitness of the individual.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>function</p>
+<dd class="field-odd"><p>callable</p>
 </dd>
 </dl>
 </dd></dl>
@@ -644,34 +992,75 @@ Each subclass will define a gene in some genotype space.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.Individual.get_fitness_function">
 <span class="sig-name descname"><span class="pre">get_fitness_function</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#Individual.get_fitness_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.population.Individual.get_fitness_function" title="Link to this definition">¶</a></dt>
-<dd><p>Returns the fitness function.</p>
+<dd><p>Returns the fitness function used by the individual.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.Individual.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#Individual.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.population.Individual.copy" title="Link to this definition">¶</a></dt>
-<dd><p>Returns a copy of the individual.</p>
+<dd><p>Creates and returns a copy of the individual.</p>
 </dd></dl>
 
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the fitness function evaluation fails, indicating incompatibility with the individual’s genes.</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="id8">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#Individual.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id8" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Creates and returns a copy of the individual.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new Individual instance with the same genes and fitness.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#lightweight_genetic_algorithm.population.Individual" title="lightweight_genetic_algorithm.population.Individual">Individual</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="id9">
 <span class="sig-name descname"><span class="pre">get_fitness_function</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#Individual.get_fitness_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id9" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the fitness function used by the individual.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The fitness function.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>callable</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="id10">
 <span class="sig-name descname"><span class="pre">get_gene_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#Individual.get_gene_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id10" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a copy of the gene values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An array containing the values of the individual’s genes.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="id11">
 <span class="sig-name descname"><span class="pre">get_genes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#Individual.get_genes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id11" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a copy of the genes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An array containing copies of the individual’s genes.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -679,12 +1068,12 @@ Each subclass will define a gene in some genotype space.</p>
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.NumericGene">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightweight_genetic_algorithm.population.</span></span><span class="sig-name descname"><span class="pre">NumericGene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gene_range</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#NumericGene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.population.NumericGene" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lightweight_genetic_algorithm.population.Gene" title="lightweight_genetic_algorithm.population.Gene"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gene</span></code></a></p>
-<p>A numeric gene is represented by a real number within a range.</p>
+<p>A numeric gene represented by a real number within a range.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>gene_range</strong> (<em>tuple</em>) – The range of the gene values.</p></li>
-<li><p><strong>value</strong> (<em>float</em><em>, </em><em>optional</em>) – The value of the gene. If not provided, the gene will be initialized randomly.</p></li>
+<li><p><strong>gene_range</strong> (<em>tuple</em><em> of </em><em>float</em>) – The range (low, high) of the gene values.</p></li>
+<li><p><strong>value</strong> (<em>float</em><em>, </em><em>optional</em>) – The value of the gene. If not provided, the gene will be initialized with a random value.</p></li>
 </ul>
 </dd>
 </dl>
@@ -713,7 +1102,7 @@ Each subclass will define a gene in some genotype space.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.NumericGene.value">
 <span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.population.NumericGene.value" title="Link to this definition">¶</a></dt>
-<dd><p>The value of the gene.</p>
+<dd><p>The current value of the gene.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
@@ -724,31 +1113,40 @@ Each subclass will define a gene in some genotype space.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.NumericGene.get_gene_range">
 <span class="sig-name descname"><span class="pre">get_gene_range</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#NumericGene.get_gene_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.population.NumericGene.get_gene_range" title="Link to this definition">¶</a></dt>
-<dd><p>Returns the gene range.</p>
+<dd><p>Returns the gene range as a tuple (low, high).</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.NumericGene.random_initialization">
 <span class="sig-name descname"><span class="pre">random_initialization</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#NumericGene.random_initialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.population.NumericGene.random_initialization" title="Link to this definition">¶</a></dt>
-<dd><p>Creates a gene with random value.</p>
+<dd><p>Generates and returns a random value within the gene range.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.NumericGene.set_value">
 <span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#NumericGene.set_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.population.NumericGene.set_value" title="Link to this definition">¶</a></dt>
-<dd><p>Sets the value of the gene.</p>
+<dd><p>Sets the value of the gene to the specified value.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.NumericGene.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#NumericGene.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.population.NumericGene.copy" title="Link to this definition">¶</a></dt>
-<dd><p>Returns a copy of the gene.</p>
+<dd><p>Creates and returns a copy of the gene.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="id12">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#NumericGene.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id12" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Creates and returns a copy of the gene.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new instance of NumericGene with the same range and value.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#lightweight_genetic_algorithm.population.NumericGene" title="lightweight_genetic_algorithm.population.NumericGene">NumericGene</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.NumericGene.crossover_methods">
@@ -758,7 +1156,16 @@ Each subclass will define a gene in some genotype space.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="id13">
 <span class="sig-name descname"><span class="pre">get_gene_range</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#NumericGene.get_gene_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id13" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the gene range.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple (low, high) representing the gene range.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple of float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.population.NumericGene.mutation_methods">
@@ -768,12 +1175,27 @@ Each subclass will define a gene in some genotype space.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="id14">
 <span class="sig-name descname"><span class="pre">random_initialization</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#NumericGene.random_initialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id14" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Generates and returns a random value within the gene range.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A random value within the gene range.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="id15">
 <span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/population.html#NumericGene.set_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id15" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sets the value of the gene to the specified value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>float</em>) – The new value for the gene.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -784,14 +1206,30 @@ Each subclass will define a gene in some genotype space.</p>
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightweight_genetic_algorithm.selection.</span></span><span class="sig-name descname"><span class="pre">DiversityEnhancedSurvivorSelection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/selection.html#DiversityEnhancedSurvivorSelection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lightweight_genetic_algorithm.selection.SurvivorSelection" title="lightweight_genetic_algorithm.selection.SurvivorSelection"><code class="xref py py-class docutils literal notranslate"><span class="pre">SurvivorSelection</span></code></a></p>
-<p>A class for diversity enhanced survivor selection.</p>
-<p>This class implements the diversity enhanced survivor selection method.
-The method selects the survivors from the population based both the fitness
-and the diversity of the individuals.</p>
+<p>Diversity-enhanced survivor selection strategy.</p>
+<p>This class implements a survivor selection method that considers both
+the fitness and the diversity of individuals. It aims to maintain
+diversity in the population by penalizing individuals that are too
+similar to already selected survivors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>measure</strong> (<em>callable</em><em> or </em><em>{'euclidean'</em><em>, </em><em>'hamming'</em><em>, </em><em>'dynamic'}</em>) – A function to measure the distance or dissimilarity between two individuals.
+If a string is provided, it must be one of the predefined measures:
+- ‘euclidean’: Sum of squared differences (Euclidean distance squared).
+- ‘hamming’: Hamming distance normalized by the length of the vectors.
+- ‘dynamic’: Dynamic distance considering relative differences.</p></li>
+<li><p><strong>r0</strong> (<em>float</em><em>, </em><em>optional</em>) – The characteristic distance beyond which there is no diversity penalty.
+Default is 1.0.</p></li>
+<li><p><strong>D0</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum diversity penalty for identical individuals.
+Default is 1.0.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection.r0">
 <span class="sig-name descname"><span class="pre">r0</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection.r0" title="Link to this definition">¶</a></dt>
-<dd><p>The characteristic distance beyond which there is no diversity punishment.</p>
+<dd><p>Characteristic distance for diversity calculation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
@@ -802,7 +1240,7 @@ and the diversity of the individuals.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection.D0">
 <span class="sig-name descname"><span class="pre">D0</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection.D0" title="Link to this definition">¶</a></dt>
-<dd><p>Diversity punishment for identical individuals.</p>
+<dd><p>Maximum diversity penalty.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>float</p>
@@ -813,49 +1251,63 @@ and the diversity of the individuals.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection.measure">
 <span class="sig-name descname"><span class="pre">measure</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection.measure" title="Link to this definition">¶</a></dt>
-<dd><p>The function used to measure the “distance” or “dissimilarity” between two individuals.</p>
+<dd><p>Function to compute the distance between two individuals.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>function</p>
+<dd class="field-odd"><p>callable</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">select_survivors(self,</span> <span class="pre">population,</span> <span class="pre">surviving_population_size):</span></span></dt>
-<dd><p>Selects the survivors from a population. Returns a list of individuals of size surviving_population_size.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">compute_diversity(self,</span> <span class="pre">point,</span> <span class="pre">survivor):</span></span></dt>
-<dd><p>Compute diversity punishment for an individual (point) given a survivor.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection.compute_diversity">
 <span class="sig-name descname"><span class="pre">compute_diversity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">individual</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">survivor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/selection.html#DiversityEnhancedSurvivorSelection.compute_diversity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection.compute_diversity" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute the diversity penalty between an individual and a selected survivor.</p>
+<p>The penalty decreases exponentially with the squared distance between
+the individual and the survivor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>individual</strong> (<em>object</em>) – An individual from the population. Must have a method <cite>get_gene_values()</cite>
+that returns a numpy array of gene values.</p></li>
+<li><p><strong>survivor</strong> (<em>object</em>) – A survivor individual already selected. Must have a method <cite>get_gene_values()</cite>
+that returns a numpy array of gene values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The diversity penalty for the individual.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection.select_survivors">
 <span class="sig-name descname"><span class="pre">select_survivors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surviving_population_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/selection.html#DiversityEnhancedSurvivorSelection.select_survivors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.selection.DiversityEnhancedSurvivorSelection.select_survivors" title="Link to this definition">¶</a></dt>
-<dd><p>Selects the survivors from a population. Returns a list of individuals of size surviving_population_size.</p>
+<dd><p>Select survivors from the population based on fitness and diversity.</p>
+<p>The method iteratively selects the best individual (based on adjusted fitness),
+adds it to the list of survivors, and updates the fitness of the remaining
+individuals by subtracting the diversity penalty with respect to the newly
+added survivor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>population</strong> (<em>list</em>) – A list of individuals.</p></li>
-<li><p><strong>surviving_population_size</strong> (<em>int</em>) – The number of individuals to select from the population.</p></li>
+<li><p><strong>population</strong> (<em>list</em>) – A list of individuals in the current population.
+Each individual must have a <cite>fitness</cite> attribute and a <cite>get_gene_values()</cite> method.</p></li>
+<li><p><strong>surviving_population_size</strong> (<em>int</em>) – The number of individuals to select as survivors.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list of individuals of size surviving_population_size.</p>
+<dd class="field-even"><p>A list of selected individuals of length <cite>surviving_population_size</cite>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>The method modifies the input <cite>population</cite> list by removing selected survivors.</p>
 </dd></dl>
 
 </dd></dl>
@@ -864,34 +1316,24 @@ and the diversity of the individuals.</p>
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.selection.FitnessProportionalSurvivorSelection">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightweight_genetic_algorithm.selection.</span></span><span class="sig-name descname"><span class="pre">FitnessProportionalSurvivorSelection</span></span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/selection.html#FitnessProportionalSurvivorSelection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.selection.FitnessProportionalSurvivorSelection" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#lightweight_genetic_algorithm.selection.SurvivorSelection" title="lightweight_genetic_algorithm.selection.SurvivorSelection"><code class="xref py py-class docutils literal notranslate"><span class="pre">SurvivorSelection</span></code></a></p>
-<p>A class for fitness proportional survivor selection.</p>
-<p>This class implements the fitness proportional survivor selection method.
-The method selects the survivors from the population based on the fitness
-of the individuals.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="lightweight_genetic_algorithm.selection.FitnessProportionalSurvivorSelection.None">
-<span class="sig-name descname"><span class="pre">None</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.selection.FitnessProportionalSurvivorSelection.None" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">select_survivors(self,</span> <span class="pre">population,</span> <span class="pre">surviving_population_size):</span></span></dt>
-<dd><p>Selects the survivors from a population. Returns a list of individuals of size surviving_population_size.</p>
-</dd></dl>
-
+<p>Fitness-proportional survivor selection strategy.</p>
+<p>This class implements a survivor selection method where individuals
+are selected based solely on their fitness values. Individuals with
+higher fitness have a higher chance of being selected.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.selection.FitnessProportionalSurvivorSelection.select_survivors">
 <span class="sig-name descname"><span class="pre">select_survivors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surviving_population_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/selection.html#FitnessProportionalSurvivorSelection.select_survivors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.selection.FitnessProportionalSurvivorSelection.select_survivors" title="Link to this definition">¶</a></dt>
-<dd><p>Selects the survivors from a population. Returns a list of individuals of size surviving_population_size.</p>
+<dd><p>Select survivors from the population based on fitness.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>population</strong> (<em>list</em>) – A list of individuals.</p></li>
-<li><p><strong>surviving_population_size</strong> (<em>int</em>) – The number of individuals to select from the population.</p></li>
+<li><p><strong>population</strong> (<em>list</em>) – A list of individuals in the current population.
+Each individual must have a <cite>fitness</cite> attribute.</p></li>
+<li><p><strong>surviving_population_size</strong> (<em>int</em>) – The number of individuals to select as survivors.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list of individuals of size surviving_population_size.</p>
+<dd class="field-even"><p>A list of selected individuals of length <cite>surviving_population_size</cite>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
@@ -905,38 +1347,29 @@ of the individuals.</p>
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.selection.SurvivorSelection">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightweight_genetic_algorithm.selection.</span></span><span class="sig-name descname"><span class="pre">SurvivorSelection</span></span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/selection.html#SurvivorSelection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.selection.SurvivorSelection" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A base class for survivor selection methods.</p>
-<p>This class is used to define the interface for survivor selection methods.
-The class is not intended to be used directly, but rather to be inherited
-by other classes that define specific survivor selection methods.</p>
-<p>…</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="lightweight_genetic_algorithm.selection.SurvivorSelection.None">
-<span class="sig-name descname"><span class="pre">None</span></span><a class="headerlink" href="#lightweight_genetic_algorithm.selection.SurvivorSelection.None" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">select_survivors(self,</span> <span class="pre">population,</span> <span class="pre">surviving_population_size):</span></span></dt>
-<dd><p>Selects the survivors from a population. Returns a list of individuals of size surviving_population_size.</p>
-</dd></dl>
-
+<p>Base class for survivor selection methods in evolutionary algorithms.</p>
+<p>This abstract class defines the interface for survivor selection strategies.
+Subclasses should implement the <cite>select_survivors</cite> method to specify
+how survivors are selected from a population.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightweight_genetic_algorithm.selection.SurvivorSelection.select_survivors">
 <span class="sig-name descname"><span class="pre">select_survivors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surviving_population_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lightweight_genetic_algorithm/selection.html#SurvivorSelection.select_survivors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightweight_genetic_algorithm.selection.SurvivorSelection.select_survivors" title="Link to this definition">¶</a></dt>
-<dd><p>Selects the survivors from a population. Returns a list of individuals of size surviving_population_size.</p>
+<dd><p>Select survivors from the population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>population</strong> (<em>list</em>) – A list of individuals.</p></li>
-<li><p><strong>surviving_population_size</strong> (<em>int</em>) – The number of individuals to select from the population.</p></li>
+<li><p><strong>population</strong> (<em>list</em>) – A list of individuals in the current population.</p></li>
+<li><p><strong>surviving_population_size</strong> (<em>int</em>) – The number of individuals to select as survivors.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list of individuals of size surviving_population_size.</p>
+<dd class="field-even"><p>A list of selected individuals of length <cite>surviving_population_size</cite>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – If the method is not implemented in the subclass.</p>
 </dd>
 </dl>
 </dd></dl>
