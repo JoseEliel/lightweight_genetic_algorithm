@@ -48,3 +48,7 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+
+# macOS / OS X
+.DS_Store
+
