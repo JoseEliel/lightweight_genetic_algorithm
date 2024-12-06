@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name='lightweight_genetic_algorithm'
-version='0.0.1b'
+version='0.0.2b'
 description='An intuitive, flexible and efficient implementation of a genetic algorithm in Python'
 readme="README.md"
 requires-python= ">=3.7"
