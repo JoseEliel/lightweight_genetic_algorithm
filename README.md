@@ -1,6 +1,6 @@
 ## Lightweight Genetic Algorithm
 
-<img src="https://github.com/JoseEliel/lightweight_genetic_algorithm/blob/main/graphical_abstract.png" width="800"/>
+<img src="https://github.com/JoseEliel/lightweight_genetic_algorithm/raw/main/graphical_abstract.png" width="800"/>
 
 - [About](#about)
 - [Installation](#installation)
@@ -14,6 +14,8 @@
 ### About
 
 This package provides an intuitive, flexible, and efficient implementation of a genetic algorithm in Python. It is designed to be easy to use while still providing a high degree of flexibility for a wide range of optimization problems. The package is developed by Eliel Camargo-Molina and Jonas Wessén. 
+
+For detailed documentation please visit our [Read the Docs page](https://lightweight-genetic-algorithm.readthedocs.io/). 
 
 ### Installation
 
@@ -161,6 +163,6 @@ if __name__ == '__main__':
 
 The net charges and SCD values for the initial and final populations are shown in Figure 2 below. Note that the SCD values are close to the target value of -10 while there is a wide range of net charges in the final population. This demonstrates the effect of the diversity-enhanced selection method.
 
-![Figure 2: SCD values and net charges for initial and final populations of the categorical genes example.](https://github.com/JoseEliel/lightweight_genetic_algorithm/blob/main/Figure_A4.png)
+![Figure 2: SCD values and net charges for initial and final populations of the categorical genes example.](https://github.com/JoseEliel/lightweight_genetic_algorithm/raw/main/Figure_A4.png)
 
 *Figure 2: The initial population has a wide range of SCD values and net charges, while the final population has SCD values close to the target value of -10.0.*
