@@ -11,7 +11,7 @@
     - [Example 2: Categorical Genes](#example-2-categorical-genes)
 
 
-### About
+### <a id="about"></a> About
 
 This package provides an intuitive, flexible, and efficient implementation of a genetic algorithm in Python. It is designed to be easy to use while still providing a high degree of flexibility for a wide range of optimization problems. The package is developed by Eliel Camargo-Molina and Jonas Wessén. 
 
