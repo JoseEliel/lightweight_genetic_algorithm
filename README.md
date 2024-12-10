@@ -1,6 +1,6 @@
 ## Lightweight Genetic Algorithm
 
-<img src="graphical_abstract.png" width="800"/>
+<img src="https://github.com/JoseEliel/lightweight_genetic_algorithm/blob/main/graphical_abstract.png" width="800"/>
 
 - [About](#about)
 - [Installation](#installation)
@@ -103,7 +103,7 @@ all_populations = ga.run_light(n_generations=20, population_size=100)
 
 The resulting population after 20 generations is depicted below in Figure 1. In 20 generations, the individuals are evenly distributed along the circle.
 
-![Figure 1: Initial and final populations for the numerical genes example.](Figure_A2.png)
+![Figure 1: Initial and final populations for the numerical genes example.](https://github.com/JoseEliel/lightweight_genetic_algorithm/raw/main/Figure_A2.png)
 
 *Figure 1: The initial population is randomly distributed, while the final population is evenly distributed along the circle after 20 generations.*
 
@@ -161,6 +161,6 @@ if __name__ == '__main__':
 
 The net charges and SCD values for the initial and final populations are shown in Figure 2 below. Note that the SCD values are close to the target value of -10 while there is a wide range of net charges in the final population. This demonstrates the effect of the diversity-enhanced selection method.
 
-![Figure 2: SCD values and net charges for initial and final populations of the categorical genes example.](Figure_A4.png)
+![Figure 2: SCD values and net charges for initial and final populations of the categorical genes example.](https://github.com/JoseEliel/lightweight_genetic_algorithm/blob/main/Figure_A4.png)
 
 *Figure 2: The initial population has a wide range of SCD values and net charges, while the final population has SCD values close to the target value of -10.0.*
