@@ -18,7 +18,7 @@ This package provides an intuitive, flexible, and efficient implementation of a 
 > For detailed documentation please visit [Read the Docs](https://lightweight-genetic-algorithm.readthedocs.io/).
 
 
-### Installation
+### <a id="installation"></a>Installation
 
 The `lightweight-genetic-algorithm` Python module can be installed using `pip`:
 
@@ -28,7 +28,7 @@ pip install lightweight-genetic-algorithm
 
 The source code is available at [github.com/JoseEliel/lightweight_genetic_algorithm](https://github.com/JoseEliel/lightweight_genetic_algorithm).
 
-### Features
+### <a id="features"></a>Features
 
 The `lightweight-genetic-algorithm` Python module contains several features that allow the user to easily set up a GA for a wide range of optimization problems. These features include:
 
@@ -39,9 +39,9 @@ The `lightweight-genetic-algorithm` Python module contains several features that
 - **Customizable Distance Measure**: The user can specify the distance function (used during selection) to be either `Euclidean` or `Dynamic` for numeric genes. For categorical genes, the Hamming distance is assumed. It is also possible for the user to supply their own distance function.
 - **Multiprocessing**: The package supports multiprocessing for parallel fitness evaluations, which can dramatically speed up the genetic algorithm for problems where the fitness function is computationally expensive.
 
-## User Guide
+## <a id="user-guide"></a> User Guide
 
-### Overview
+### <a id="overview"></a> Overview
 
 The primary class in this package is `GeneticAlgorithm`. A `GeneticAlgorithm` instance is created with the following inputs:
 
@@ -70,7 +70,7 @@ The `run` method returns the full list of `Individual` instances across all gene
 
 The `run_light` method is similar to `run` but returns only the gene values of all individuals across all generations.
 
-### Example 1: Numerical Genes
+### <a id="example-1-numerical-genes"></a> Example 1: Numerical Genes
 
 In this example, an individual represents a point in the xy-plane, and the fitness function takes the form:
 
@@ -111,7 +111,7 @@ The resulting population after 20 generations is depicted below in Figure 1. In 
 *Figure 1: The initial population is randomly distributed, while the final population is evenly distributed along the circle after 20 generations.*
 
 
-### Example 2: Categorical Genes
+### <a id="example-2-categorical-genes"></a> Example 2: Categorical Genes
 
 Next, we turn to a slightly more complex example involving categorical genes. In this example, we seek to construct an array of Lysine (K) and Glutamic acid (E) representing the amino-acid sequence of a model intrinsically disordered protein. The goal is to find a diverse set of sequences with a sequence charge decoration (SCD) parameter near a given target value.
 
