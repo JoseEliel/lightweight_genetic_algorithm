@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name='lightweight_genetic_algorithm'
-version='0.0.5b0'
+version='1.0.0'
 description='An intuitive, flexible and efficient implementation of a genetic algorithm in Python'
 readme="README.md"
 requires-python= ">=3.7"
@@ -22,4 +22,5 @@ authors = [ {name="Eliel Camargo-Molina", email="eliel@camargo-molina.com" },
 			{name = "Jonas Wessén", email="jonas@jonas-wessen.com"},]
 
 [project.urls]
-"Homepage"="https://github.com/JoseEliel/lightweight_genetic_algorithm"
+Homepage="https://github.com/JoseEliel/lightweight_genetic_algorithm"
+Documentation="https://lightweight-genetic-algorithm.readthedocs.io/"
