@@ -56,7 +56,7 @@ The primary class in this package is `GeneticAlgorithm`. A `GeneticAlgorithm` in
 - `use_multiprocessing` (optional): Whether to use multiprocessing for parallel fitness evaluations. Default is False.
 - `ncpus` (optional): The number of CPUs to use for multiprocessing. Default is the number of CPUs on the system minus one. This argument is used only when `use_multiprocessing` is True.
 - `selection_method` (optional): The method used for survivor selection. Available options are `Diversity Enhanced` and `Fitness Proportionate`. Default is `Diversity Enhanced`.
-- `output_directory` (optional): The directory where the output files are saved. Default is None. If specified, the algorithm saves the genes of the selected survivors in each generation to a file `<date-time>_survivors.npy` in the output directory. The average fitness and best fitness at each generation are saved to `<date-time>_fitness.txt`. A log file is saved to `log.txt` containing the output of the algorithm printed to the console.
+- `output_directory` (optional): The directory where the output files are saved. Default is None. If specified, the algorithm saves the genes of the selected survivors in each generation to a file `<date-time>_survivors.npy` as a *numpy* array in the output directory. The average fitness and best fitness at each generation are saved to `<date-time>_fitness.txt`. A log file is saved to `log.txt` containing the output of the algorithm printed to the console.
 
 Once an instance of the `GeneticAlgorithm` class has been created, the genetic algorithm is executed using the `run` or `run_light` methods. These methods take the following arguments:
 
