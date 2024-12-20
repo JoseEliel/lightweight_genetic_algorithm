@@ -35,7 +35,7 @@ class GeneticAlgorithm:
         Available options are: "additive", "multiplicative", "random", "categorical".
         Default is ["additive"]*number_of_genes for numerical genes and ["categorical"]*number_of_genes for categorical genes.
     mutation_rate : float, optional
-        The rate of mutation for each gene. Default is 1.0 / number_of_genes.
+        The rate of mutation for each gene. Default is 0.1.
     measure : str or callable, optional
         Defines the distance measure between two individuals for diversity.
         Options are "Hamming", "Euclidean", "Dynamic", or a custom function.
