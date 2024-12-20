@@ -40,6 +40,10 @@ class GeneticAlgorithm:
         Defines the distance measure between two individuals for diversity.
         Options are "Hamming", "Euclidean", "Dynamic", or a custom function.
         Default depends on gene type: "Hamming" for categorical genes, "Euclidean" for numerical genes.
+    r0 : float, optional
+        The characteristic distance beyond which there is no diversity penalty (default is 1/10 of the average spread of initial population). Only used for diversity enhanced selection.
+    D0 : float, optional
+        The maximum diversity penalty for identical individuals (default is 1.0). Only used for diversity enhanced selection.
     use_multiprocessing : bool, optional
         Whether to use multiprocessing for fitness evaluations (default is False).
     ncpus : int, optional
@@ -107,7 +111,7 @@ class GeneticAlgorithm:
     """
 
     def __init__(self, fitness_function, gene_ranges, fitness_function_args=(), number_of_genes=None, 
-                 crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None, 
+                 crossover_method="Either Or", mutation_mode=None, mutation_rate=None, measure=None, r0=None, D0=None,
                  use_multiprocessing=False, ncpus=None, verbosity=1, selection_method="Diversity Enhanced", 
                  output_directory=None):
         # Verbosity level for printing out messages
@@ -154,7 +158,7 @@ class GeneticAlgorithm:
             if mode not in {'additive', 'multiplicative', 'random', 'categorical'}:
                 warnings.warn(f"Invalid mutation mode '{mode}'. Available options are: 'additive', 'multiplicative', 'random', 'categorical'. Defaulting to 'additive'!")
 
-        self.mutation_rate = mutation_rate if mutation_rate else 1.0/self.number_of_genes
+        self.mutation_rate = mutation_rate if mutation_rate else 0.1
         self.log(f"Mutation rate: {self.mutation_rate}", level=2)
 
         self.mutation = Mutation(self.mutation_mode, self.mutation_rate, self.gene_ranges)
@@ -198,7 +202,11 @@ class GeneticAlgorithm:
             self.survivor_selection = FitnessProportionalSurvivorSelection()
         else:
             raise ValueError("Invalid selection method. Available options are: 'Diversity Enhanced', 'Fitness Proportionate'.")
-
+        # Setting r0 and D0
+        if isinstance(self.survivor_selection, DiversityEnhancedSurvivorSelection):
+            self.survivor_selection.r0 = r0 if r0 else None
+            self.survivor_selection.D0 = D0 if D0 else 1.0
+        
         # Setup multiprocessing if specified
         self.use_multiprocessing = use_multiprocessing
         if self.use_multiprocessing:
@@ -359,7 +367,7 @@ class GeneticAlgorithm:
             raise ValueError("Failed to create initial population.")
         
         # Set the values for r0 for diversity enhanced selection
-        if isinstance(self.survivor_selection, DiversityEnhancedSurvivorSelection):                        
+        if isinstance(self.survivor_selection, DiversityEnhancedSurvivorSelection) and self.survivor_selection.r0 is None:                        
             # Compute the average measure between two individuals, including only non-zero distances
             initial_population_distances = [self.survivor_selection.measure(p1.get_gene_values(), p2.get_gene_values()) for p1 in population for p2 in population]
             # drop the zeros
