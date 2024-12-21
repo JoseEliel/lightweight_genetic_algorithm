@@ -51,7 +51,7 @@ The primary class in this package is `GeneticAlgorithm`. A `GeneticAlgorithm` in
 - `fitness_function_args` (optional): Additional arguments to pass to the fitness function. This should be a tuple of arguments.
 - `crossover_method` (optional): The method used for crossover. Available options are `Between`, `Midpoint`, `Either Or`, and `None`. Default is `Between` for numeric genes. For categorical genes, only `Either Or` or `None` is possible.
 - `mutation_mode` (optional): The mode used for mutation. Options available are `additive`, `multiplicative`, `random`, and `categorical`. Default is `additive` for numeric genes and `categorical` for categorical genes.
-- `mutation_rate` (optional): The rate of mutation. The default is 1.0/`number_of_genes`. During crossover, each gene is mutated with probability `mutation_rate`.
+- `mutation_rate` (optional): The rate of mutation. The default is 0.1. During crossover, each gene is mutated with probability `mutation_rate`.
 - `measure` (optional): Specifies the distance function between two points in the gene space. This argument can be a string variable (`Euclidean`, `Dynamic`, or `Hamming`) corresponding to the three distance measures discussed in this work. The `measure` argument can also be a user-defined distance function. The default is Euclidean distance for numeric genes and Hamming distance for categorical genes.
 - `r0` (optional): The characteristic distance beyond which there is no diversity penalty (default is 1/10 of the average spread of initial population). Only used for diversity enhanced selection.
 - `D0` (optional): The maximum diversity penalty for identical individuals (default is 1.0). Only used for diversity enhanced selection.
